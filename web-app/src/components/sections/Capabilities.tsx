@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { capabilities, stats } from '@/data/mockData';
+import { capabilities, stats, siteCopy } from '@/data/mockData';
 import { CountUp } from '@/components/animations/CountUp';
 import { ScrollFloat } from '@/components/animations/ScrollFloat';
 
@@ -10,6 +10,16 @@ export function Capabilities() {
         <section className="relative bg-black py-32 px-6">
             <div className="max-w-7xl mx-auto">
                 {/* Stats */}
+                <motion.h2
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="text-4xl md:text-6xl font-bold text-center mb-16"
+                >
+                    {siteCopy.stats.title}
+                </motion.h2>
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-32">
                     {stats.map((stat, index) => (
                         <ScrollFloat key={stat.label} offset={30} direction="up">
@@ -40,7 +50,7 @@ export function Capabilities() {
                             viewport={{ once: true }}
                             className="text-4xl md:text-6xl font-bold mb-6"
                         >
-                            What We Do
+                            {siteCopy.capabilities.title}
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 30 }}
@@ -49,8 +59,7 @@ export function Capabilities() {
                             transition={{ delay: 0.1 }}
                             className="text-white/60 text-lg max-w-md"
                         >
-                            From strategy to execution, we craft comprehensive visual experiences
-                            that elevate brands and captivate audiences worldwide.
+                            {siteCopy.capabilities.subtitle}
                         </motion.p>
                     </div>
 

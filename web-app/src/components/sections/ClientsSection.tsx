@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { InfiniteCarousel } from '@/components/animations/InfiniteCarousel';
-import { clients } from '@/data/mockData';
+import { clients, siteCopy } from '@/data/mockData';
 
 export function ClientsSection() {
     return (
@@ -15,7 +15,7 @@ export function ClientsSection() {
                     transition={{ duration: 0.8 }}
                     className="text-4xl md:text-6xl font-bold text-center mb-4"
                 >
-                    Trusted By
+                    {siteCopy.clients.title}
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
@@ -24,7 +24,7 @@ export function ClientsSection() {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="text-white/50 text-center text-lg max-w-xl mx-auto"
                 >
-                    We&apos;ve partnered with leading global brands
+                    {siteCopy.clients.subtitle}
                 </motion.p>
             </div>
 

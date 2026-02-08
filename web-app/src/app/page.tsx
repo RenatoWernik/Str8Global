@@ -1,9 +1,11 @@
 import { CursorFollower } from '@/components/animations/CursorFollower';
 import {
   Hero,
+  Services,
   SelectedWorks,
-  PortfolioGrid,
   HorizontalGallery,
+  PortfolioGrid,
+  Industries,
   ClientsSection,
   Capabilities,
   Contact,
@@ -14,9 +16,11 @@ export default function Home() {
     <main className="relative">
       <CursorFollower />
       <Hero />
+      <Services />
       <SelectedWorks />
       <HorizontalGallery />
       <PortfolioGrid />
+      <Industries />
       <ClientsSection />
       <Capabilities />
       <Contact />

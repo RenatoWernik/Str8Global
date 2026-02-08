@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { projects } from '@/data/mockData';
+import { projects, siteCopy } from '@/data/mockData';
 import Image from 'next/image';
 
 export function SelectedWorks() {
@@ -16,7 +16,7 @@ export function SelectedWorks() {
                     transition={{ duration: 0.8 }}
                     className="text-4xl md:text-6xl font-bold text-center mb-4"
                 >
-                    Selected Works
+                    {siteCopy.selectedWorks.title}
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
@@ -25,7 +25,7 @@ export function SelectedWorks() {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="text-white/50 text-center text-lg max-w-xl mx-auto"
                 >
-                    A curated selection of our most impactful projects
+                    {siteCopy.selectedWorks.subtitle}
                 </motion.p>
             </div>
 
@@ -113,8 +113,8 @@ function ProjectSlide({ project, index }: ProjectSlideProps) {
                     transition={{ delay: 0.5 }}
                     className="flex items-center justify-center gap-8 text-sm text-white/50"
                 >
-                    <span>Client: {project.client}</span>
-                    <span>Year: {project.year}</span>
+                    <span>Cliente: {project.client}</span>
+                    <span>Ano: {project.year}</span>
                 </motion.div>
             </div>
         </motion.div>

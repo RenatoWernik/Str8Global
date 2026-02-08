@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { projects } from '@/data/mockData';
+import { projects, siteCopy } from '@/data/mockData';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -16,7 +16,7 @@ export function PortfolioGrid() {
                     transition={{ duration: 0.8 }}
                     className="text-4xl md:text-6xl font-bold text-center mb-4"
                 >
-                    All Projects
+                    {siteCopy.portfolio.title}
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
@@ -25,7 +25,7 @@ export function PortfolioGrid() {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="text-white/50 text-center text-lg max-w-xl mx-auto mb-16"
                 >
-                    Explore our complete portfolio
+                    {siteCopy.portfolio.subtitle}
                 </motion.p>
 
                 {/* Masonry Grid */}

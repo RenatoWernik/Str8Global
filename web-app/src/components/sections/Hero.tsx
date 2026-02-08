@@ -3,59 +3,76 @@
 import { motion } from 'framer-motion';
 import { TextReveal } from '@/components/animations/TextReveal';
 import { RotatingText } from '@/components/animations/RotatingText';
-import { ArrowDown } from 'lucide-react';
+import { PremiumLogo } from '@/components/animations/PremiumLogo';
+import { siteCopy } from '@/data/mockData';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for Silk (uses Three.js)
+const Silk = dynamic(() => import('@/components/effects/Silk'), {
+    ssr: false,
+});
 
 export function Hero() {
-    const scrollToNext = () => {
-        window.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth',
-        });
-    };
-
     return (
-        <section className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-black">
-            {/* Subtle animated gradient background */}
-            <motion.div
-                className="absolute inset-0 opacity-30"
-                animate={{
-                    background: [
-                        'radial-gradient(circle at 20% 50%, rgba(255,16,240,0.15) 0%, transparent 50%)',
-                        'radial-gradient(circle at 80% 50%, rgba(255,16,240,0.15) 0%, transparent 50%)',
-                        'radial-gradient(circle at 50% 80%, rgba(255,16,240,0.15) 0%, transparent 50%)',
-                        'radial-gradient(circle at 20% 50%, rgba(255,16,240,0.15) 0%, transparent 50%)',
-                    ],
+        <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
+            {/* Silk Background Effect - with flowing animation */}
+            <div className="absolute inset-0">
+                <Silk
+                    speed={5}
+                    scale={1.2}
+                    color="#ff10f0"
+                    noiseIntensity={1.0}
+                    rotation={0.1}
+                />
+            </div>
+
+            {/* Accent gradient overlay */}
+            <div
+                className="absolute inset-0 pointer-events-none z-[2]"
+                style={{
+                    background: 'radial-gradient(ellipse at 50% 0%, rgba(255,16,240,0.08) 0%, transparent 60%)',
                 }}
-                transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: 'linear',
+            />
+
+            {/* Dark gradient overlay for depth */}
+            <div
+                className="absolute inset-0 pointer-events-none z-[4]"
+                style={{
+                    background: 'linear-gradient(180deg, rgba(5,5,7,0.3) 0%, transparent 30%, transparent 70%, rgba(5,5,7,0.5) 100%)',
                 }}
             />
 
             {/* Main Content */}
             <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
+                {/* Premium Animated Logo - larger on both mobile and desktop */}
+                <div className="mb-8 md:mb-10 flex justify-center">
+                    <PremiumLogo size={280} className="w-[220px] h-[220px] md:w-[280px] md:h-[280px]" />
+                </div>
+
                 {/* Agency Label */}
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.8 }}
-                    className="text-sm md:text-base uppercase tracking-[0.3em] text-white/50 mb-6"
+                    transition={{ delay: 1.5, duration: 0.8 }}
+                    className="text-sm md:text-base uppercase tracking-[0.3em] text-white/50 mb-4 md:mb-6"
                 >
-                    Marketing & Photography Agency
+                    {siteCopy.brand.tagline}
                 </motion.p>
 
                 {/* Main Headline */}
-                <h1 className="text-5xl md:text-7xl lg:text-9xl font-bold leading-[0.9] tracking-tighter mb-8">
-                    <TextReveal delay={0.4}>We Create</TextReveal>
-                    <br />
-                    <span className="inline-flex items-center gap-4">
-                        <TextReveal delay={0.6}>Bold</TextReveal>
+                <h1 className="text-4xl md:text-7xl lg:text-9xl font-bold leading-[1.1] tracking-tighter mb-6 md:mb-8">
+                    <span className="block">
+                        <TextReveal delay={1.7}>Criamos</TextReveal>
+                    </span>
+                    <span className="block">
                         <RotatingText
-                            words={['Visuals', 'Stories', 'Brands', 'Impact']}
+                            words={siteCopy.hero.rotatingWords}
                             className="text-[var(--color-accent)]"
                             interval={2500}
                         />
+                    </span>
+                    <span className="block">
+                        <TextReveal delay={1.9}>Que Convertem.</TextReveal>
                     </span>
                 </h1>
 
@@ -63,49 +80,30 @@ export function Hero() {
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1, duration: 0.8 }}
-                    className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12"
+                    transition={{ delay: 2.2, duration: 0.8 }}
+                    className="text-base md:text-xl text-white/60 max-w-2xl mx-auto"
                 >
-                    Premium creative studio crafting unforgettable visual experiences for brands that dare to stand out.
+                    {siteCopy.hero.subheadline}
                 </motion.p>
-
-                {/* CTA Button */}
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.2, duration: 0.5 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-[var(--color-accent)] text-black font-semibold rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
-                >
-                    View Our Work
-                </motion.button>
             </div>
-
-            {/* Scroll Indicator */}
-            <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
-                onClick={scrollToNext}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 hover:text-white/80 transition-colors cursor-pointer"
-            >
-                <span className="text-xs uppercase tracking-widest">Scroll</span>
-                <motion.div
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                    <ArrowDown size={20} />
-                </motion.div>
-            </motion.button>
 
             {/* Corner decorations */}
-            <div className="absolute top-8 left-8 text-xs text-white/30 font-mono">
-                STR8GLOBAL © 2024
-            </div>
-            <div className="absolute top-8 right-8 text-xs text-white/30 font-mono">
-                PORTO, PORTUGAL
-            </div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="absolute top-8 left-8 text-xs text-white/30 font-mono z-10 hidden md:block"
+            >
+                {siteCopy.brand.name.toUpperCase()} © 2024
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="absolute top-8 right-8 text-xs text-white/30 font-mono z-10 hidden md:block"
+            >
+                PORTUGAL
+            </motion.div>
         </section>
     );
 }

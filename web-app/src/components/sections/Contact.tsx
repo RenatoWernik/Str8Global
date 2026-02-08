@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
+import { siteCopy } from '@/data/mockData';
 
 export function Contact() {
     return (
@@ -18,16 +19,25 @@ export function Contact() {
                     className="text-center mb-24"
                 >
                     <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
-                        Let&apos;s Create
+                        {siteCopy.cta.title.split(' ').slice(0, 2).join(' ')}
                         <br />
-                        <span className="text-[var(--color-accent)]">Together</span>
+                        <span className="text-[var(--color-accent)]">{siteCopy.cta.title.split(' ').slice(2).join(' ')}</span>
                     </h2>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="text-white/60 text-lg max-w-xl mx-auto mb-8"
+                    >
+                        {siteCopy.cta.subtitle}
+                    </motion.p>
                     <motion.button
                         whileHover={{ scale: 1.05, gap: '1rem' }}
                         whileTap={{ scale: 0.95 }}
                         className="inline-flex items-center gap-3 px-10 py-5 bg-[var(--color-accent)] text-black font-bold text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
                     >
-                        Start a Project
+                        {siteCopy.cta.button}
                         <ArrowRight size={20} />
                     </motion.button>
                 </motion.div>
@@ -44,9 +54,9 @@ export function Contact() {
                             <Mail size={20} className="text-[var(--color-accent)]" />
                         </div>
                         <div>
-                            <h3 className="font-bold mb-2">Email Us</h3>
-                            <a href="mailto:hello@str8global.com" className="text-white/60 hover:text-[var(--color-accent)] transition-colors">
-                                hello@str8global.com
+                            <h3 className="font-bold mb-2">Email</h3>
+                            <a href={`mailto:${siteCopy.contact.email}`} className="text-white/60 hover:text-[var(--color-accent)] transition-colors">
+                                {siteCopy.contact.email}
                             </a>
                         </div>
                     </motion.div>
@@ -62,9 +72,9 @@ export function Contact() {
                             <Phone size={20} className="text-[var(--color-accent)]" />
                         </div>
                         <div>
-                            <h3 className="font-bold mb-2">Call Us</h3>
-                            <a href="tel:+351912345678" className="text-white/60 hover:text-[var(--color-accent)] transition-colors">
-                                +351 912 345 678
+                            <h3 className="font-bold mb-2">Telefone</h3>
+                            <a href={`tel:${siteCopy.contact.phone.replace(/\s/g, '')}`} className="text-white/60 hover:text-[var(--color-accent)] transition-colors">
+                                {siteCopy.contact.phone}
                             </a>
                         </div>
                     </motion.div>
@@ -80,22 +90,33 @@ export function Contact() {
                             <MapPin size={20} className="text-[var(--color-accent)]" />
                         </div>
                         <div>
-                            <h3 className="font-bold mb-2">Visit Us</h3>
+                            <h3 className="font-bold mb-2">Localização</h3>
                             <span className="text-white/60">
-                                Porto, Portugal
+                                {siteCopy.contact.location}
                             </span>
                         </div>
                     </motion.div>
                 </div>
 
+                {/* Footer note */}
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="text-center text-white/40 mb-12"
+                >
+                    {siteCopy.contact.footer}
+                </motion.p>
+
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/40">
-                    <div>© 2024 Str8Global. All rights reserved.</div>
+                    <div>{siteCopy.contact.copyright}</div>
                     <div className="flex gap-8">
-                        <a href="#" className="hover:text-white transition-colors">Instagram</a>
-                        <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
-                        <a href="#" className="hover:text-white transition-colors">Behance</a>
-                        <a href="#" className="hover:text-white transition-colors">Vimeo</a>
+                        {siteCopy.social.map((platform) => (
+                            <a key={platform} href="#" className="hover:text-white transition-colors">
+                                {platform}
+                            </a>
+                        ))}
                     </div>
                 </div>
             </div>

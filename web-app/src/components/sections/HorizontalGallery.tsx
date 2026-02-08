@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { projects } from '@/data/mockData';
+import { projects, siteCopy } from '@/data/mockData';
 import Image from 'next/image';
 import { useRef } from 'react';
 
@@ -26,7 +26,7 @@ export function HorizontalGallery() {
                         viewport={{ once: true }}
                         className="text-3xl md:text-5xl font-bold"
                     >
-                        Gallery
+                        Galeria
                     </motion.h2>
                     <motion.span
                         initial={{ opacity: 0 }}
@@ -34,7 +34,7 @@ export function HorizontalGallery() {
                         viewport={{ once: true }}
                         className="text-white/50 text-sm"
                     >
-                        Scroll to explore
+                        {siteCopy.nav.scroll} para explorar
                     </motion.span>
                 </div>
 
