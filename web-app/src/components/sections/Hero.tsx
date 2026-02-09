@@ -5,25 +5,34 @@ import { TextReveal } from '@/components/animations/TextReveal';
 import { RotatingText } from '@/components/animations/RotatingText';
 import { PremiumLogo } from '@/components/animations/PremiumLogo';
 import { siteCopy } from '@/data/mockData';
-import dynamic from 'next/dynamic';
-
-// Dynamic import for Silk (uses Three.js)
-const Silk = dynamic(() => import('@/components/effects/Silk'), {
-    ssr: false,
-});
 
 export function Hero() {
     return (
         <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
-            {/* Silk Background Effect - with flowing animation */}
-            <div className="absolute inset-0">
-                <Silk
-                    speed={5}
-                    scale={1.2}
-                    color="#ff10f0"
-                    noiseIntensity={1.0}
-                    rotation={0.1}
-                />
+            {/* Video Background */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                {/* Mobile Video */}
+                <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover scale-[1.02] md:hidden"
+                >
+                    <source src="/studio-mobile.mp4" type="video/mp4" />
+                </video>
+                {/* Desktop Video */}
+                <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover hidden md:block"
+                >
+                    <source src="/studio.mp4" type="video/mp4" />
+                </video>
+                {/* Dark overlay to ensure text readability */}
+                <div className="absolute inset-0 bg-black/50" />
             </div>
 
             {/* Accent gradient overlay */}
