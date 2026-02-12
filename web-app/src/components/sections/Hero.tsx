@@ -81,7 +81,7 @@ export function Hero() {
                         />
                     </span>
                     <span className="block">
-                        <TextReveal delay={1.9}>Que Convertem.</TextReveal>
+                        <TextReveal delay={1.9} className="flex-nowrap">Que Convertem.</TextReveal>
                     </span>
                 </h1>
 

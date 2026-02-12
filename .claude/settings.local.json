@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude:*)",
+      "Bash(dir:*)",
+      "Bash(git -C \".\" log --oneline -10)",
+      "Bash(npx skills:*)",
+      "WebFetch(domain:www.reactbits.dev)",
+      "WebFetch(domain:www.lightswind.com)",
+      "WebFetch(domain:www.hover.dev)",
+      "WebFetch(domain:react-spring.dev)",
+      "WebSearch"
+    ]
+  }
+}
