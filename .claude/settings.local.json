@@ -9,7 +9,22 @@
       "WebFetch(domain:www.lightswind.com)",
       "WebFetch(domain:www.hover.dev)",
       "WebFetch(domain:react-spring.dev)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npx next build:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run lint:*)",
+      "WebFetch(domain:store.dji.com)",
+      "WebFetch(domain:www.godox.com)",
+      "WebFetch(domain:www.bhphotovideo.com)",
+      "WebFetch(domain:www.smallrig.com)",
+      "WebFetch(domain:www.ulanzi.com)",
+      "WebFetch(domain:www.dji.com)",
+      "WebFetch(domain:www.sigmaphoto.com)",
+      "WebFetch(domain:www.amazon.com)",
+      "WebFetch(domain:samyangus.com)",
+      "WebFetch(domain:store.sirui.com)"
     ]
   }
 }

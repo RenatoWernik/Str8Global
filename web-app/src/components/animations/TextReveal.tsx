@@ -36,7 +36,7 @@ export function TextReveal({ children, className, delay = 0, once = true }: Text
             y: 0,
             rotateX: 0,
             transition: {
-                type: 'spring',
+                type: 'spring' as const,
                 damping: 12,
                 stiffness: 100,
             },

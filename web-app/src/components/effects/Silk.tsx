@@ -75,6 +75,7 @@ void main() {
 `;
 
 interface SilkUniforms {
+    [uniform: string]: THREE.IUniform;
     uSpeed: { value: number };
     uScale: { value: number };
     uNoiseIntensity: { value: number };

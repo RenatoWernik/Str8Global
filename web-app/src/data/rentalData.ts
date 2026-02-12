@@ -7,106 +7,96 @@
 export interface GearItem {
   id: string;
   name: string;
-  pricePerDay: number;
+  category: 'acessorios' | 'drone' | 'cameras' | 'objetivas';
+  dailyPrice: number;
   note?: string;
+  image?: string;
 }
 
-export interface GearCategory {
-  id: string;
-  label: string;
-  items: GearItem[];
-}
+// WhatsApp contact
+export const WHATSAPP_NUMBER = '351933029438';
+export const getWhatsAppUrl = (message: string) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+export type GearCategoryId = GearItem['category'];
+
+export const gearCategoryLabels: Record<GearCategoryId, string> = {
+  acessorios: 'Acessórios',
+  drone: 'Drone',
+  cameras: 'Câmeras',
+  objetivas: 'Objetivas',
+};
 
 export interface StudioTier {
-  label: string;
-  pricePerHour: number | null;
-  note?: string;
+  name: string;
+  price: number | null;
+  priceLabel: string;
+  featured?: boolean;
 }
 
 export interface Studio {
   id: string;
   name: string;
+  icon: string;
   tiers: StudioTier[];
 }
+
+export type CoworkStudioPeriod = 'diaria' | 'semanal' | 'mensal';
 
 export interface CoworkStudioPlan {
   name: string;
   description: string;
-  daily: { price: number; hours: number } | null;
-  weekly: { price: number; hours: number } | null;
-  monthly: { price: number; hours: number } | null;
+  pricing: Record<CoworkStudioPeriod, { price: number; studioHours: string } | null>;
+  featured?: boolean;
 }
 
 export interface CoworkPlan {
   name: string;
-  description: string;
-  daily: number | null;
-  weekly: number | null;
-  monthly: number | null;
+  deskDescription: string;
+  pricing: {
+    diaria: number | null;
+    semanal: number;
+    mensal: number;
+  };
+  featured?: boolean;
 }
 
 // ============================================================
-// Section definitions for navigation
+// Tab navigation
 // ============================================================
 
-export type RentalSectionId = 'gear' | 'studio' | 'cowork-studio' | 'cowork';
+export type RentalTab = 'gear' | 'studios' | 'cowork-studio' | 'cowork';
 
-export interface RentalSection {
-  id: RentalSectionId;
-  label: string;
-  shortLabel: string;
-}
-
-export const rentalSections: RentalSection[] = [
-  { id: 'gear', label: 'Gear Renting', shortLabel: 'Gear' },
-  { id: 'studio', label: 'Studio Renting', shortLabel: 'Estúdios' },
-  { id: 'cowork-studio', label: 'Cowork + Estúdio', shortLabel: 'Cowork+Estúdio' },
-  { id: 'cowork', label: 'Co-Work', shortLabel: 'Co-Work' },
+export const rentalTabs: { id: RentalTab; label: string; icon: string }[] = [
+  { id: 'gear', label: 'Gear Renting', icon: 'Camera' },
+  { id: 'studios', label: 'Studio Renting', icon: 'Video' },
+  { id: 'cowork-studio', label: 'Cowork + Estúdio', icon: 'Building' },
+  { id: 'cowork', label: 'Co-Work', icon: 'Laptop' },
 ];
 
 // ============================================================
 // GEAR RENTING
 // ============================================================
 
-export const gearCategories: GearCategory[] = [
-  {
-    id: 'acessorios',
-    label: 'Acessórios',
-    items: [
-      { id: 'dji-rs4', name: 'DJI RS4 Pro Combo', pricePerDay: 50, note: 'com mala' },
-      { id: 'flash-v480', name: 'Flash V480 Godox', pricePerDay: 10, note: 'Sony' },
-      { id: 'led-rgb', name: 'LED RGB MS60C', pricePerDay: 15 },
-      { id: 'smallrig', name: 'Smallrig RF10C', pricePerDay: 5 },
-      { id: 'camera-cooler', name: 'Camera Cooler Ulanzi', pricePerDay: 10 },
-    ],
-  },
-  {
-    id: 'drone',
-    label: 'Drone',
-    items: [
-      { id: 'dji-mini4', name: 'DJI Mini 4 Pro', pricePerDay: 60 },
-    ],
-  },
-  {
-    id: 'cameras',
-    label: 'Câmeras',
-    items: [
-      { id: 'sony-a7iv', name: 'Sony A7 IV', pricePerDay: 60 },
-      { id: 'sony-a6700', name: 'Sony A6700', pricePerDay: 50 },
-      { id: 'dji-pocket3', name: 'DJI Osmo Pocket 3 Creator Combo', pricePerDay: 30, note: 'c/ Mic' },
-      { id: 'dji-action5', name: 'DJI Osmo Action 5', pricePerDay: 15 },
-    ],
-  },
-  {
-    id: 'objetivas',
-    label: 'Objetivas',
-    items: [
-      { id: 'sony-20mm', name: 'Sony 20mm G f1.8', pricePerDay: 25 },
-      { id: 'sirui-85mm', name: 'Sirui 85mm f1.4', pricePerDay: 45 },
-      { id: 'samyang-35-150', name: 'Samyang 35-150mm f2-2.8', pricePerDay: 60 },
-      { id: 'sigma-17-40', name: 'Sigma 17-40mm f1.8', pricePerDay: 55 },
-    ],
-  },
+export const gearItems: GearItem[] = [
+  // Acessorios
+  { id: 'dji-rs4', name: 'DJI RS4 Pro Combo', category: 'acessorios', dailyPrice: 50, note: 'com mala' },
+  { id: 'flash-v480', name: 'Flash V480 Godox', category: 'acessorios', dailyPrice: 10, note: 'Sony' },
+  { id: 'led-rgb', name: 'LED RGB MS60C', category: 'acessorios', dailyPrice: 15 },
+  { id: 'smallrig', name: 'Smallrig RF10C', category: 'acessorios', dailyPrice: 5 },
+  { id: 'camera-cooler', name: 'Camera Cooler Ulanzi', category: 'acessorios', dailyPrice: 10 },
+  // Drone
+  { id: 'dji-mini4', name: 'DJI Mini 4 Pro', category: 'drone', dailyPrice: 60 },
+  // Cameras
+  { id: 'sony-a7iv', name: 'Sony A7 IV', category: 'cameras', dailyPrice: 60 },
+  { id: 'sony-a6700', name: 'Sony A6700', category: 'cameras', dailyPrice: 50 },
+  { id: 'dji-pocket3', name: 'DJI Osmo Pocket 3 Creator Combo', category: 'cameras', dailyPrice: 30, note: 'c/ Mic' },
+  { id: 'dji-action5', name: 'DJI Osmo Action 5', category: 'cameras', dailyPrice: 15 },
+  // Objetivas
+  { id: 'sony-20mm', name: 'Sony 20mm G f1.8', category: 'objetivas', dailyPrice: 25 },
+  { id: 'sirui-85mm', name: 'Sirui 85mm f1.4', category: 'objetivas', dailyPrice: 45 },
+  { id: 'samyang-35-150', name: 'Samyang 35-150mm f2-2.8', category: 'objetivas', dailyPrice: 60 },
+  { id: 'sigma-17-40', name: 'Sigma 17-40mm f1.8', category: 'objetivas', dailyPrice: 55 },
 ];
 
 // ============================================================
@@ -117,29 +107,32 @@ export const studios: Studio[] = [
   {
     id: 'estudio-1',
     name: 'Estúdio 1',
+    icon: 'Aperture',
     tiers: [
-      { label: 'Equipado', pricePerHour: 40 },
-      { label: 'Com Apoio Técnico', pricePerHour: 50 },
-      { label: 'Com Apoio Criativo', pricePerHour: null, note: 'sob orçamento' },
+      { name: 'Equipado', price: 40, priceLabel: '40€/h' },
+      { name: 'Com Apoio Técnico', price: 50, priceLabel: '50€/h', featured: true },
+      { name: 'Com Apoio Criativo', price: null, priceLabel: 'Sob orçamento' },
     ],
   },
   {
     id: 'estudio-2',
     name: 'Estúdio 2',
+    icon: 'Focus',
     tiers: [
-      { label: 'Equipado', pricePerHour: 30 },
-      { label: 'Com Apoio Técnico', pricePerHour: 40 },
-      { label: 'Com Apoio Criativo', pricePerHour: null, note: 'sob orçamento' },
+      { name: 'Equipado', price: 30, priceLabel: '30€/h' },
+      { name: 'Com Apoio Técnico', price: 40, priceLabel: '40€/h', featured: true },
+      { name: 'Com Apoio Criativo', price: null, priceLabel: 'Sob orçamento' },
     ],
   },
   {
     id: 'estudio-podcast',
     name: 'Estúdio Podcast',
+    icon: 'Mic',
     tiers: [
-      { label: 'Apenas Espaço', pricePerHour: 30 },
-      { label: 'Equipado', pricePerHour: 70 },
-      { label: 'Gravação & Edição', pricePerHour: null, note: '200€ por sessão' },
-      { label: 'Pack 4 episódios', pricePerHour: null, note: 'sob orçamento' },
+      { name: 'Apenas Espaço', price: 30, priceLabel: '30€/h' },
+      { name: 'Equipado', price: 70, priceLabel: '70€/h', featured: true },
+      { name: 'Gravação & Edição', price: 200, priceLabel: '200€' },
+      { name: 'Pack 4 episódios', price: null, priceLabel: 'Sob orçamento' },
     ],
   },
 ];
@@ -152,27 +145,34 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Starter',
     description: 'Mesa 180x160cm partilhada',
-    daily: { price: 25, hours: 1 },
-    weekly: { price: 90, hours: 3 },
-    monthly: { price: 200, hours: 8 },
+    pricing: {
+      diaria: { price: 25, studioHours: '1h estúdio' },
+      semanal: { price: 90, studioHours: '3h estúdio' },
+      mensal: { price: 200, studioHours: '8h estúdio' },
+    },
   },
   {
     name: 'Prime',
     description: 'Mesa conferência partilhada',
-    daily: { price: 30, hours: 1 },
-    weekly: { price: 110, hours: 4 },
-    monthly: { price: 240, hours: 10 },
+    pricing: {
+      diaria: { price: 30, studioHours: '1h estúdio' },
+      semanal: { price: 110, studioHours: '4h estúdio' },
+      mensal: { price: 240, studioHours: '10h estúdio' },
+    },
+    featured: true,
   },
   {
     name: 'Premium',
     description: 'Mesa elevatória privada',
-    daily: null,
-    weekly: { price: 130, hours: 7 },
-    monthly: { price: 280, hours: 12 },
+    pricing: {
+      diaria: null,
+      semanal: { price: 130, studioHours: '7h estúdio' },
+      mensal: { price: 280, studioHours: '12h estúdio' },
+    },
   },
 ];
 
-export const coworkStudioIncludes = [
+export const coworkStudioAmenities = [
   "WC's",
   'Copa',
   'Arrumação',
@@ -188,28 +188,23 @@ export const coworkStudioIncludes = [
 export const coworkPlans: CoworkPlan[] = [
   {
     name: 'Starter',
-    description: 'Mesa 180x60cm partilhada',
-    daily: 12,
-    weekly: 45,
-    monthly: 120,
+    deskDescription: 'Mesa 180x60cm partilhada',
+    pricing: { diaria: 12, semanal: 45, mensal: 120 },
   },
   {
     name: 'Prime',
-    description: 'Mesa de conferência partilhada',
-    daily: 15,
-    weekly: 60,
-    monthly: 150,
+    deskDescription: 'Mesa de conferência partilhada',
+    pricing: { diaria: 15, semanal: 60, mensal: 150 },
+    featured: true,
   },
   {
     name: 'Premium',
-    description: 'Mesa elevatória privada',
-    daily: null,
-    weekly: 75,
-    monthly: 180,
+    deskDescription: 'Mesa elevatória privada',
+    pricing: { diaria: null, semanal: 75, mensal: 180 },
   },
 ];
 
-export const coworkIncludes = [
+export const coworkAmenities = [
   "WC's",
   'Copa',
   'Arrumação',
@@ -232,13 +227,11 @@ export const rentalCopy = {
     label: 'Gear Renting',
     title: 'Equipamento Profissional',
     subtitle: 'Alugue câmeras, objetivas, drones e acessórios de topo ao dia.',
-    priceUnit: '/dia',
   },
   studio: {
     label: 'Studio Renting',
     title: 'Estúdios Profissionais',
     subtitle: 'Espaços equipados para fotografia, vídeo e podcast — à hora.',
-    priceUnit: '/h',
   },
   coworkStudio: {
     label: 'Cowork + Estúdio',
