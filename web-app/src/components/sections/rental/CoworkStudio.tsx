@@ -2,14 +2,18 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, MessageCircle } from 'lucide-react';
 import {
   coworkStudioPlans,
   coworkStudioAmenities,
   rentalCopy,
+  CONTACTS,
+  getWhatsAppUrl,
   type CoworkStudioPeriod,
   type CoworkStudioPlan,
 } from '@/data/rentalData';
+import ScrollReveal from '@/components/animations/ScrollReveal';
+import ShinyText from '@/components/animations/ShinyText';
 
 const periodLabels: Record<CoworkStudioPeriod, string> = {
   diaria: 'Diária',
@@ -30,33 +34,21 @@ export function CoworkStudio() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
-        <motion.span
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block"
-        >
-          {rentalCopy.coworkStudio.label}
-        </motion.span>
-        <motion.h2
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
-        >
-          {rentalCopy.coworkStudio.title}
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/50 text-lg max-w-xl mb-12"
-        >
-          {rentalCopy.coworkStudio.subtitle}
-        </motion.p>
+        <ScrollReveal baseOpacity={0.3}>
+          <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+            {rentalCopy.coworkStudio.label}
+          </span>
+        </ScrollReveal>
+        <ScrollReveal baseOpacity={0.3} delay={0.1}>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+            <ShinyText duration={4}>{rentalCopy.coworkStudio.title}</ShinyText>
+          </h2>
+        </ScrollReveal>
+        <ScrollReveal baseOpacity={0.3} delay={0.2}>
+          <p className="text-white/50 text-lg max-w-xl mb-12">
+            {rentalCopy.coworkStudio.subtitle}
+          </p>
+        </ScrollReveal>
 
         {/* Period toggle */}
         <motion.div
@@ -195,6 +187,23 @@ function PlanCard({
               </p>
             </div>
           )}
+
+          {/* WhatsApp CTA */}
+          <a
+            href={getWhatsAppUrl(
+              CONTACTS.MARTA.number,
+              `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+              bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+              border border-white/10 hover:border-transparent
+              transition-all duration-300"
+          >
+            <MessageCircle size={16} />
+            <span>Reservar via WhatsApp</span>
+          </a>
         </div>
 
         {/* Bottom accent line */}

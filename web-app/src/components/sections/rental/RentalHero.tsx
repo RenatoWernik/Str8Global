@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Camera, Video, Building, Laptop } from 'lucide-react';
 import { rentalCopy, rentalTabs, type RentalTab } from '@/data/rentalData';
+import AuroraBackground from '@/components/effects/AuroraBackground';
+import ShinyText from '@/components/animations/ShinyText';
 
 const tabIcons: Record<string, React.ReactNode> = {
   Camera: <Camera size={18} strokeWidth={1.5} />,
@@ -21,17 +23,8 @@ export function RentalHero({ activeTab, onTabChange }: RentalHeroProps) {
     <>
       {/* Hero */}
       <section className="relative bg-black pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
-        {/* Background orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-[var(--color-accent)] rounded-full blur-[120px] opacity-10 pointer-events-none" />
-
-        {/* Accent gradient */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 0%, rgba(255,16,240,0.06) 0%, transparent 60%)',
-          }}
-        />
+        {/* Aurora Background */}
+        <AuroraBackground intensity={0.15} speed={0.8} />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.span
@@ -50,7 +43,9 @@ export function RentalHero({ activeTab, onTabChange }: RentalHeroProps) {
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6"
           >
             {rentalCopy.hero.title.split('&')[0]}
-            <span className="text-[var(--color-accent)]">&amp;</span>
+            <ShinyText className="text-[var(--color-accent)]" duration={3}>
+              &amp;
+            </ShinyText>
             {rentalCopy.hero.title.split('&')[1]}
           </motion.h1>
 
@@ -65,8 +60,8 @@ export function RentalHero({ activeTab, onTabChange }: RentalHeroProps) {
         </div>
       </section>
 
-      {/* Sticky Tab Navigation */}
-      <nav className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
+      {/* Sticky Tab Navigation — offset by navbar height (h-20 = 5rem) */}
+      <nav className="sticky top-20 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto scrollbar-none py-3">
             {rentalTabs.map((tab) => (

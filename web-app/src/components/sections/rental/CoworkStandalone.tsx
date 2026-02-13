@@ -2,8 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Check } from 'lucide-react';
-import { coworkPlans, coworkAmenities, rentalCopy, type CoworkPlan } from '@/data/rentalData';
+import { Check, MessageCircle } from 'lucide-react';
+import { coworkPlans, coworkAmenities, rentalCopy, CONTACTS, getWhatsAppUrl, type CoworkPlan } from '@/data/rentalData';
 
 type CoworkPeriod = 'diaria' | 'semanal' | 'mensal';
 
@@ -187,6 +187,23 @@ function CoworkCard({
               </p>
             </div>
           )}
+
+          {/* WhatsApp CTA */}
+          <a
+            href={getWhatsAppUrl(
+              CONTACTS.MARTA.number,
+              `Olá! Tenho interesse no plano Co-Work "${plan.name}". Podem dar-me mais informações?`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+              bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+              border border-white/10 hover:border-transparent
+              transition-all duration-300"
+          >
+            <MessageCircle size={16} />
+            <span>Reservar via WhatsApp</span>
+          </a>
         </div>
 
         {/* Bottom accent line */}

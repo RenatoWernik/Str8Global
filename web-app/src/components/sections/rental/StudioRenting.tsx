@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion';
 import { Aperture, Focus, Mic, MessageCircle } from 'lucide-react';
-import { studios, rentalCopy, type Studio, type StudioTier } from '@/data/rentalData';
-
-const WHATSAPP_NUMBER = '351933029438';
+import { studios, rentalCopy, CONTACTS, getWhatsAppUrl, type Studio, type StudioTier } from '@/data/rentalData';
+import ScrollReveal from '@/components/animations/ScrollReveal';
+import ShinyText from '@/components/animations/ShinyText';
 
 const studioIcons: Record<string, React.ReactNode> = {
   Aperture: <Aperture size={32} strokeWidth={1.5} />,
@@ -20,33 +20,23 @@ export function StudioRenting() {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
-        <motion.span
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block"
-        >
-          {rentalCopy.studio.label}
-        </motion.span>
-        <motion.h2
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
-        >
-          {rentalCopy.studio.title}
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/50 text-lg max-w-xl mb-16"
-        >
-          {rentalCopy.studio.subtitle}
-        </motion.p>
+        <ScrollReveal baseOpacity={0.3} delay={0}>
+          <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+            {rentalCopy.studio.label}
+          </span>
+        </ScrollReveal>
+        <ScrollReveal baseOpacity={0.3} delay={0.1}>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+            <ShinyText shimmerWidth={150} duration={3}>
+              {rentalCopy.studio.title}
+            </ShinyText>
+          </h2>
+        </ScrollReveal>
+        <ScrollReveal baseOpacity={0.3} delay={0.2}>
+          <p className="text-white/50 text-lg max-w-xl mb-16">
+            {rentalCopy.studio.subtitle}
+          </p>
+        </ScrollReveal>
 
         {/* Studios grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -92,9 +82,26 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
           {/* Tiers */}
           <div className="space-y-4">
             {studio.tiers.map((tier) => (
-              <TierRow key={tier.name} tier={tier} studioName={studio.name} />
+              <TierRow key={tier.name} tier={tier} />
             ))}
           </div>
+
+          {/* WhatsApp CTA */}
+          <a
+            href={getWhatsAppUrl(
+              CONTACTS.MARTA.number,
+              `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full mt-6 py-3 rounded-xl text-sm font-medium
+              bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+              border border-white/10 hover:border-transparent
+              transition-all duration-300"
+          >
+            <MessageCircle size={16} />
+            <span>Reservar via WhatsApp</span>
+          </a>
         </div>
 
         {/* Bottom accent line */}

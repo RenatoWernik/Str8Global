@@ -13,10 +13,14 @@ export interface GearItem {
   image?: string;
 }
 
-// WhatsApp contact
-export const WHATSAPP_NUMBER = '351933029438';
-export const getWhatsAppUrl = (message: string) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+// WhatsApp contacts
+export const CONTACTS = {
+  IGOR: { name: 'Igor', number: '351966128922' },
+  MARTA: { name: 'Marta', number: '351933029438' },
+};
+
+export const getWhatsAppUrl = (number: string, message: string) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
 export type GearCategoryId = GearItem['category'];
 
@@ -80,23 +84,23 @@ export const rentalTabs: { id: RentalTab; label: string; icon: string }[] = [
 
 export const gearItems: GearItem[] = [
   // Acessorios
-  { id: 'dji-rs4', name: 'DJI RS4 Pro Combo', category: 'acessorios', dailyPrice: 50, note: 'com mala' },
-  { id: 'flash-v480', name: 'Flash V480 Godox', category: 'acessorios', dailyPrice: 10, note: 'Sony' },
-  { id: 'led-rgb', name: 'LED RGB MS60C', category: 'acessorios', dailyPrice: 15 },
-  { id: 'smallrig', name: 'Smallrig RF10C', category: 'acessorios', dailyPrice: 5 },
-  { id: 'camera-cooler', name: 'Camera Cooler Ulanzi', category: 'acessorios', dailyPrice: 10 },
+  { id: 'dji-rs4', name: 'DJI RS4 Pro Combo', category: 'acessorios', dailyPrice: 50, note: 'com mala', image: '/images/gear/dji-rs4.png' },
+  { id: 'flash-v480', name: 'Flash V480 Godox', category: 'acessorios', dailyPrice: 10, note: 'Sony', image: '/images/gear/flash-v480.png' },
+  { id: 'led-rgb', name: 'LED RGB MS60C', category: 'acessorios', dailyPrice: 15, image: '/images/gear/led-rgb.png' },
+  { id: 'smallrig', name: 'Smallrig RF10C', category: 'acessorios', dailyPrice: 5, image: '/images/gear/smallrig.png' },
+  { id: 'camera-cooler', name: 'Camera Cooler Ulanzi', category: 'acessorios', dailyPrice: 10, image: '/images/gear/camera-cooler.png' },
   // Drone
-  { id: 'dji-mini4', name: 'DJI Mini 4 Pro', category: 'drone', dailyPrice: 60 },
+  { id: 'dji-mini4', name: 'DJI Mini 4 Pro', category: 'drone', dailyPrice: 60, image: '/images/gear/dji-mini4.png' },
   // Cameras
-  { id: 'sony-a7iv', name: 'Sony A7 IV', category: 'cameras', dailyPrice: 60 },
-  { id: 'sony-a6700', name: 'Sony A6700', category: 'cameras', dailyPrice: 50 },
-  { id: 'dji-pocket3', name: 'DJI Osmo Pocket 3 Creator Combo', category: 'cameras', dailyPrice: 30, note: 'c/ Mic' },
-  { id: 'dji-action5', name: 'DJI Osmo Action 5', category: 'cameras', dailyPrice: 15 },
+  { id: 'sony-a7iv', name: 'Sony A7 IV', category: 'cameras', dailyPrice: 60, image: '/images/gear/sony-a7iv.png' },
+  { id: 'sony-a6700', name: 'Sony A6700', category: 'cameras', dailyPrice: 50, image: '/images/gear/sony-a6700.webp' },
+  { id: 'dji-pocket3', name: 'DJI Osmo Pocket 3 Creator Combo', category: 'cameras', dailyPrice: 30, note: 'c/ Mic', image: '/images/gear/dji-pocket3.png' },
+  { id: 'dji-action5', name: 'DJI Osmo Action 5', category: 'cameras', dailyPrice: 15, image: '/images/gear/dji-action5.png' },
   // Objetivas
-  { id: 'sony-20mm', name: 'Sony 20mm G f1.8', category: 'objetivas', dailyPrice: 25 },
-  { id: 'sirui-85mm', name: 'Sirui 85mm f1.4', category: 'objetivas', dailyPrice: 45 },
-  { id: 'samyang-35-150', name: 'Samyang 35-150mm f2-2.8', category: 'objetivas', dailyPrice: 60 },
-  { id: 'sigma-17-40', name: 'Sigma 17-40mm f1.8', category: 'objetivas', dailyPrice: 55 },
+  { id: 'sony-20mm', name: 'Sony 20mm G f1.8', category: 'objetivas', dailyPrice: 25, image: '/images/gear/sony-20mm.webp' },
+  { id: 'sirui-85mm', name: 'Sirui 85mm f1.4', category: 'objetivas', dailyPrice: 45, image: '/images/gear/sirui-85mm.png' },
+  { id: 'samyang-35-150', name: 'Samyang 35-150mm f2-2.8', category: 'objetivas', dailyPrice: 60, image: '/images/gear/samyang-35-150.png' },
+  { id: 'sigma-17-40', name: 'Sigma 17-40mm f1.8', category: 'objetivas', dailyPrice: 55, image: '/images/gear/sigma-17-40.png' },
 ];
 
 // ============================================================

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { LenisProvider, GSAPProvider } from "@/providers";
+import { Navbar, Footer } from "@/components/layout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,7 +59,9 @@ export default function RootLayout({
       >
         <LenisProvider>
           <GSAPProvider>
+            <Navbar />
             {children}
+            <Footer />
           </GSAPProvider>
         </LenisProvider>
       </body>
