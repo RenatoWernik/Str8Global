@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import { Aperture, Focus, Mic, MessageCircle } from 'lucide-react';
 import { studios, rentalCopy, CONTACTS, getWhatsAppUrl, type Studio, type StudioTier } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
@@ -50,17 +51,22 @@ export function StudioRenting() {
 }
 
 function StudioCard({ studio, index }: { studio: Studio; index: number }) {
+  const [showContacts, setShowContacts] = useState(false);
+
+  // Generate base message for WhatsApp
+  const messageBody = `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group"
+      className="group h-full"
     >
       <div
         className={`
-          relative h-full p-6 md:p-8 rounded-2xl overflow-hidden
+          relative h-full p-6 md:p-8 rounded-2xl overflow-hidden flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
           backdrop-blur-sm
@@ -70,7 +76,7 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
         {/* Hover glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col h-full">
           {/* Icon + Name */}
           <div className="flex items-center gap-4 mb-8">
             <div className="text-[var(--color-accent)]">
@@ -80,28 +86,73 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
           </div>
 
           {/* Tiers */}
-          <div className="space-y-4">
+          <div className="space-y-4 mb-8">
             {studio.tiers.map((tier) => (
               <TierRow key={tier.name} tier={tier} />
             ))}
           </div>
 
           {/* WhatsApp CTA */}
-          <a
-            href={getWhatsAppUrl(
-              CONTACTS.MARTA.number,
-              `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full mt-6 py-3 rounded-xl text-sm font-medium
-              bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
-              border border-white/10 hover:border-transparent
-              transition-all duration-300"
-          >
-            <MessageCircle size={16} />
-            <span>Reservar via WhatsApp</span>
-          </a>
+          <div className="mt-auto pt-6 border-t border-white/5">
+            <AnimatePresence mode="wait">
+              {!showContacts ? (
+                <motion.button
+                  key="main-btn"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  onClick={() => setShowContacts(true)}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+                    bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                    border border-white/10 hover:border-transparent
+                    transition-all duration-300"
+                >
+                  <MessageCircle size={16} />
+                  <span>Reservar via WhatsApp</span>
+                </motion.button>
+              ) : (
+                <motion.div
+                  key="contacts"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex flex-col gap-2 w-full"
+                >
+                  <a
+                    href={getWhatsAppUrl(CONTACTS.IGOR.number, messageBody)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
+                      bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                      border border-white/10 hover:border-transparent
+                      transition-all duration-300"
+                  >
+                    <span>Falar com {CONTACTS.IGOR.name}</span>
+                  </a>
+                  <a
+                    href={getWhatsAppUrl(CONTACTS.MARTA.number, messageBody)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
+                      bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                      border border-white/10 hover:border-transparent
+                      transition-all duration-300"
+                  >
+                    <span>Falar com {CONTACTS.MARTA.name}</span>
+                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowContacts(false);
+                    }}
+                    className="text-[10px] uppercase tracking-wider text-white/40 hover:text-white text-center w-full py-1"
+                  >
+                    Cancelar
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Bottom accent line */}

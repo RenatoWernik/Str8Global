@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Check, MessageCircle } from 'lucide-react';
 import {
@@ -123,8 +123,12 @@ function PlanCard({
   period: CoworkStudioPeriod;
   index: number;
 }) {
+  const [showContacts, setShowContacts] = useState(false);
   const pricing = plan.pricing[period];
   const isFeatured = plan.featured;
+
+  // Generate base message for WhatsApp
+  const messageBody = `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`;
 
   return (
     <motion.div
@@ -132,18 +136,17 @@ function PlanCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative"
+      className="group relative h-full"
     >
       <div
         className={`
-          relative h-full p-6 md:p-8 rounded-2xl overflow-hidden
+          relative h-full p-6 md:p-8 rounded-2xl overflow-hidden flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
           backdrop-blur-sm
           transition-all duration-300
-          ${
-            isFeatured
-              ? 'border border-[var(--color-accent)]/50 hover:border-[var(--color-accent)]/70 shadow-[0_0_30px_rgba(255,16,240,0.1)]'
-              : 'border border-white/10 hover:border-white/20'
+          ${isFeatured
+            ? 'border border-[var(--color-accent)]/50 hover:border-[var(--color-accent)]/70 shadow-[0_0_30px_rgba(255,16,240,0.1)]'
+            : 'border border-white/10 hover:border-white/20'
           }
         `}
       >
@@ -159,7 +162,7 @@ function PlanCard({
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent" />
         )}
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col h-full">
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
           <p className="text-white/40 text-sm mb-8">{plan.description}</p>
@@ -189,21 +192,66 @@ function PlanCard({
           )}
 
           {/* WhatsApp CTA */}
-          <a
-            href={getWhatsAppUrl(
-              CONTACTS.MARTA.number,
-              `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
-              bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
-              border border-white/10 hover:border-transparent
-              transition-all duration-300"
-          >
-            <MessageCircle size={16} />
-            <span>Reservar via WhatsApp</span>
-          </a>
+          <div className="mt-auto">
+            <AnimatePresence mode="wait">
+              {!showContacts ? (
+                <motion.button
+                  key="main-btn"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  onClick={() => setShowContacts(true)}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+                    bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                    border border-white/10 hover:border-transparent
+                    transition-all duration-300"
+                >
+                  <MessageCircle size={16} />
+                  <span>Reservar via WhatsApp</span>
+                </motion.button>
+              ) : (
+                <motion.div
+                  key="contacts"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex flex-col gap-2 w-full"
+                >
+                  <a
+                    href={getWhatsAppUrl(CONTACTS.IGOR.number, messageBody)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
+                      bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                      border border-white/10 hover:border-transparent
+                      transition-all duration-300"
+                  >
+                    <span>Falar com {CONTACTS.IGOR.name}</span>
+                  </a>
+                  <a
+                    href={getWhatsAppUrl(CONTACTS.MARTA.number, messageBody)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
+                      bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
+                      border border-white/10 hover:border-transparent
+                      transition-all duration-300"
+                  >
+                    <span>Falar com {CONTACTS.MARTA.name}</span>
+                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowContacts(false);
+                    }}
+                    className="text-[10px] uppercase tracking-wider text-white/40 hover:text-white text-center w-full py-1"
+                  >
+                    Cancelar
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Bottom accent line */}

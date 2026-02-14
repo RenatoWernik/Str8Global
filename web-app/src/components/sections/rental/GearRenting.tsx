@@ -19,7 +19,7 @@ import ShinyText from '@/components/animations/ShinyText';
 const categories = Object.keys(gearCategoryLabels) as GearCategoryId[];
 
 export function GearRenting() {
-  const [activeCategory, setActiveCategory] = useState<GearCategoryId>('acessorios');
+  const [activeCategory, setActiveCategory] = useState<GearCategoryId>('cameras');
 
   const filteredItems = gearItems.filter((item) => item.category === activeCategory);
 
