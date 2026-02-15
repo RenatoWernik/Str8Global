@@ -50,6 +50,8 @@ export function StudioRenting() {
   );
 }
 
+import Image from 'next/image';
+
 function StudioCard({ studio, index }: { studio: Studio; index: number }) {
   const [showContacts, setShowContacts] = useState(false);
 
@@ -73,16 +75,29 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
           hover:border-white/20 transition-all duration-300
         `}
       >
+        {/* Image Background (if exists) */}
+        {studio.image && (
+          <div className="absolute inset-x-0 top-0 h-48 z-0">
+            <Image
+              src={studio.image}
+              alt={studio.name}
+              fill
+              className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 mask-image-b-fade"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
+          </div>
+        )}
+
         {/* Hover glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
-        <div className="relative z-10 flex flex-col h-full">
+        <div className="relative z-10 flex flex-col h-full mt-4">
           {/* Icon + Name */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="text-[var(--color-accent)]">
+            <div className={`p-3 rounded-xl bg-black/50 border border-white/10 text-[var(--color-accent)] backdrop-blur-md`}>
               {studioIcons[studio.icon] || <Aperture size={32} strokeWidth={1.5} />}
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold">{studio.name}</h3>
+            <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">{studio.name}</h3>
           </div>
 
           {/* Tiers */}

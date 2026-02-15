@@ -45,6 +45,7 @@ export interface Studio {
   name: string;
   icon: string;
   tiers: StudioTier[];
+  image?: string;
 }
 
 export type CoworkStudioPeriod = 'diaria' | 'semanal' | 'mensal';
@@ -54,6 +55,7 @@ export interface CoworkStudioPlan {
   description: string;
   pricing: Record<CoworkStudioPeriod, { price: number; studioHours: string } | null>;
   featured?: boolean;
+  image?: string;
 }
 
 export interface CoworkPlan {
@@ -65,6 +67,7 @@ export interface CoworkPlan {
     mensal: number;
   };
   featured?: boolean;
+  image?: string;
 }
 
 // ============================================================
@@ -127,6 +130,7 @@ export const studios: Studio[] = [
     id: 'estudio-1',
     name: 'Estúdio 1',
     icon: 'Aperture',
+    image: '/images/studio/studio-01.jpg',
     tiers: [
       { name: 'Equipado', price: 40, priceLabel: '40€/h' },
       { name: 'Com Apoio Técnico', price: 50, priceLabel: '50€/h', featured: true },
@@ -137,6 +141,7 @@ export const studios: Studio[] = [
     id: 'estudio-2',
     name: 'Estúdio 2',
     icon: 'Focus',
+    image: '/images/studio/studio-02.jpg',
     tiers: [
       { name: 'Equipado', price: 30, priceLabel: '30€/h' },
       { name: 'Com Apoio Técnico', price: 40, priceLabel: '40€/h', featured: true },
@@ -147,6 +152,7 @@ export const studios: Studio[] = [
     id: 'estudio-podcast',
     name: 'Estúdio Podcast',
     icon: 'Mic',
+    image: '/images/studio/studio-03.jpg',
     tiers: [
       { name: 'Apenas Espaço', price: 30, priceLabel: '30€/h' },
       { name: 'Equipado', price: 70, priceLabel: '70€/h', featured: true },
@@ -164,6 +170,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Starter',
     description: 'Mesa 180x160cm partilhada',
+    image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: { price: 25, studioHours: '1h estúdio' },
       semanal: { price: 90, studioHours: '3h estúdio' },
@@ -173,6 +180,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Prime',
     description: 'Mesa conferência partilhada',
+    image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: { price: 30, studioHours: '1h estúdio' },
       semanal: { price: 110, studioHours: '4h estúdio' },
@@ -183,6 +191,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Premium',
     description: 'Mesa elevatória privada',
+    image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: null,
       semanal: { price: 130, studioHours: '7h estúdio' },
@@ -208,17 +217,20 @@ export const coworkPlans: CoworkPlan[] = [
   {
     name: 'Starter',
     deskDescription: 'Mesa 180x60cm partilhada',
+    image: '/images/studio/studio-04.jpg',
     pricing: { diaria: 12, semanal: 45, mensal: 120 },
   },
   {
     name: 'Prime',
     deskDescription: 'Mesa de conferência partilhada',
+    image: '/images/studio/studio-04.jpg',
     pricing: { diaria: 15, semanal: 60, mensal: 150 },
     featured: true,
   },
   {
     name: 'Premium',
     deskDescription: 'Mesa elevatória privada',
+    image: '/images/studio/studio-04.jpg',
     pricing: { diaria: null, semanal: 75, mensal: 180 },
   },
 ];

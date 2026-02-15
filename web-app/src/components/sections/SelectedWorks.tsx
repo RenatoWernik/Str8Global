@@ -6,19 +6,8 @@ import { projects, siteCopy } from '@/data/mockData';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
 
-// Custom first item for SelectedWorks only (image instead of video)
-const selectedWorksProjects = [
-    {
-        id: 'sw-1',
-        title: 'Roma Eterna',
-        category: 'Fotografia de Viagem',
-        description: 'O majestoso Coliseu captado com luz matinal perfeita. Arquitectura milenar que conta histórias de um império lendário.',
-        image: '/gallery/3.jpg',
-        year: '2024',
-        client: 'Turismo Roma',
-    },
-    ...projects.slice(1, 4) // Use projects 2-4 from the main list
-];
+// Use first 4 projects from the list
+const selectedWorksProjects = projects.slice(0, 4);
 
 export function SelectedWorks() {
     return (
@@ -210,4 +199,3 @@ function ProjectSlide({ project, index }: ProjectSlideProps) {
 }
 
 export default SelectedWorks;
-

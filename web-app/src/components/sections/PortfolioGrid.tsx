@@ -56,9 +56,28 @@ function GridItem({ project, index }: GridItemProps) {
         setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     }, []);
 
-    // Responsive aspect ratios: simpler on mobile
-    const getMobileAspect = () => index % 2 === 0 ? 'aspect-[3/4]' : 'aspect-square';
+    // Responsive aspect ratios and spans
+    const getSizeClass = () => {
+        switch (project.size) {
+            case 'large': return 'md:col-span-2 md:row-span-2';
+            case 'wide': return 'md:col-span-2';
+            case 'tall': return 'md:row-span-2';
+            default: return 'md:col-span-1';
+        }
+    };
+
+    const getMobileAspect = () => {
+        if (project.size === 'large' || project.size === 'wide') return 'aspect-video';
+        if (project.size === 'tall') return 'aspect-[3/4]';
+        return 'aspect-square';
+    };
+
     const getDesktopAspect = () => {
+        if (project.size === 'large') return 'aspect-square';
+        if (project.size === 'wide') return 'aspect-[2/1]';
+        if (project.size === 'tall') return 'aspect-[1/2]';
+
+        // Default fallback pattern if no size specified
         if (index % 3 === 0) return 'md:aspect-[4/5]';
         if (index % 3 === 1) return 'md:aspect-square';
         return 'md:aspect-[5/4]';
@@ -110,7 +129,7 @@ function GridItem({ project, index }: GridItemProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.6, delay: index * 0.05 }}
-            className={`relative overflow-hidden rounded-lg md:rounded-xl cursor-pointer group ${getMobileAspect()} ${getDesktopAspect()}`}
+            className={`relative overflow-hidden rounded-lg md:rounded-xl cursor-pointer group ${getMobileAspect()} ${getDesktopAspect()} ${getSizeClass()}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onClick={handleClick}

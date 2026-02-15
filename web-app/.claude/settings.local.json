@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm run build)",
       "Skill(paul:plan)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:www.reactbits.dev)",
+      "WebFetch(domain:www.lightswind.com)"
     ]
   }
 }

@@ -1,32 +1,13 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Portfolio — Str8Global',
-  description: 'Trabalhos de fotografia e vídeo do Igor e da Marta. Portfolio premium da Str8Global.',
-  openGraph: {
-    title: 'Portfolio — Str8Global',
-    description: 'Trabalhos de fotografia e vídeo do Igor e da Marta.',
-    url: 'https://str8global.com/portfolio',
-  },
-};
+import { PortfolioHero, PortfolioSplit, PortfolioShowcase } from '@/components/sections/portfolio';
 
 export default function PortfolioPage() {
   return (
-    <main className="relative min-h-screen flex items-center justify-center bg-black px-6">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--color-accent)] rounded-full blur-[200px] opacity-[0.06]" />
-      <div className="relative z-10 text-center max-w-lg">
-        <h1 className="text-5xl md:text-7xl font-bold mb-4">Portfolio</h1>
-        <p className="text-white/50 text-lg mb-8">
-          Em breve — estamos a preparar algo especial.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex items-center px-8 py-3 bg-[var(--color-accent)] text-black font-bold rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
-        >
-          Voltar ao Início
-        </Link>
-      </div>
+    <main className="relative bg-black min-h-screen">
+      <PortfolioHero />
+      <PortfolioSplit />
+      <PortfolioShowcase />
     </main>
   );
 }

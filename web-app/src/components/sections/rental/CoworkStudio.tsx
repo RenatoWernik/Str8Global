@@ -114,6 +114,8 @@ export function CoworkStudio() {
   );
 }
 
+import Image from 'next/image';
+
 function PlanCard({
   plan,
   period,
@@ -150,9 +152,22 @@ function PlanCard({
           }
         `}
       >
+        {/* Image Background (if exists) */}
+        {plan.image && (
+          <div className="absolute inset-x-0 top-0 h-48 z-0">
+            <Image
+              src={plan.image}
+              alt={plan.name}
+              fill
+              className="object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500 mask-image-b-fade"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
+          </div>
+        )}
+
         {/* Featured badge */}
         {isFeatured && (
-          <div className="absolute top-4 right-4 px-3 py-1 text-[10px] uppercase tracking-wider font-bold bg-[var(--color-accent)] text-black rounded-full">
+          <div className="absolute top-4 right-4 z-20 px-3 py-1 text-[10px] uppercase tracking-wider font-bold bg-[var(--color-accent)] text-black rounded-full">
             Popular
           </div>
         )}
@@ -162,7 +177,7 @@ function PlanCard({
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent" />
         )}
 
-        <div className="relative z-10 flex flex-col h-full">
+        <div className="relative z-10 flex flex-col h-full mt-2">
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
           <p className="text-white/40 text-sm mb-8">{plan.description}</p>
