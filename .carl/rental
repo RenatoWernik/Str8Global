@@ -1,0 +1,10 @@
+# RENTAL Domain — Página de Aluguel (/aluguel)
+
+RENTAL_RULE_0=Page: app/aluguel/page.tsx. 4 sections: GearRenting, StudioRenting, CoworkStudio, CoworkStandalone. All in components/sections/rental/.
+RENTAL_RULE_1=Data: src/data/rentalData.ts. Types: GearItem, Studio, StudioTier, CoworkStudioPlan, CoworkPlan. Tab nav: RentalTab type.
+RENTAL_RULE_2=Gear categories: acessorios, drone, cameras, objetivas. Images in /images/gear/. Daily pricing in EUR.
+RENTAL_RULE_3=Studios: Estúdio 1 (foto/vídeo), Estúdio 2 (smaller), Estúdio Podcast. Tiers: Equipado, Com Apoio Técnico, Com Apoio Criativo.
+RENTAL_RULE_4=Cowork+Studio plans: Starter/Prime/Premium with diaria/semanal/mensal pricing + studio hours included.
+RENTAL_RULE_5=Cowork standalone: same tier names, lower prices, no studio access.
+RENTAL_RULE_6=CTA links to /#contacto. WhatsApp integration via getWhatsAppUrl() helper.
+RENTAL_RULE_7=Sticky tab navigation in RentalHero. Smooth scroll to sections via refs.

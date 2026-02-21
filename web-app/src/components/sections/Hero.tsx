@@ -1,39 +1,43 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { TextReveal } from '@/components/animations/TextReveal';
-import { RotatingText } from '@/components/animations/RotatingText';
+import { TypewriterText } from '@/components/animations/TypewriterText';
 import { PremiumLogo } from '@/components/animations/PremiumLogo';
 import { siteCopy } from '@/data/mockData';
+import { HighlightText } from '@/components/ui/HighlightText';
+import { Globe } from '@/components/ui/globe';
 
 export function Hero() {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ['start start', 'end start'],
+    });
+
+    // Move the video down slightly as the user scrolls
+    const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+
     return (
-        <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
-            {/* Video Background */}
-            <div className="absolute inset-0 z-0 overflow-hidden">
-                {/* Mobile Video */}
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover scale-[1.02] md:hidden"
-                >
-                    <source src="/studio-mobile.mp4" type="video/mp4" />
-                </video>
-                {/* Desktop Video */}
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover hidden md:block"
-                >
-                    <source src="/studio.mp4" type="video/mp4" />
-                </video>
+        <section ref={containerRef} className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
+            {/* Interactive Aurora & Globe Background with Parallax */}
+            <motion.div
+                className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center"
+                style={{ y: backgroundY }}
+            >
+
+                {/* Interactive Globe enlarged and positioned lower to be cut by the section end */}
+                <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
+                    <div className="relative w-[250%] md:w-[200%] max-w-[1200px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+                        <Globe className="opacity-100" />
+                    </div>
+                </div>
+
                 {/* Dark overlay to ensure text readability */}
-                <div className="absolute inset-0 bg-black/50" />
-            </div>
+                <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
+            </motion.div>
 
             {/* Accent gradient overlay */}
             <div
@@ -73,11 +77,10 @@ export function Hero() {
                     <span className="block">
                         <TextReveal delay={1.7}>Criamos</TextReveal>
                     </span>
-                    <span className="block">
-                        <RotatingText
+                    <span className="block min-h-[1.2em]">
+                        <TypewriterText
                             words={siteCopy.hero.rotatingWords}
                             className="text-[var(--color-accent)]"
-                            interval={2500}
                         />
                     </span>
                     <span className="block">
@@ -92,7 +95,7 @@ export function Hero() {
                     transition={{ delay: 2.2, duration: 0.8 }}
                     className="text-base md:text-xl text-white/60 max-w-2xl mx-auto"
                 >
-                    {siteCopy.hero.subheadline}
+                    <HighlightText text={siteCopy.hero.subheadline} />
                 </motion.p>
             </div>
 

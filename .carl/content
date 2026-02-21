@@ -1,0 +1,11 @@
+# CONTENT Domain — PT-PT Copy & Business Context
+
+CONTENT_RULE_0=Str8Global: agência de marketing e fotografia premium em Lisboa, Portugal.
+CONTENT_RULE_1=Language: PT-PT (Portugal). Use "contacto" not "contato", "projecto" not "projeto", "objectivo" not "objetivo".
+CONTENT_RULE_2=Tone: profissional, direto, confiante. Sem jargão excessivo. Comunica resultados e qualidade.
+CONTENT_RULE_3=Services: Estratégia de Conteúdo, Sessões Fotográficas, Produção de Vídeo, Vídeos Aéreos (drone), Fotografia de Produto, Cobertura de Eventos, Podcasts, Gestão de Redes Sociais.
+CONTENT_RULE_4=Industries: Desporto, Restauração, Viagens & Turismo, Comercial & Retalho, Imobiliário, Marcas Pessoais.
+CONTENT_RULE_5=Homepage copy in siteCopy (mockData.ts). Rental copy in rentalCopy (rentalData.ts). Always source text from data files.
+CONTENT_RULE_6=Email: str8global.co@gmail.com. WhatsApp Igor: +351 966 128 922. WhatsApp Marta: +351 933 029 438.
+CONTENT_RULE_7=Instagram: @str8global.co (main), @str8.lab, @str8sports.co. Igor: @igoracfilipe. Marta: @martadoliveiraa.
+CONTENT_RULE_8=Stats (mock): 150+ projectos, 45+ clientes PT, 28 prémios, 12 anos experiência. Clients: Nike, Apple, Google, etc. (placeholders).

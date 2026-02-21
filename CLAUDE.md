@@ -54,6 +54,12 @@ npm run lint   # ESLint check
 - Use `useMediaQuery` hook for responsive logic
 - Always lazy-load heavy components (Three.js, videos)
 
+## CARL Integration
+- CARL config at `.carl/` — domain-based rules for context-aware responses
+- Domains: GLOBAL (always), STACK, ANIMATIONS, DESIGN, CONTENT, RENTAL, PERFORMANCE
+- Star-commands: `*brief`, `*deep`, `*fix`, `*new`, `*review`, `*deploy`
+- Manage with `*carl` → `*list`, `*add`, `*create`, `*edit`, `*toggle`, `*view`
+
 ## Important Notes
 - Images are optimized via Next.js Image with allowed domains: `images.unsplash.com`, `player.vimeo.com`
 - Video backgrounds have separate mobile/desktop versions

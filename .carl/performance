@@ -1,0 +1,10 @@
+# PERFORMANCE Domain — Optimization & SEO
+
+PERFORMANCE_RULE_0=Images: Next.js Image component with allowed domains (images.unsplash.com, player.vimeo.com). Use width/height or fill. Always add alt text in PT-PT.
+PERFORMANCE_RULE_1=Videos: separate mobile/desktop versions. autoPlay muted loop playsInline. Hidden via Tailwind responsive (md:hidden / hidden md:block).
+PERFORMANCE_RULE_2=Heavy components (Three.js, effects like Silk/VolumetricLight): lazy-load with next/dynamic + { ssr: false }.
+PERFORMANCE_RULE_3=SEO metadata defined in layout.tsx. OpenGraph, Twitter cards, robots, canonical URL configured.
+PERFORMANCE_RULE_4=Font: Inter via next/font/google with display: swap. Single font family to minimize load.
+PERFORMANCE_RULE_5=Avoid layout shifts: set explicit dimensions on media elements. Use aspect-ratio where needed.
+PERFORMANCE_RULE_6=Bundle: check imports are tree-shakeable. Lucide icons — import individually, never from root.
+PERFORMANCE_RULE_7=Build check: npm run build must pass clean. Fix all TS errors before suggesting deployment.

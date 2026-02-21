@@ -3,7 +3,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import ShinyText from '@/components/animations/ShinyText';
 
 const stats = [
   { value: '500+', label: 'Projetos Realizados' },
@@ -56,13 +55,11 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
         transition={{ duration: 0.3 }}
       />
       <div className="relative z-10">
-        <ShinyText
+        <span
           className="text-4xl md:text-5xl font-bold block mb-2"
-          shimmerColor="#FF10F0"
-          duration={3 + index}
         >
           {stat.value}
-        </ShinyText>
+        </span>
         <p className="text-white/50 text-sm uppercase tracking-wider">
           {stat.label}
         </p>
@@ -163,10 +160,10 @@ export function PortfolioShowcase() {
               O Que Fazemos
             </span>
             <h2 className="text-4xl md:text-6xl font-bold">
-              Serviços{' '}
-              <ShinyText className="text-[var(--color-accent)]" duration={3}>
-                Premium
-              </ShinyText>
+              Serviços de{' '}
+              <span className="text-[var(--color-accent)]">
+                Elite
+              </span>
             </h2>
           </motion.div>
 
@@ -191,11 +188,11 @@ export function PortfolioShowcase() {
             className="text-center"
           >
             <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
-              Vamos Criar
+              O Próximo Projecto
               <br />
-              <ShinyText className="text-[var(--color-accent)]" duration={3}>
-                Juntos
-              </ShinyText>
+              é{' '}<span className="text-[var(--color-accent)]">
+                Seu
+              </span>
             </h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -204,8 +201,8 @@ export function PortfolioShowcase() {
               transition={{ delay: 0.2 }}
               className="text-white/60 text-lg max-w-xl mx-auto mb-8"
             >
-              Pronto para elevar a imagem da sua marca? Fale connosco e
-              transforme a sua visão em realidade.
+              A sua marca merece mais do que &quot;fotos bonitas&quot;. Merece resultados.
+              Fale connosco — o pior que pode acontecer é ficar impressionado.
             </motion.p>
             <motion.a
               href="/#contacto"

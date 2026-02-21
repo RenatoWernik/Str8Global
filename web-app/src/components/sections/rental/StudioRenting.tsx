@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Aperture, Focus, Mic, MessageCircle } from 'lucide-react';
 import { studios, rentalCopy, CONTACTS, getWhatsAppUrl, type Studio, type StudioTier } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
-import ShinyText from '@/components/animations/ShinyText';
 
 const studioIcons: Record<string, React.ReactNode> = {
   Aperture: <Aperture size={32} strokeWidth={1.5} />,
@@ -28,9 +27,7 @@ export function StudioRenting() {
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <ShinyText shimmerWidth={150} duration={3}>
-              {rentalCopy.studio.title}
-            </ShinyText>
+            {rentalCopy.studio.title}
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>

@@ -1,12 +1,13 @@
 'use client';
 
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { industries, siteCopy } from '@/data/mockData';
-import { useRef, useState } from 'react';
+import { HighlightText } from '@/components/ui/HighlightText';
+import { useRef } from 'react';
+import Image from 'next/image';
 
 export function Industries() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -15,16 +16,12 @@ export function Industries() {
 
     const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
 
-    const handleToggle = (index: number) => {
-        setActiveIndex(activeIndex === index ? null : index);
-    };
-
     return (
         <section ref={containerRef} className="relative bg-black py-32 overflow-hidden">
             {/* Animated mesh gradient background */}
             <motion.div
                 style={{ y: backgroundY }}
-                className="absolute inset-0 opacity-20"
+                className="absolute inset-0 opacity-20 pointer-events-none"
             >
                 <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-purple-600 to-transparent rounded-full blur-[100px]" />
                 <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-[var(--color-accent)] to-transparent rounded-full blur-[100px]" />
@@ -32,14 +29,14 @@ export function Industries() {
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 {/* Header - Split design */}
-                <div className="grid lg:grid-cols-2 gap-8 mb-20">
+                <div className="grid lg:grid-cols-2 gap-8 mb-20 lg:mb-32">
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: '50px' }}
                         transition={{ duration: 0.8 }}
                     >
-                        <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+                        <span className="text-[var(--color-accent)] text-xs md:text-sm uppercase tracking-[0.3em] mb-4 block">
                             Indústrias
                         </span>
                         <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
@@ -54,21 +51,18 @@ export function Industries() {
                         className="flex items-end"
                     >
                         <p className="text-white/50 text-lg lg:text-xl max-w-md">
-                            {siteCopy.industries.subtitle}
+                            <HighlightText text={siteCopy.industries.subtitle} />
                         </p>
                     </motion.div>
                 </div>
 
-                {/* Industries - Accordion Layout */}
-                <div className="space-y-3">
+                {/* Industries - Zig-Zag Layout */}
+                <div className="space-y-32 md:space-y-48">
                     {industries.map((industry, index) => (
                         <IndustryRow
                             key={industry.id}
                             industry={industry}
                             index={index}
-                            isActive={activeIndex === index}
-                            isOtherActive={activeIndex !== null && activeIndex !== index}
-                            onToggle={() => handleToggle(index)}
                         />
                     ))}
                 </div>
@@ -79,7 +73,7 @@ export function Industries() {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.5 }}
-                    className="mt-20 flex justify-center"
+                    className="mt-32 flex justify-center"
                 >
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-px bg-gradient-to-r from-transparent to-white/20" />
@@ -95,182 +89,70 @@ export function Industries() {
 interface IndustryRowProps {
     industry: (typeof industries)[0];
     index: number;
-    isActive: boolean;
-    isOtherActive: boolean;
-    onToggle: () => void;
 }
 
-function IndustryRow({ industry, index, isActive, isOtherActive, onToggle }: IndustryRowProps) {
-    const rowRef = useRef<HTMLDivElement>(null);
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+function IndustryRow({ industry, index }: IndustryRowProps) {
+    const isEven = index % 2 === 0;
 
-    const spotlightX = useSpring(mouseX, { stiffness: 300, damping: 25 });
-    const spotlightY = useSpring(mouseY, { stiffness: 300, damping: 25 });
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!rowRef.current) return;
-        const rect = rowRef.current.getBoundingClientRect();
-        mouseX.set(e.clientX - rect.left);
-        mouseY.set(e.clientY - rect.top);
-    };
-
-    // Extract keywords for tags
-    const keywords = industry.description.split('.')[0].split(',').slice(0, 3).map(k => k.trim().split(' ').slice(-2).join(' '));
+    // Use explicit tags from data
+    const keywords = industry.tags || [];
 
     return (
         <motion.div
-            ref={rowRef}
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            onClick={onToggle}
-            onMouseMove={handleMouseMove}
-            className="group relative cursor-pointer"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.8 }}
+            className={`flex flex-col gap-12 md:gap-16 lg:gap-24 items-center ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}
         >
-            <div
-                className={`
-          relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]
-          transition-opacity duration-300
-          ${isOtherActive ? 'opacity-50' : 'opacity-100'}
-        `}
-            >
-                {/* Spotlight effect that follows cursor */}
-                <motion.div
-                    style={{
-                        left: spotlightX,
-                        top: spotlightY,
-                    }}
-                    className={`
-            absolute w-64 h-64 -translate-x-1/2 -translate-y-1/2 
-            bg-[var(--color-accent)] rounded-full blur-[60px] pointer-events-none
-            transition-opacity duration-300
-            ${isActive ? 'opacity-20' : 'opacity-0'}
-          `}
-                />
-
-                {/* Border glow on active */}
-                <div
-                    className={`
-            absolute inset-0 rounded-xl border border-[var(--color-accent)]/50 pointer-events-none
-            transition-opacity duration-300
-            ${isActive ? 'opacity-100' : 'opacity-0'}
-          `}
-                />
-
-                {/* Content */}
-                <div className="relative z-10 p-6 md:p-8">
-                    {/* Row header - always visible */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
-                            {/* Number */}
-                            <span
-                                className={`
-                  text-4xl md:text-5xl font-bold tabular-nums
-                  transition-colors duration-300
-                  ${isActive ? 'text-[var(--color-accent)]' : 'text-white/20'}
-                `}
-                            >
-                                {String(index + 1).padStart(2, '0')}
-                            </span>
-
-                            {/* Title */}
-                            <h3
-                                className={`
-                  text-2xl md:text-3xl lg:text-4xl font-bold
-                  transition-colors duration-300
-                  ${isActive ? 'text-white' : 'text-white/80'}
-                `}
-                            >
-                                {industry.title}
-                            </h3>
-                        </div>
-
-                        {/* Animated expand indicator */}
-                        <motion.div
-                            animate={{
-                                rotate: isActive ? 45 : 0,
-                                scale: isActive ? 1.1 : [1, 1.25, 1],
-                                boxShadow: isActive
-                                    ? '0 0 20px rgba(255,16,240,0.5)'
-                                    : ['0 0 10px rgba(255,16,240,0.3)', '0 0 25px rgba(255,16,240,0.6)', '0 0 10px rgba(255,16,240,0.3)'],
-                            }}
-                            transition={isActive ? {
-                                duration: 0.25,
-                                ease: 'easeOut',
-                            } : {
-                                rotate: { duration: 0.25 },
-                                scale: {
-                                    duration: 1.5,
-                                    repeat: Infinity,
-                                    ease: 'easeInOut',
-                                },
-                                boxShadow: {
-                                    duration: 1.5,
-                                    repeat: Infinity,
-                                    ease: 'easeInOut',
-                                },
-                            }}
-                            className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)] flex items-center justify-center bg-black/50"
-                        >
-                            <span className="text-2xl font-light select-none text-[var(--color-accent)]">
-                                +
-                            </span>
-                        </motion.div>
-                    </div>
-
-                    {/* Expanded content - CSS grid for smooth height animation */}
-                    <div
-                        className="grid transition-all duration-500 ease-out"
-                        style={{
-                            gridTemplateRows: isActive ? '1fr' : '0fr',
-                        }}
-                    >
-                        <div className="overflow-hidden">
-                            <div className="mt-6 pl-[4.5rem] md:pl-[5.5rem]">
-                                <p
-                                    className={`
-                    text-white/60 text-lg max-w-2xl leading-relaxed
-                    transition-all duration-500 ease-out
-                    ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
-                  `}
-                                >
-                                    {industry.description}
-                                </p>
-
-                                {/* Tags */}
-                                <div
-                                    className={`
-                    flex flex-wrap gap-2 mt-4
-                    transition-all duration-500 ease-out delay-75
-                    ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
-                  `}
-                                >
-                                    {keywords.map((keyword, i) => (
-                                        <span
-                                            key={i}
-                                            className="px-3 py-1 text-xs uppercase tracking-wider bg-white/5 border border-white/10 rounded-full text-white/50"
-                                        >
-                                            {keyword}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {/* Text Content */}
+            <div className={`w-full lg:w-1/2 flex flex-col justify-center ${isEven ? 'lg:pr-12' : 'lg:pl-12'}`}>
+                <div className="flex items-center gap-4 mb-6">
+                    <span className="text-5xl md:text-7xl lg:text-8xl font-black text-[var(--color-accent)] opacity-60 drop-shadow-[0_0_15px_rgba(255,16,240,0.3)] tabular-nums leading-none">
+                        {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold">
+                        {industry.title}
+                    </h3>
                 </div>
 
-                {/* Decorative line */}
-                <div
-                    className={`
-            absolute bottom-0 left-0 right-0 h-[2px] 
-            bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent)]/50 to-transparent 
-            origin-left transition-transform duration-500 ease-out
-            ${isActive ? 'scale-x-100' : 'scale-x-0'}
-          `}
-                />
+                <p className="text-white/90 text-[1.35rem] md:text-2xl lg:text-[1.7rem] font-medium leading-relaxed mb-10 max-w-2xl drop-shadow-md">
+                    <HighlightText text={industry.description} />
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-3">
+                    {keywords.map((keyword, i) => (
+                        <span
+                            key={i}
+                            className="px-5 py-2.5 text-sm md:text-base font-medium uppercase tracking-wider bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 rounded-full text-white shadow-[0_0_15px_rgba(255,16,240,0.15)] hover:bg-[var(--color-accent)]/20 hover:border-[var(--color-accent)] transition-all cursor-default"
+                        >
+                            {keyword}
+                        </span>
+                    ))}
+                </div>
             </div>
+
+            {/* Image Content */}
+            <motion.div
+                className="w-full lg:w-1/2 relative h-[400px] sm:h-[500px] lg:h-[700px] rounded-2xl md:rounded-3xl overflow-hidden group"
+                whileHover={{ scale: 0.98 }}
+                transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+            >
+                {industry.image && (
+                    <Image
+                        src={industry.image}
+                        alt={industry.title}
+                        fill
+                        className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        quality={95}
+                    />
+                )}
+                {/* Gradient overlays to ensure text readability if it ever overlaps and for aesthetics */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-40 transition-opacity duration-700 ease-in-out" />
+                <div className="absolute inset-0 border border-white/10 rounded-2xl md:rounded-3xl pointer-events-none transition-colors duration-700 ease-in-out group-hover:border-[var(--color-accent)]/50 mix-blend-overlay" />
+            </motion.div>
         </motion.div>
     );
 }

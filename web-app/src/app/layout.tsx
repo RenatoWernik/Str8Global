@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Oswald, Outfit } from "next/font/google";
 import "./globals.css";
 import { LenisProvider, GSAPProvider } from "@/providers";
 import { Navbar, Footer } from "@/components/layout";
 
-const inter = Inter({
+const oswald = Oswald({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-title",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-body",
   display: "swap",
 });
 
@@ -55,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="pt-PT" className="bg-black">
       <body
-        className={`${inter.variable} font-sans antialiased bg-black text-white`}
+        className={`antialiased bg-black text-white ${oswald.variable} ${outfit.variable}`}
       >
         <LenisProvider>
           <GSAPProvider>

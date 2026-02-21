@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
+import { HighlightText } from '@/components/ui/HighlightText';
 import { siteCopy } from '@/data/mockData';
 
 export function Contact() {
@@ -19,9 +20,9 @@ export function Contact() {
                     className="text-center mb-24"
                 >
                     <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
-                        {siteCopy.cta.title.split(' ').slice(0, 2).join(' ')}
+                        O Próximo Passo
                         <br />
-                        <span className="text-[var(--color-accent)]">{siteCopy.cta.title.split(' ').slice(2).join(' ')}</span>
+                        É <span className="text-[var(--color-accent)]">Seu</span>
                     </h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -30,7 +31,7 @@ export function Contact() {
                         transition={{ delay: 0.2 }}
                         className="text-white/60 text-lg max-w-xl mx-auto mb-8"
                     >
-                        {siteCopy.cta.subtitle}
+                        <HighlightText text={siteCopy.cta.subtitle} />
                     </motion.p>
                     <motion.button
                         whileHover={{ scale: 1.05, gap: '1rem' }}
@@ -105,7 +106,7 @@ export function Contact() {
                     viewport={{ once: true }}
                     className="text-center text-white/40 mb-12"
                 >
-                    {siteCopy.contact.footer}
+                    <HighlightText text={siteCopy.contact.footer} />
                 </motion.p>
 
                 {/* Bottom Bar */}

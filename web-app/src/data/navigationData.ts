@@ -24,10 +24,10 @@ export interface ContactInfo {
 // Main navigation links
 export const mainNav: NavItem[] = [
   { id: 'home', label: 'Home', href: '/' },
-  { id: 'portfolio', label: 'Portfolio', href: '/portfolio' },
+  { id: 'portfolio', label: 'Portfólio', href: '/portfolio' },
   { id: 'cursos', label: 'Cursos', href: '/cursos' },
   { id: 'espaco', label: 'Espaço', href: '/espaco' },
-  { id: 'aluguel', label: 'Aluguel', href: '/aluguel' },
+  { id: 'aluguel', label: 'Aluguer', href: '/aluguel' },
   { id: 'servicos', label: 'Serviços', href: '/servicos' },
 ];
 

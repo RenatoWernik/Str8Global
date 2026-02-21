@@ -10,12 +10,12 @@ const GLOBE_CONFIG: any = {
     width: 800,
     height: 800,
     onRender: () => { },
-    devicePixelRatio: 2,
+    devicePixelRatio: 1,
     phi: 0,
     theta: 0.3,
     dark: 0,
     diffuse: 0,
-    mapSamples: 16000,
+    mapSamples: 2000,
     mapBrightness: 12,
     baseColor: [0.05, 0.15, 0.6],
     markerColor: [1, 16 / 255, 240 / 255],
@@ -77,8 +77,8 @@ export function Globe({
                 phi += 0.005;
             }
             state.phi = phi + r.get();
-            state.width = width * 2;
-            state.height = width * 2;
+            state.width = width;
+            state.height = width;
         },
         [r],
     );
@@ -92,10 +92,12 @@ export function Globe({
     useEffect(() => {
         window.addEventListener("resize", onResize);
         onResize();
+        // Use a fallback if element hasn't laid out yet
+        const initWidth = width || 600;
         const globe = createGlobe(canvasRef.current!, {
             ...config,
-            width: width * 2,
-            height: width * 2,
+            width: initWidth,
+            height: initWidth,
             onRender,
         });
 
@@ -108,7 +110,7 @@ export function Globe({
     return (
         <div
             className={cn(
-                "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-[600px]",
+                "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-full",
                 className,
             )}
         >

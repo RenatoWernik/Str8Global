@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { capabilities, stats, siteCopy } from '@/data/mockData';
+import { HighlightText } from '@/components/ui/HighlightText';
 import { CountUp } from '@/components/animations/CountUp';
 import { ScrollFloat } from '@/components/animations/ScrollFloat';
 
@@ -59,7 +60,7 @@ export function Capabilities() {
                             transition={{ delay: 0.1 }}
                             className="text-white/60 text-lg max-w-md"
                         >
-                            {siteCopy.capabilities.subtitle}
+                            <HighlightText text={siteCopy.capabilities.subtitle} />
                         </motion.p>
                     </div>
 

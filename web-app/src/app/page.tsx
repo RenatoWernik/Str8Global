@@ -1,4 +1,3 @@
-import { CursorFollower } from '@/components/animations/CursorFollower';
 import {
   Hero,
   Services,
@@ -14,7 +13,6 @@ import {
 export default function Home() {
   return (
     <main className="relative">
-      <CursorFollower />
       <Hero />
       <Services />
       <SelectedWorks />

@@ -46,7 +46,7 @@ export function ScrollReveal({
                 opacity: baseOpacity,
                 y: 60,
                 rotationX: baseRotation,
-                filter: enableBlur ? `blur(${blurStrength}px)` : 'none',
+                filter: 'none',
             });
 
             // Create animation timeline
@@ -64,7 +64,7 @@ export function ScrollReveal({
                 opacity: 1,
                 y: 0,
                 rotationX: 0,
-                filter: enableBlur ? 'blur(0px)' : 'none',
+                filter: 'none',
                 duration: 1.2,
                 delay: delay,
                 ease: 'power3.out',

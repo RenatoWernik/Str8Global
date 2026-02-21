@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { InfiniteCarousel } from '@/components/animations/InfiniteCarousel';
+import { HighlightText } from '@/components/ui/HighlightText';
 import { clients, siteCopy } from '@/data/mockData';
 
 export function ClientsSection() {
@@ -24,7 +25,7 @@ export function ClientsSection() {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="text-white/50 text-center text-lg max-w-xl mx-auto"
                 >
-                    {siteCopy.clients.subtitle}
+                    <HighlightText text={siteCopy.clients.subtitle} />
                 </motion.p>
             </div>
 

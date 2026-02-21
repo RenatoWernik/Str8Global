@@ -13,7 +13,6 @@ import {
   type CoworkStudioPlan,
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
-import ShinyText from '@/components/animations/ShinyText';
 
 const periodLabels: Record<CoworkStudioPeriod, string> = {
   diaria: 'Diária',
@@ -41,7 +40,7 @@ export function CoworkStudio() {
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <ShinyText duration={4}>{rentalCopy.coworkStudio.title}</ShinyText>
+            {rentalCopy.coworkStudio.title}
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>

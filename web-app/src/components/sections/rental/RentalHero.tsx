@@ -1,12 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, Video, Building, Laptop } from 'lucide-react';
 import { rentalCopy, rentalTabs, type RentalTab } from '@/data/rentalData';
-import AuroraBackground from '@/components/effects/AuroraBackground';
 
 import { Globe } from '@/components/ui/globe';
-import ShinyText from '@/components/animations/ShinyText';
 
 const tabIcons: Record<string, React.ReactNode> = {
   Camera: <Camera size={18} strokeWidth={1.5} />,
@@ -21,21 +20,38 @@ interface RentalHeroProps {
 }
 
 export function RentalHero({ activeTab, onTabChange }: RentalHeroProps) {
+  const containerRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
+  // Move the background down slightly as the user scrolls
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-black pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
-        {/* Aurora Background */}
-        <div className="absolute inset-0 z-0 opacity-50">
-          <AuroraBackground intensity={0.15} speed={0.8} />
-        </div>
+      <section ref={containerRef} className="relative bg-black pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+        {/* Interactive Aurora & Globe Background with Parallax */}
+        <motion.div
+          className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center"
+          style={{ y: backgroundY }}
+        >
+          {/* Aurora Background */}
 
-        {/* Interactive Globe */}
-        <div className="absolute inset-x-0 top-32 md:top-60 z-0 flex justify-center items-center pointer-events-none">
-          <div className="relative w-full max-w-[600px] aspect-square pointer-events-auto">
-            <Globe className="opacity-100" />
+
+          {/* Interactive Globe enlarged and positioned lower to be cut by the section end */}
+          <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
+            <div className="relative w-[250%] md:w-[200%] max-w-[1200px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+              <Globe className="opacity-100" />
+            </div>
           </div>
-        </div>
+
+          {/* Dark overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
+        </motion.div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 pointer-events-none">
           <motion.span
@@ -54,9 +70,7 @@ export function RentalHero({ activeTab, onTabChange }: RentalHeroProps) {
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 pointer-events-auto"
           >
             {rentalCopy.hero.title.split('&')[0]}
-            <ShinyText className="text-[var(--color-accent)]" duration={3}>
-              &amp;
-            </ShinyText>
+            <span className="text-[var(--color-accent)]">&amp;</span>
             {rentalCopy.hero.title.split('&')[1]}
           </motion.h1>
 

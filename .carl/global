@@ -1,0 +1,13 @@
+# GLOBAL Domain Rules — Always Active
+# Core behavior rules for every interaction
+
+GLOBAL_RULE_0=Respond in PT-PT. Code comments and variable names in English.
+GLOBAL_RULE_1=Be concise: no filler, no over-explaining. Show code, not paragraphs about code.
+GLOBAL_RULE_2=Never add features, refactors, comments, or docs beyond what was asked.
+GLOBAL_RULE_3=Path alias: always use @/* for imports from src/. Never use relative paths beyond same-folder.
+GLOBAL_RULE_4=Project root: C:\Users\renat\Desktop\Str8Global\web-app. Source: src/. Pages: app/. Sections: components/sections/.
+GLOBAL_RULE_5=All components are 'use client' unless explicitly server. Every section is a named export function.
+GLOBAL_RULE_6=Data lives in src/data/ (mockData.ts for homepage, rentalData.ts for /aluguel). Content comes from data files, never hardcoded in components.
+GLOBAL_RULE_7=When editing a file, read it first. When adding to a section, check the existing pattern in that file.
+GLOBAL_RULE_8=Prefer editing existing files over creating new ones. One component = one file.
+GLOBAL_RULE_9=Never create README, docs, or .md files unless explicitly asked.

@@ -1,51 +1,114 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { projects, siteCopy } from '@/data/mockData';
+import { motion, AnimatePresence } from 'framer-motion';
+import { projects, siteCopy, Project } from '@/data/mockData';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import { Play, X } from 'lucide-react';
 
 export function PortfolioGrid() {
-    return (
-        <section className="relative bg-black py-16 md:py-24 px-4 md:px-6">
-            <div className="max-w-7xl mx-auto">
-                <motion.h2
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="text-3xl md:text-6xl font-bold text-center mb-4"
-                >
-                    {siteCopy.portfolio.title}
-                </motion.h2>
-                <motion.p
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.1 }}
-                    className="text-white/50 text-center text-base md:text-lg max-w-xl mx-auto mb-10 md:mb-16"
-                >
-                    {siteCopy.portfolio.subtitle}
-                </motion.p>
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-                {/* Responsive Grid: 2 cols on mobile, 3 on desktop */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-                    {projects.map((project, index) => (
-                        <GridItem key={project.id} project={project} index={index} />
-                    ))}
+    // Prevent scrolling when modal is open
+    useEffect(() => {
+        if (selectedProject) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [selectedProject]);
+
+    return (
+        <>
+            <section className="relative bg-black py-16 md:py-24 px-4 md:px-6">
+                <div className="max-w-7xl mx-auto">
+                    <motion.h2
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="text-3xl md:text-6xl font-bold text-center mb-4"
+                    >
+                        {siteCopy.portfolio.title}
+                    </motion.h2>
+                    <motion.p
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.1 }}
+                        className="text-white/50 text-center text-base md:text-lg max-w-xl mx-auto mb-10 md:mb-16"
+                    >
+                        {siteCopy.portfolio.subtitle}
+                    </motion.p>
+
+                    {/* Responsive Grid: 2 cols on mobile, 3 on desktop */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+                        {projects.map((project, index) => (
+                            <GridItem
+                                key={project.id}
+                                project={project}
+                                index={index}
+                                onSelect={() => {
+                                    if (project.video) {
+                                        setSelectedProject(project);
+                                    }
+                                }}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            {/* Video Lightbox Modal */}
+            <AnimatePresence>
+                {selectedProject && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 md:p-8"
+                        onClick={() => setSelectedProject(null)}
+                    >
+                        <button
+                            onClick={() => setSelectedProject(null)}
+                            className="absolute top-4 right-4 md:top-8 md:right-8 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            transition={{ duration: 0.4, type: 'spring', damping: 25 }}
+                            className="relative w-full max-w-6xl aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-black shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <video
+                                src={selectedProject.video}
+                                autoPlay
+                                controls
+                                className="w-full h-full object-contain"
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
     );
 }
 
 interface GridItemProps {
-    project: (typeof projects)[0];
+    project: Project;
     index: number;
+    onSelect: () => void;
 }
 
-function GridItem({ project, index }: GridItemProps) {
+function GridItem({ project, index, onSelect }: GridItemProps) {
     const [isActive, setIsActive] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -83,22 +146,9 @@ function GridItem({ project, index }: GridItemProps) {
         return 'md:aspect-[5/4]';
     };
 
-    // Click handler - toggle video play/pause
+    // Click handler - open modal rather than inline play/pause
     const handleClick = () => {
-        setIsActive(!isActive);
-
-        if (project.video && videoRef.current) {
-            if (isPlaying) {
-                videoRef.current.pause();
-                setIsPlaying(false);
-            } else {
-                videoRef.current.play().then(() => {
-                    setIsPlaying(true);
-                }).catch((err) => {
-                    console.log('Video play failed:', err);
-                });
-            }
-        }
+        onSelect();
     };
 
     const handleMouseEnter = () => {

@@ -11,7 +11,6 @@ import {
 } from 'framer-motion';
 import Image from 'next/image';
 import { Heart, X, RotateCcw, Camera, Instagram, ArrowRight } from 'lucide-react';
-import ShinyText from '@/components/animations/ShinyText';
 
 /* ─── Data ─── */
 
@@ -84,7 +83,7 @@ function TinderCard({
       <motion.div className="absolute inset-0 rounded-2xl overflow-hidden">
         <Image
           src={src}
-          alt="Portfolio"
+          alt="Portfólio"
           fill
           className="object-cover"
           sizes="(max-width: 768px) 90vw, 45vw"
@@ -109,7 +108,7 @@ function TinderCard({
     >
       <Image
         src={src}
-        alt="Portfolio"
+        alt="Portfólio"
         fill
         className="object-cover pointer-events-none"
         sizes="(max-width: 768px) 90vw, 45vw"
@@ -240,8 +239,8 @@ function PhotographerDeck({
                     ? '#FF10F0'
                     : 'rgba(255,255,255,0.3)'
                   : i === currentIndex
-                  ? 'rgba(255,255,255,0.8)'
-                  : 'rgba(255,255,255,0.1)',
+                    ? 'rgba(255,255,255,0.8)'
+                    : 'rgba(255,255,255,0.1)',
             }}
           />
         ))}
@@ -257,7 +256,7 @@ function PhotographerDeck({
                 <TinderCard
                   key={`bg-${currentIndex + 1}`}
                   src={allImages[currentIndex + 1]}
-                  onSwipe={() => {}}
+                  onSwipe={() => { }}
                   isTop={false}
                 />
               )}
@@ -431,13 +430,13 @@ export function PortfolioSplit() {
             Dois Olhares
           </span>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
-            Uma{' '}
-            <ShinyText className="text-[var(--color-accent)]" duration={3}>
-              Visão
-            </ShinyText>
+            Dois Olhares.{' '}
+            <span className="text-[var(--color-accent)]">
+              Zero
+            </span>{' '}Limites.
           </h2>
           <p className="text-white/40 text-sm md:text-base max-w-md mx-auto">
-            Desliza ou usa os botões para explorar o portfólio de cada fotógrafo
+            Desliza ou usa os botões para explorar o portfólio de cada fotógrafo. Spoiler: vais querer os dois.
           </p>
         </motion.div>
       </div>

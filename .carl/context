@@ -1,0 +1,14 @@
+# CONTEXT Domain — Bracket-based injection by context window usage
+
+FRESH_ENABLED=true
+FRESH_RULE_0=Full context available. Can reference earlier messages freely.
+FRESH_RULE_1=Read multiple files in parallel when exploring.
+
+MODERATE_ENABLED=true
+MODERATE_RULE_0=Context filling up. Be more direct, skip preambles.
+MODERATE_RULE_1=Avoid re-reading files already discussed. Reference by path:line.
+
+DEPLETED_ENABLED=true
+DEPLETED_RULE_0=Context critical. Maximum brevity. Code-only responses.
+DEPLETED_RULE_1=No summaries or recaps. Just the changes needed.
+DEPLETED_RULE_2=If task is complex, suggest starting a new conversation with context handoff.

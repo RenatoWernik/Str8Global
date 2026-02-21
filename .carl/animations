@@ -1,0 +1,11 @@
+# ANIMATIONS Domain — GSAP + Framer Motion + Lenis
+
+ANIMATIONS_RULE_0=GSAP: registered via GSAPProvider. Use useGSAP hook from @gsap/react for component-scoped animations.
+ANIMATIONS_RULE_1=ScrollTrigger: available via useGSAPContext(). Always kill triggers on cleanup. Use ScrollTrigger.refresh() after DOM changes.
+ANIMATIONS_RULE_2=Framer Motion: primary for component enter/exit and hover states. Use motion.div with whileInView for scroll reveals.
+ANIMATIONS_RULE_3=Pattern: viewport={{ once: true }} for scroll-triggered animations. Avoid re-triggering.
+ANIMATIONS_RULE_4=Lenis smooth scroll: configured in LenisProvider (lerp: 0.1, duration: 1.2). Never add scroll-behavior: smooth when Lenis is active.
+ANIMATIONS_RULE_5=Reusable animations in components/animations/: ScrollReveal, TextReveal, ScrollFloat, ShinyText, CountUp, RotatingText, InfiniteCarousel.
+ANIMATIONS_RULE_6=Always support prefers-reduced-motion. Use useReducedMotion hook. Fallback: instant visibility, no animation.
+ANIMATIONS_RULE_7=Performance: use will-change sparingly. Prefer transform/opacity over layout-triggering properties. GPU-accelerate with translateZ(0).
+ANIMATIONS_RULE_8=Effects in components/effects/: AuroraBackground, LightRays, Silk, VolumetricLight. These are heavy — lazy-load with dynamic imports.

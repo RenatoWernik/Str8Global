@@ -1,0 +1,25 @@
+# CARL Star-Commands
+
+BRIEF_RULE_0=*brief — Maximum brevity mode
+BRIEF_RULE_1=Code only. No explanations unless critical.
+BRIEF_RULE_2=Use inline comments only for non-obvious logic.
+
+DEEP_RULE_0=*deep — Deep analysis mode
+DEEP_RULE_1=Explain reasoning, trade-offs, and alternatives.
+DEEP_RULE_2=Include performance/accessibility implications.
+
+FIX_RULE_0=*fix — Bug fix mode
+FIX_RULE_1=Read the relevant code first. Identify root cause.
+FIX_RULE_2=Show only the minimal change needed. No refactoring alongside.
+
+NEW_RULE_0=*new — New section/component mode
+NEW_RULE_1=Follow existing patterns from similar components. Check barrel exports.
+NEW_RULE_2=Add to barrel index (components/sections/index.ts or similar). Update page if needed.
+
+REVIEW_RULE_0=*review — Code review mode
+REVIEW_RULE_1=Check: types, a11y, performance, responsive, reduced-motion, PT-PT content.
+REVIEW_RULE_2=Flag issues by severity (critical/warning/suggestion). No nitpicks.
+
+DEPLOY_RULE_0=*deploy — Pre-deploy checklist
+DEPLOY_RULE_1=Run build. Check for TypeScript errors and warnings.
+DEPLOY_RULE_2=Verify images optimized, no console.logs, no placeholder content.

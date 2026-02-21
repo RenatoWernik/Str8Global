@@ -1,0 +1,12 @@
+# STACK Domain — Next.js 16 + React 19 + TypeScript 5 + Tailwind v4
+
+STACK_RULE_0=Next.js 16 App Router. Pages in app/. Layouts wrap children with providers.
+STACK_RULE_1=React 19 — use modern patterns. No legacy class components. Hooks only.
+STACK_RULE_2=TypeScript strict mode. Define interfaces in data files or at top of component. Export types that others need.
+STACK_RULE_3=Tailwind v4 with @import "tailwindcss". CSS vars defined in globals.css :root. Use @theme inline for custom colors.
+STACK_RULE_4=Component pattern: 'use client' → imports → interface (if needed) → export function ComponentName() { return JSX }
+STACK_RULE_5=Hooks: useCursorPosition, useInView, useMediaQuery, useReducedMotion, useScrollProgress. Check hooks/index.ts before creating new ones.
+STACK_RULE_6=Providers wrap in layout.tsx: LenisProvider > GSAPProvider > children. Do not duplicate providers.
+STACK_RULE_7=Icons: lucide-react only. Import specific icons, never the whole library.
+STACK_RULE_8=Barrel exports: components/sections/index.ts and components/animations/index.ts. Always update when adding components.
+STACK_RULE_9=tailwind-merge via clsx for conditional classes: cn() util in lib/utils.ts.

@@ -14,7 +14,6 @@ import {
   type GearItem,
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
-import ShinyText from '@/components/animations/ShinyText';
 
 const categories = Object.keys(gearCategoryLabels) as GearCategoryId[];
 
@@ -37,7 +36,7 @@ export function GearRenting() {
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <ShinyText shimmerWidth={150} duration={2.5}>{rentalCopy.gear.title}</ShinyText>
+            {rentalCopy.gear.title}
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>

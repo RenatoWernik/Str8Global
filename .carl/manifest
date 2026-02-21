@@ -1,0 +1,56 @@
+# CARL Manifest — Str8Global
+# Format: DOMAIN_KEY=value
+
+# ── GLOBAL (always injected) ──
+GLOBAL_STATE=active
+GLOBAL_RECALL=
+GLOBAL_EXCLUDE=
+GLOBAL_ALWAYS_ON=true
+
+# ── CONTEXT (bracket-based injection) ──
+CONTEXT_STATE=active
+CONTEXT_RECALL=
+CONTEXT_EXCLUDE=
+CONTEXT_ALWAYS_ON=true
+
+# ── COMMANDS (star-commands) ──
+COMMANDS_STATE=active
+COMMANDS_RECALL=
+COMMANDS_EXCLUDE=
+COMMANDS_ALWAYS_ON=true
+
+# ── STACK (Next.js + React + TS + Tailwind patterns) ──
+STACK_STATE=active
+STACK_RECALL=component, react, next, tailwind, typescript, hook, provider, import, css
+STACK_EXCLUDE=
+STACK_ALWAYS_ON=false
+
+# ── ANIMATIONS (GSAP + Framer Motion + Lenis) ──
+ANIMATIONS_STATE=active
+ANIMATIONS_RECALL=animation, gsap, framer, motion, scroll, lenis, transition, animate, parallax
+ANIMATIONS_EXCLUDE=
+ANIMATIONS_ALWAYS_ON=false
+
+# ── DESIGN (visual identity + design system) ──
+DESIGN_STATE=active
+DESIGN_RECALL=design, color, theme, style, font, typography, layout, responsive, ui, ux, accent, magenta
+DESIGN_EXCLUDE=
+DESIGN_ALWAYS_ON=false
+
+# ── CONTENT (PT-PT copy + business context) ──
+CONTENT_STATE=active
+CONTENT_RECALL=text, copy, content, translation, portuguese, label, title, subtitle, description, data
+CONTENT_EXCLUDE=
+CONTENT_ALWAYS_ON=false
+
+# ── RENTAL (aluguel page specifics) ──
+RENTAL_STATE=active
+RENTAL_RECALL=aluguel, rental, gear, studio, cowork, equipment, price, plan
+RENTAL_EXCLUDE=
+RENTAL_ALWAYS_ON=false
+
+# ── PERFORMANCE (optimization + SEO) ──
+PERFORMANCE_STATE=active
+PERFORMANCE_RECALL=performance, seo, speed, lighthouse, lazy, optimize, build, bundle, image, video, loading
+PERFORMANCE_EXCLUDE=
+PERFORMANCE_ALWAYS_ON=false

@@ -5,30 +5,17 @@ import { siteCopy } from '@/data/mockData';
 import Image from 'next/image';
 import { useRef, useState, useEffect } from 'react';
 
-// Gallery images - all 22 images from gallery folder
 const galleryImages = [
-    { id: '1', image: '/gallery/1.jpg', title: 'Lisboa Sunset', category: 'Viagem' },
-    { id: '2', image: '/gallery/2.jpg', title: 'Ayutthaya Temple', category: 'Arquitectura' },
-    { id: '3', image: '/gallery/3.jpg', title: 'Roma Coliseum', category: 'Património' },
-    { id: '4', image: '/gallery/4.jpg', title: 'Beach Paradise', category: 'Natureza' },
-    { id: '5', image: '/gallery/5.jpg', title: 'Urban Streets', category: 'Street' },
-    { id: '6', image: '/gallery/6.jpg', title: 'Wildlife Safari', category: 'Natureza' },
-    { id: '7', image: '/gallery/7.jpg', title: 'Mountain Views', category: 'Paisagem' },
-    { id: '8', image: '/gallery/8.jpg', title: 'Golden Hour', category: 'Retrato' },
-    { id: '9', image: '/gallery/9.jpg', title: 'City Lights', category: 'Urbano' },
-    { id: '10', image: '/gallery/10.jpg', title: 'Desert Dunes', category: 'Natureza' },
-    { id: '11', image: '/gallery/11.jpg', title: 'Ocean Waves', category: 'Natureza' },
-    { id: '12', image: '/gallery/12.jpg', title: 'Forest Trail', category: 'Paisagem' },
-    { id: '13', image: '/gallery/13.jpg', title: 'Night City', category: 'Urbano' },
-    { id: '14', image: '/gallery/14.jpg', title: 'Studio Session', category: 'Retrato' },
-    { id: '15', image: '/gallery/15.jpg', title: 'Party Nights', category: 'Eventos' },
-    { id: '16', image: '/gallery/16.jpg', title: 'Street Art', category: 'Street' },
-    { id: '17', image: '/gallery/17.jpg', title: 'Morning Coffee', category: 'Lifestyle' },
-    { id: '18', image: '/gallery/18.jpg', title: 'Travel Moments', category: 'Viagem' },
-    { id: '19', image: '/gallery/19.jpg', title: 'Aerial View', category: 'Drone' },
-    { id: '20', image: '/gallery/20.jpg', title: 'Vintage Style', category: 'Editorial' },
-    { id: '21', image: '/gallery/21.jpg', title: 'Nature Close-up', category: 'Macro' },
-    { id: '22', image: '/gallery/22.jpg', title: 'Abstract Art', category: 'Criativo' },
+    { id: '1', image: '/images/gallery/1.JPG', title: 'Legado de Roma', category: 'Arquitetura' },
+    { id: '2', image: '/images/gallery/2.JPG', title: 'Instante Mágico', category: 'Urbano' },
+    { id: '3', image: '/images/gallery/3.JPG', title: 'Horizonte Infinito', category: 'Paisagem' },
+    { id: '4', image: '/images/gallery/4.JPG', title: 'Cores de Lisboa', category: 'Urbano' },
+    { id: '5', image: '/images/gallery/5.JPG', title: 'Ouro sobre Tejo', category: 'Paisagem' },
+    { id: '6', image: '/images/gallery/6.JPG', title: 'Fiel Companheiro', category: 'Retrato' },
+    { id: '7', image: '/images/gallery/7.JPG', title: 'Voo Estático', category: 'Natureza' },
+    { id: '8', image: '/images/gallery/8.JPG', title: 'Prece Silenciosa', category: 'Cultura' },
+    { id: '9', image: '/images/gallery/9.JPG', title: 'União e Fé', category: 'Cultura' },
+    { id: '10', image: '/images/gallery/10.JPG', title: 'Olhar Curioso', category: 'Natureza' }
 ];
 
 export function HorizontalGallery() {
@@ -56,7 +43,7 @@ export function HorizontalGallery() {
     const x = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
 
     return (
-        <section ref={containerRef} className="relative h-[400vh] md:h-[500vh] bg-black">
+        <section ref={containerRef} className="relative h-[200vh] md:h-[250vh] bg-black">
             <div className="sticky top-0 h-screen overflow-hidden">
                 {/* Header */}
                 <div className="absolute top-8 md:top-12 left-4 md:left-6 right-4 md:right-6 z-10 flex justify-between items-center">
@@ -66,7 +53,7 @@ export function HorizontalGallery() {
                         viewport={{ once: true }}
                         className="text-2xl md:text-5xl font-bold"
                     >
-                        Galeria
+                        A Nossa Visão
                     </motion.h2>
                     <motion.span
                         initial={{ opacity: 0 }}

@@ -13,8 +13,8 @@ export function PremiumLogo({ size = 220, className = '' }: SimplifiedLogoProps)
         <motion.div
             className={`relative ${className}`}
             style={{ width: size, height: size }}
-            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
                 duration: 1.2,
                 delay: 0.3,
@@ -34,8 +34,7 @@ export function PremiumLogo({ size = 220, className = '' }: SimplifiedLogoProps)
                 }}
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
-                    background: 'radial-gradient(circle, rgba(255,16,240,0.2) 0%, transparent 60%)',
-                    filter: 'blur(30px)',
+                    background: 'radial-gradient(circle, rgba(255,16,240,0.15) 0%, transparent 60%)',
                 }}
             />
 
@@ -45,7 +44,7 @@ export function PremiumLogo({ size = 220, className = '' }: SimplifiedLogoProps)
                 alt="Str8Global"
                 width={size}
                 height={size}
-                className="relative z-10 drop-shadow-[0_0_40px_rgba(255,16,240,0.2)]"
+                className="relative z-10"
                 priority
             />
         </motion.div>
