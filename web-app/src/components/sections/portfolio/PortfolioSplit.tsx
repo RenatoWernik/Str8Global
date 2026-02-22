@@ -28,27 +28,46 @@ interface PhotographerData {
 const photographers: [PhotographerData, PhotographerData] = [
   {
     name: 'Igor',
-    role: 'Fotógrafo & Diretor Criativo',
+    role: 'O Mestre da Execução',
     description:
-      'Especialista em fotografia documental e retratos autênticos. Capta a essência de cada momento com um olhar cinematográfico.',
-    specialties: ['Retratos', 'Documental', 'Lifestyle', 'Eventos'],
-    profileImage: '/images/team/igor.png',
-    portfolio: Array.from({ length: 10 }, (_, i) =>
-      `/images/portfolio/igor/${String(i + 1).padStart(2, '0')}.jpg`
-    ),
+      'O olhar pragmático por trás das câmaras. Capta momentos, resolve desafios e garante que cada sessão acontece sem stress. Objetivo, focado e sempre pronto para tornar as tuas ideias em fotografias que vais postar em todo o lado. Apaixonado por fotografia desportiva, vídeo e operações aéreas com Drone.',
+    specialties: ['Desporto', 'Vídeo', 'Drone', 'Documental'],
+    profileImage: '/images/portfolio/igor/Capa.jpg',
+    portfolio: [
+      '/images/portfolio/igor/1.JPG',
+      '/images/portfolio/igor/2.JPG',
+      '/images/portfolio/igor/3.JPG',
+      '/images/portfolio/igor/4.JPG',
+      '/images/portfolio/igor/5.JPG',
+      '/images/portfolio/igor/6.JPG',
+      '/images/portfolio/igor/7.JPG',
+      '/images/portfolio/igor/8.JPG',
+      '/images/portfolio/igor/9.JPG',
+      '/images/portfolio/igor/10.JPG',
+      '/images/portfolio/igor/11.JPG',
+      '/images/portfolio/igor/12.JPG',
+      '/images/portfolio/igor/13.jpg',
+    ],
     accent: '#FF10F0',
     instagram: '#',
   },
   {
-    name: 'Marta',
-    role: 'Fotógrafa & Diretora de Arte',
+    name: 'Marta Oliveira',
+    role: 'A Mente Criativa',
     description:
-      'Mestre em fotografia de moda e beleza. Cria composições elegantes que elevam cada projeto a um nível único.',
-    specialties: ['Moda', 'Beleza', 'Editorial', 'Branding'],
-    profileImage: '/images/team/marta.png',
-    portfolio: Array.from({ length: 10 }, (_, i) =>
-      `/images/portfolio/marta/${String(i + 1).padStart(2, '0')}.jpg`
-    ),
+      'A mente criativa por trás de cada sessão. Transforma ideias em conteúdos para marcas com pura estratégia, sempre com boa energia e aquele olhar super atento aos detalhes que faz absolutamente toda a diferença. Se isto não é ser imparável, então não sabemos o que é.',
+    specialties: ['Estratégia Visual', 'Conteúdo para Marcas', 'Direção de Arte'],
+    profileImage: '/images/portfolio/marta/capa.jpg',
+    portfolio: [
+      '/images/portfolio/marta/1.mp4',
+      '/images/portfolio/marta/2.mp4',
+      '/images/portfolio/marta/3.mov',
+      '/images/portfolio/marta/4.mov',
+      '/images/portfolio/marta/5.mov',
+      '/images/portfolio/marta/6.mov',
+      '/images/portfolio/marta/7.mov',
+      '/images/portfolio/marta/8.mov',
+    ],
     accent: '#FF10F0',
     instagram: '#',
   },
@@ -78,16 +97,30 @@ function TinderCard({
     }
   };
 
+  const isVideo = src.toLowerCase().endsWith('.mp4') || src.toLowerCase().endsWith('.mov');
+
   if (!isTop) {
     return (
       <motion.div className="absolute inset-0 rounded-2xl overflow-hidden">
-        <Image
-          src={src}
-          alt="Portfólio"
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 90vw, 45vw"
-        />
+        {isVideo ? (
+          <video
+            src={src}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="object-cover w-full h-full"
+          />
+        ) : (
+          <Image
+            src={src}
+            alt="Portfólio"
+            fill
+            quality={100}
+            unoptimized
+            className="object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-black/20" />
       </motion.div>
     );
@@ -106,14 +139,26 @@ function TinderCard({
       exit={{ opacity: 0, transition: { duration: 0.2 } }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
     >
-      <Image
-        src={src}
-        alt="Portfólio"
-        fill
-        className="object-cover pointer-events-none"
-        sizes="(max-width: 768px) 90vw, 45vw"
-        priority
-      />
+      {isVideo ? (
+        <video
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="object-cover w-full h-full pointer-events-none"
+        />
+      ) : (
+        <Image
+          src={src}
+          alt="Portfólio"
+          fill
+          quality={100}
+          unoptimized
+          className="object-cover pointer-events-none"
+          priority
+        />
+      )}
 
       {/* Gradient bottom */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
@@ -200,6 +245,8 @@ function PhotographerDeck({
             alt={data.name}
             width={40}
             height={40}
+            quality={100}
+            unoptimized
             className="object-cover w-full h-full"
           />
         </div>
@@ -254,7 +301,7 @@ function PhotographerDeck({
               {/* Next card (behind) */}
               {currentIndex + 1 < total && (
                 <TinderCard
-                  key={`bg-${currentIndex + 1}`}
+                  key={`card-${currentIndex + 1}`}
                   src={allImages[currentIndex + 1]}
                   onSwipe={() => { }}
                   isTop={false}
@@ -410,12 +457,8 @@ export function PortfolioSplit() {
           style={{
             background:
               'linear-gradient(180deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 80%, transparent 100%)',
-            boxShadow:
-              '0 0 20px var(--color-accent), 0 0 60px rgba(255,16,240,0.3)',
           }}
         />
-        {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--color-accent)] rounded-full blur-[300px] opacity-[0.04]" />
       </div>
 
       {/* Section header */}
@@ -448,27 +491,6 @@ export function PortfolioSplit() {
           <PhotographerDeck data={photographers[1]} side="right" index={1} />
         </div>
       </div>
-
-      {/* VS badge — desktop only */}
-      <motion.div
-        className="hidden md:flex absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 items-center justify-center"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={isInView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ delay: 0.8, type: 'spring', stiffness: 200, damping: 15 }}
-      >
-        <div className="relative">
-          <div className="w-14 h-14 rounded-full bg-black border-2 border-[var(--color-accent)] flex items-center justify-center shadow-[0_0_30px_rgba(255,16,240,0.4)]">
-            <span className="text-[var(--color-accent)] font-bold text-sm tracking-wider">
-              VS
-            </span>
-          </div>
-          <motion.div
-            className="absolute inset-0 rounded-full border border-[var(--color-accent)]"
-            animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }
