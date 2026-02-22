@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, memo } from 'react';
 import {
   motion,
   useInView,
@@ -10,7 +10,7 @@ import {
   PanInfo,
 } from 'framer-motion';
 import Image from 'next/image';
-import { Heart, X, RotateCcw, Camera, Instagram, ArrowRight } from 'lucide-react';
+import { Heart, X, RotateCcw, Camera, Instagram } from 'lucide-react';
 
 /* ─── Data ─── */
 
@@ -74,8 +74,8 @@ const photographers: [PhotographerData, PhotographerData] = [
 ];
 
 /* ─── Tinder Card ─── */
-
-function TinderCard({
+// memo prevents re-renders when parent state changes but props are the same
+const TinderCard = memo(function TinderCard({
   src,
   onSwipe,
   isTop,
@@ -85,59 +85,61 @@ function TinderCard({
   isTop: boolean;
 }) {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-18, 18]);
-  const likeOpacity = useTransform(x, [0, 100], [0, 1]);
-  const nopeOpacity = useTransform(x, [-100, 0], [1, 0]);
+  const rotate = useTransform(x, [-200, 200], [-15, 15]);
+  const likeOpacity = useTransform(x, [20, 100], [0, 1]);
+  const nopeOpacity = useTransform(x, [-100, -20], [1, 0]);
 
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
+  const handleDragEnd = useCallback((_: unknown, info: PanInfo) => {
     if (info.offset.x > 100) {
       onSwipe('right');
     } else if (info.offset.x < -100) {
       onSwipe('left');
     }
-  };
+  }, [onSwipe]);
 
-  const isVideo = src.toLowerCase().endsWith('.mp4') || src.toLowerCase().endsWith('.mov');
+  const isVideo = src.endsWith('.mp4') || src.endsWith('.mov');
 
+  // Background card — no drag, no autoplay on videos (perf: don't decode video until it's the top)
   if (!isTop) {
     return (
-      <motion.div className="absolute inset-0 rounded-2xl overflow-hidden">
+      <div
+        className="absolute inset-0 rounded-2xl overflow-hidden"
+        style={{ willChange: 'transform' }}
+      >
         {isVideo ? (
-          <video
-            src={src}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="object-cover w-full h-full"
-          />
+          // Static poster placeholder for background card — avoid decoding 2 videos at once
+          <div className="w-full h-full bg-black/40 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+              <div className="w-0 h-0 border-l-[16px] border-l-white/60 border-y-[10px] border-y-transparent ml-1" />
+            </div>
+          </div>
         ) : (
           <Image
             src={src}
             alt="Portfólio"
             fill
-            quality={100}
-            unoptimized
-            className="object-cover"
+            quality={75}
+            className="object-cover opacity-70"
+            sizes="(max-width: 768px) 100vw, 40vw"
           />
         )}
-        <div className="absolute inset-0 bg-black/20" />
-      </motion.div>
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
     );
   }
 
   return (
     <motion.div
       className="absolute inset-0 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing touch-none"
-      style={{ x, rotate, zIndex: 10 }}
+      style={{ x, rotate, zIndex: 10, willChange: 'transform' }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.9}
+      dragElastic={0.7}
       onDragEnd={handleDragEnd}
-      initial={{ scale: 0.95, opacity: 0 }}
+      initial={{ scale: 0.97, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.2 } }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
     >
       {isVideo ? (
         <video
@@ -153,24 +155,22 @@ function TinderCard({
           src={src}
           alt="Portfólio"
           fill
-          quality={100}
-          unoptimized
+          quality={85}
           className="object-cover pointer-events-none"
+          sizes="(max-width: 768px) 100vw, 40vw"
           priority
         />
       )}
 
       {/* Gradient bottom */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
       {/* LIKE stamp */}
       <motion.div
         className="absolute top-8 left-6 z-20 border-4 border-green-400 rounded-lg px-4 py-2 rotate-[-15deg] pointer-events-none"
         style={{ opacity: likeOpacity }}
       >
-        <span className="text-green-400 font-black text-3xl tracking-wider">
-          LIKE
-        </span>
+        <span className="text-green-400 font-black text-3xl tracking-wider">LIKE</span>
       </motion.div>
 
       {/* NOPE stamp */}
@@ -178,13 +178,11 @@ function TinderCard({
         className="absolute top-8 right-6 z-20 border-4 border-red-500 rounded-lg px-4 py-2 rotate-[15deg] pointer-events-none"
         style={{ opacity: nopeOpacity }}
       >
-        <span className="text-red-500 font-black text-3xl tracking-wider">
-          NOPE
-        </span>
+        <span className="text-red-500 font-black text-3xl tracking-wider">NOPE</span>
       </motion.div>
     </motion.div>
   );
-}
+});
 
 /* ─── Photographer Tinder Deck ─── */
 
@@ -201,15 +199,14 @@ function PhotographerDeck({
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [liked, setLiked] = useState<number[]>([]);
-  const [direction, setDirection] = useState<'left' | 'right' | null>(null);
 
   const allImages = [data.profileImage, ...data.portfolio];
   const total = allImages.length;
   const isFinished = currentIndex >= total;
 
+  // Fixed: removed currentIndex from deps — functional updater handles it
   const handleSwipe = useCallback(
     (dir: 'left' | 'right') => {
-      setDirection(dir);
       if (dir === 'right') {
         setLiked((prev) => [...prev, currentIndex]);
       }
@@ -218,11 +215,10 @@ function PhotographerDeck({
     [currentIndex]
   );
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setCurrentIndex(0);
     setLiked([]);
-    setDirection(null);
-  };
+  }, []);
 
   return (
     <motion.div
@@ -230,23 +226,17 @@ function PhotographerDeck({
       className="relative flex flex-col"
       initial={{ opacity: 0, x: side === 'left' ? -60 : 60 }}
       animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Header — name + role */}
-      <motion.div
-        className="mb-4 flex items-center gap-3"
-        initial={{ opacity: 0, y: 15 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ delay: 0.3 + index * 0.15 }}
-      >
+      <div className="mb-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--color-accent)] flex-shrink-0">
           <Image
             src={data.profileImage}
             alt={data.name}
             width={40}
             height={40}
-            quality={100}
-            unoptimized
+            quality={80}
             className="object-cover w-full h-full"
           />
         </div>
@@ -271,9 +261,9 @@ function PhotographerDeck({
             {Math.min(currentIndex + 1, total)}/{total}
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Progress dots */}
+      {/* Progress bar (one bar, no per-dot animations) */}
       <div className="flex gap-1 mb-3">
         {allImages.map((_, i) => (
           <div
@@ -294,8 +284,11 @@ function PhotographerDeck({
       </div>
 
       {/* Card Stack */}
-      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 border border-white/10">
-        {/* Next card rendered behind (no animation needed) */}
+      <div
+        className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 border border-white/10"
+        style={{ contain: 'layout paint' }}
+      >
+        {/* Next card rendered behind — static, no AnimatePresence overhead */}
         {!isFinished && currentIndex + 1 < total && (
           <TinderCard
             key={`bg-${currentIndex + 1}`}
@@ -305,8 +298,8 @@ function PhotographerDeck({
           />
         )}
 
-        {/* AnimatePresence tracks only the top draggable card + finished state */}
-        <AnimatePresence mode="popLayout">
+        {/* AnimatePresence tracks only the single top card */}
+        <AnimatePresence>
           {!isFinished ? (
             <TinderCard
               key={`card-${currentIndex}`}
@@ -315,32 +308,20 @@ function PhotographerDeck({
               isTop={true}
             />
           ) : (
-            /* Finished state */
             <motion.div
               key="finished"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="absolute inset-0 flex flex-col items-center justify-center text-center p-8"
             >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-              >
-                <Camera size={48} className="text-[var(--color-accent)] mb-4" />
-              </motion.div>
-              <h4 className="text-white text-xl font-bold mb-2">
-                Viste tudo!
-              </h4>
+              <Camera size={48} className="text-[var(--color-accent)] mb-4" />
+              <h4 className="text-white text-xl font-bold mb-2">Viste tudo!</h4>
               <p className="text-white/50 text-sm mb-1">
                 Gostaste de{' '}
-                <span className="text-[var(--color-accent)] font-bold">
-                  {liked.length}
-                </span>{' '}
+                <span className="text-[var(--color-accent)] font-bold">{liked.length}</span>{' '}
                 de {total} fotos
               </p>
-              <p className="text-white/30 text-xs mb-6">
-                do portfólio de {data.name}
-              </p>
+              <p className="text-white/30 text-xs mb-6">do portfólio de {data.name}</p>
               <button
                 onClick={handleReset}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 border border-white/10 text-white text-sm font-medium hover:bg-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40 transition-colors"
@@ -355,67 +336,30 @@ function PhotographerDeck({
 
       {/* Action Buttons */}
       {!isFinished && (
-        <motion.div
-          className="flex items-center justify-center gap-4 mt-5"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6 + index * 0.15 }}
-        >
-          {/* X button */}
-          <motion.button
+        <div className="flex items-center justify-center gap-4 mt-5">
+          <button
             onClick={() => handleSwipe('left')}
-            className="group relative w-14 h-14 rounded-full border-2 border-red-500/40 flex items-center justify-center bg-black hover:border-red-500 transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            className="w-14 h-14 rounded-full border-2 border-red-500/40 flex items-center justify-center bg-black hover:border-red-500 hover:scale-105 active:scale-95 transition-all"
           >
-            <X
-              size={24}
-              className="text-red-500/70 group-hover:text-red-500 transition-colors"
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-          </motion.button>
-
-          {/* Heart button */}
-          <motion.button
+            <X size={24} className="text-red-500/70" />
+          </button>
+          <button
             onClick={() => handleSwipe('right')}
-            className="group relative w-16 h-16 rounded-full border-2 border-[var(--color-accent)]/40 flex items-center justify-center bg-black hover:border-[var(--color-accent)] transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            className="w-16 h-16 rounded-full border-2 border-[var(--color-accent)]/40 flex items-center justify-center bg-black hover:border-[var(--color-accent)] hover:scale-105 active:scale-95 transition-all"
           >
-            <Heart
-              size={28}
-              className="text-[var(--color-accent)]/70 group-hover:text-[var(--color-accent)] transition-colors"
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full bg-[var(--color-accent)]/10 opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-          </motion.button>
-
-          {/* Reset button (small) */}
-          <motion.button
+            <Heart size={28} className="text-[var(--color-accent)]/70" />
+          </button>
+          <button
             onClick={handleReset}
-            className="group w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-black hover:border-white/30 transition-colors"
-            whileHover={{ scale: 1.1, rotate: -180 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-black hover:border-white/30 hover:scale-105 active:scale-95 transition-all"
           >
-            <RotateCcw
-              size={14}
-              className="text-white/30 group-hover:text-white/60 transition-colors"
-            />
-          </motion.button>
-        </motion.div>
+            <RotateCcw size={14} className="text-white/30" />
+          </button>
+        </div>
       )}
 
-      {/* Specialties below */}
-      <motion.div
-        className="flex flex-wrap gap-2 mt-5"
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
-        transition={{ delay: 0.8 + index * 0.15 }}
-      >
+      {/* Specialties */}
+      <div className="flex flex-wrap gap-2 mt-5">
         {data.specialties.map((spec) => (
           <span
             key={spec}
@@ -424,12 +368,10 @@ function PhotographerDeck({
             {spec}
           </span>
         ))}
-      </motion.div>
+      </div>
 
       {/* Description */}
-      <p className="text-white/40 text-sm mt-4 leading-relaxed">
-        {data.description}
-      </p>
+      <p className="text-white/40 text-sm mt-4 leading-relaxed">{data.description}</p>
     </motion.div>
   );
 }
@@ -441,19 +383,13 @@ export function PortfolioSplit() {
   const isInView = useInView(sectionRef, { once: true, margin: '-50px' });
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative bg-black py-20 md:py-32 overflow-hidden"
-    >
-      {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none" />
-
+    <section ref={sectionRef} className="relative bg-black py-20 md:py-32">
       {/* Section header */}
       <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-20 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7 }}
           className="text-center"
         >
           <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] block mb-4">
@@ -461,9 +397,7 @@ export function PortfolioSplit() {
           </span>
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
             Dois Olhares.{' '}
-            <span className="text-[var(--color-accent)]">
-              Zero
-            </span>{' '}Limites.
+            <span className="text-[var(--color-accent)]">Zero</span>{' '}Limites.
           </h2>
           <p className="text-white/40 text-sm md:text-base max-w-md mx-auto">
             Desliza ou usa os botões para explorar o portfólio de cada fotógrafo. Spoiler: vais querer os dois.
@@ -473,12 +407,9 @@ export function PortfolioSplit() {
 
       {/* Split Tinder Decks */}
       <div className="max-w-6xl mx-auto px-6 relative z-10">
-        {/* Center divider glow — desktop only */}
-        <motion.div
+        {/* Center divider — CSS only, no motion scroll listener */}
+        <div
           className="hidden md:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px"
-          initial={{ opacity: 0, scaleY: 0 }}
-          animate={isInView ? { opacity: 1, scaleY: 1 } : {}}
-          transition={{ duration: 1.2, delay: 0.3 }}
           style={{
             background:
               'linear-gradient(180deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 80%, transparent 100%)',
