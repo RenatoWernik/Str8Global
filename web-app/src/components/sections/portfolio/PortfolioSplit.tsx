@@ -295,26 +295,25 @@ function PhotographerDeck({
 
       {/* Card Stack */}
       <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+        {/* Next card rendered behind (no animation needed) */}
+        {!isFinished && currentIndex + 1 < total && (
+          <TinderCard
+            key={`bg-${currentIndex + 1}`}
+            src={allImages[currentIndex + 1]}
+            onSwipe={() => { }}
+            isTop={false}
+          />
+        )}
+
+        {/* AnimatePresence tracks only the top draggable card + finished state */}
         <AnimatePresence mode="popLayout">
           {!isFinished ? (
-            <>
-              {/* Next card (behind) */}
-              {currentIndex + 1 < total && (
-                <TinderCard
-                  key={`card-${currentIndex + 1}`}
-                  src={allImages[currentIndex + 1]}
-                  onSwipe={() => { }}
-                  isTop={false}
-                />
-              )}
-              {/* Current card (top, draggable) */}
-              <TinderCard
-                key={`card-${currentIndex}`}
-                src={allImages[currentIndex]}
-                onSwipe={handleSwipe}
-                isTop={true}
-              />
-            </>
+            <TinderCard
+              key={`card-${currentIndex}`}
+              src={allImages[currentIndex]}
+              onSwipe={handleSwipe}
+              isTop={true}
+            />
           ) : (
             /* Finished state */
             <motion.div
@@ -447,19 +446,7 @@ export function PortfolioSplit() {
       className="relative bg-black py-20 md:py-32 overflow-hidden"
     >
       {/* Background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Center divider glow — desktop only */}
-        <motion.div
-          className="hidden md:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px"
-          initial={{ opacity: 0, scaleY: 0 }}
-          animate={isInView ? { opacity: 1, scaleY: 1 } : {}}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          style={{
-            background:
-              'linear-gradient(180deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 80%, transparent 100%)',
-          }}
-        />
-      </div>
+      <div className="absolute inset-0 pointer-events-none" />
 
       {/* Section header */}
       <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-20 relative z-10">
@@ -486,6 +473,17 @@ export function PortfolioSplit() {
 
       {/* Split Tinder Decks */}
       <div className="max-w-6xl mx-auto px-6 relative z-10">
+        {/* Center divider glow — desktop only */}
+        <motion.div
+          className="hidden md:block absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px"
+          initial={{ opacity: 0, scaleY: 0 }}
+          animate={isInView ? { opacity: 1, scaleY: 1 } : {}}
+          transition={{ duration: 1.2, delay: 0.3 }}
+          style={{
+            background:
+              'linear-gradient(180deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 80%, transparent 100%)',
+          }}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 lg:gap-14">
           <PhotographerDeck data={photographers[0]} side="left" index={0} />
           <PhotographerDeck data={photographers[1]} side="right" index={1} />
