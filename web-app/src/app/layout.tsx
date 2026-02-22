@@ -3,6 +3,7 @@ import { Oswald, Outfit } from "next/font/google";
 import "./globals.css";
 import { LenisProvider, GSAPProvider } from "@/providers";
 import { Navbar, Footer } from "@/components/layout";
+import { Analytics } from "@vercel/analytics/next";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
+            <Analytics />
           </GSAPProvider>
         </LenisProvider>
       </body>
