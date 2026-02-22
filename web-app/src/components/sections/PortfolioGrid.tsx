@@ -44,20 +44,37 @@ export function PortfolioGrid() {
                         {siteCopy.portfolio.subtitle}
                     </motion.p>
 
-                    {/* Responsive Grid: 2 cols on mobile, 3 on desktop */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-                        {projects.map((project, index) => (
-                            <GridItem
-                                key={project.id}
-                                project={project}
-                                index={index}
-                                onSelect={() => {
-                                    if (project.video) {
-                                        setSelectedProject(project);
-                                    }
-                                }}
-                            />
-                        ))}
+                    {/* Dynamic Asymmetric Bento Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[250px] md:auto-rows-[300px]">
+                        {projects.map((project, index) => {
+                            // Determine dynamic span sizes based on position to create a bento box feel
+                            const getSpanClass = () => {
+                                // 1st item: large highlight
+                                if (index === 0) return "md:col-span-8 md:row-span-2";
+                                // 2nd item: tall side piece
+                                if (index === 1) return "md:col-span-4 md:row-span-2";
+                                // 3rd & 4th items: wide splits
+                                if (index === 2 || index === 3) return "md:col-span-6 md:row-span-1";
+                                // 5th item: full width banner
+                                if (index === 4) return "md:col-span-12 md:row-span-2";
+                                // Fallback
+                                return "md:col-span-4 md:row-span-1";
+                            };
+
+                            return (
+                                <GridItem
+                                    key={project.id}
+                                    project={project}
+                                    index={index}
+                                    className={getSpanClass()}
+                                    onSelect={() => {
+                                        if (project.video) {
+                                            setSelectedProject(project);
+                                        }
+                                    }}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -85,7 +102,7 @@ export function PortfolioGrid() {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
                             transition={{ duration: 0.4, type: 'spring', damping: 25 }}
-                            className="relative w-full max-w-6xl aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-black shadow-2xl"
+                            className="relative w-full max-w-6xl aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-black shadow-[0_0_50px_rgba(255,16,240,0.15)] ring-1 ring-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <video
@@ -105,10 +122,11 @@ export function PortfolioGrid() {
 interface GridItemProps {
     project: Project;
     index: number;
+    className: string;
     onSelect: () => void;
 }
 
-function GridItem({ project, index, onSelect }: GridItemProps) {
+function GridItem({ project, index, className, onSelect }: GridItemProps) {
     const [isActive, setIsActive] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -118,33 +136,6 @@ function GridItem({ project, index, onSelect }: GridItemProps) {
     useEffect(() => {
         setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     }, []);
-
-    // Responsive aspect ratios and spans
-    const getSizeClass = () => {
-        switch (project.size) {
-            case 'large': return 'md:col-span-2 md:row-span-2';
-            case 'wide': return 'md:col-span-2';
-            case 'tall': return 'md:row-span-2';
-            default: return 'md:col-span-1';
-        }
-    };
-
-    const getMobileAspect = () => {
-        if (project.size === 'large' || project.size === 'wide') return 'aspect-video';
-        if (project.size === 'tall') return 'aspect-[3/4]';
-        return 'aspect-square';
-    };
-
-    const getDesktopAspect = () => {
-        if (project.size === 'large') return 'aspect-square';
-        if (project.size === 'wide') return 'aspect-[2/1]';
-        if (project.size === 'tall') return 'aspect-[1/2]';
-
-        // Default fallback pattern if no size specified
-        if (index % 3 === 0) return 'md:aspect-[4/5]';
-        if (index % 3 === 1) return 'md:aspect-square';
-        return 'md:aspect-[5/4]';
-    };
 
     // Click handler - open modal rather than inline play/pause
     const handleClick = () => {
@@ -156,7 +147,7 @@ function GridItem({ project, index, onSelect }: GridItemProps) {
             setIsActive(true);
             // Only auto-play preview on hover if not already playing
             if (videoRef.current && project.video && !isPlaying) {
-                videoRef.current.play();
+                videoRef.current.play().catch(() => { }); // Catch play interruption promise rejection
             }
         }
     };
@@ -172,55 +163,57 @@ function GridItem({ project, index, onSelect }: GridItemProps) {
         }
     };
 
-
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.6, delay: index * 0.05 }}
-            className={`relative overflow-hidden rounded-lg md:rounded-xl cursor-pointer group ${getMobileAspect()} ${getDesktopAspect()} ${getSizeClass()}`}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            className={`relative overflow-hidden rounded-2xl cursor-pointer group bg-white/5 border border-white/10 hover:border-[var(--color-accent)]/50 transition-colors duration-500 ${className}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onClick={handleClick}
         >
             {/* Image */}
             <motion.div
-                animate={{ scale: isActive ? 1.1 : 1 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
+                animate={{ scale: isActive ? 1.05 : 1 }}
+                transition={{ duration: 0.7, ease: [0.33, 1, 0.68, 1] }}
                 className="absolute inset-0"
             >
                 <Image
                     src={project.image}
                     alt={project.title}
                     fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                    priority={index < 4}
+                    className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={index < 2}
                 />
             </motion.div>
 
-            {/* Video overlay */}
+            {/* Video overlay (muted hover preview) */}
             {project.video && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: isActive || isPlaying ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute inset-0 z-10"
+                    transition={{ duration: 0.4 }}
+                    className="absolute inset-0 z-10 bg-black"
                 >
                     <video
                         ref={videoRef}
                         src={project.video}
-                        preload="metadata"
+                        preload="none"
                         muted
                         loop
                         playsInline
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover opacity-90"
                     />
                 </motion.div>
             )}
 
-            {/* Video indicator badge */}
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+            {/* Play Button Indicator (Center) */}
             {project.video && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -228,32 +221,47 @@ function GridItem({ project, index, onSelect }: GridItemProps) {
                         opacity: isActive ? 0 : 1,
                         scale: isActive ? 0.8 : 1
                     }}
-                    className="absolute top-2 md:top-4 left-2 md:left-4 z-20 bg-black/60 backdrop-blur-sm rounded-full p-1.5 md:p-2"
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
                 >
-                    <Play size={12} className="md:w-4 md:h-4 text-white fill-white" />
+                    <div className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                        <Play size={24} className="text-white fill-white ml-1" />
+                    </div>
                 </motion.div>
             )}
 
-            {/* Overlay - always visible on mobile, hover on desktop */}
+            {/* Content Container (Bottom Left) */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isTouchDevice || isActive ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex flex-col justify-end p-3 md:p-6 z-20"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: isTouchDevice || isActive ? 0 : 10, opacity: isTouchDevice || isActive ? 1 : 0.8 }}
+                transition={{ duration: 0.4 }}
+                className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-40 pointer-events-none flex flex-col justify-end h-full"
             >
-                <span className="text-[10px] md:text-xs uppercase tracking-widest text-[var(--color-accent)] mb-1 md:mb-2">
-                    {project.category}
-                </span>
-                <h3 className="text-sm md:text-2xl font-bold mb-0.5 md:mb-2 line-clamp-1">{project.title}</h3>
-                <p className="text-xs md:text-sm text-white/70 line-clamp-2 hidden md:block">{project.description}</p>
+                {/* Year Badge */}
+                <div className="flex items-center gap-3 mb-3">
+                    <span className="px-3 py-1 rounded-full bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/30 text-[var(--color-accent)] text-[10px] md:text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
+                        {project.year}
+                    </span>
+                    <span className="text-xs text-white/60 tracking-wider">
+                        {project.client}
+                    </span>
+                </div>
+
+                <h3 className="text-2xl md:text-4xl font-bold mb-2 text-white drop-shadow-lg leading-tight group-hover:text-[var(--color-accent)] transition-colors duration-300">
+                    {project.title}
+                </h3>
+
+                <p className="text-sm md:text-base text-white/80 line-clamp-2 md:line-clamp-3 max-w-2xl font-medium">
+                    {project.description}
+                </p>
             </motion.div>
 
-            {/* Corner accent on hover */}
+            {/* Decorative Corner Framing (Top Right) */}
             <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: isActive ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute top-2 md:top-4 right-2 md:right-4 w-4 md:w-8 h-4 md:h-8 border-t-2 border-r-2 border-[var(--color-accent)] z-30"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-[var(--color-accent)] z-30 pointer-events-none"
             />
         </motion.div>
     );
