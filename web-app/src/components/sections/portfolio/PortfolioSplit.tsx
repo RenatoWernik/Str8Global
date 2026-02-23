@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, memo } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo, memo } from 'react';
 import {
   motion,
   useInView,
@@ -10,7 +10,7 @@ import {
   PanInfo,
 } from 'framer-motion';
 import Image from 'next/image';
-import { Heart, X, RotateCcw, Camera, Instagram } from 'lucide-react';
+import { Heart, X, RotateCcw, Camera, Instagram, ChevronLeft, ChevronRight, Hand, Volume2, VolumeX } from 'lucide-react';
 
 /* ─── Data ─── */
 
@@ -79,11 +79,18 @@ const TinderCard = memo(function TinderCard({
   src,
   onSwipe,
   isTop,
+  isFirst,
+  isMuted,
+  onToggleMute,
 }: {
   src: string;
   onSwipe: (dir: 'left' | 'right') => void;
   isTop: boolean;
+  isFirst?: boolean;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const likeOpacity = useTransform(x, [20, 100], [0, 1]);
@@ -97,17 +104,20 @@ const TinderCard = memo(function TinderCard({
     }
   }, [onSwipe]);
 
+  // Sync muted state to video element when it changes
+  useEffect(() => {
+    if (videoRef.current && isMuted !== undefined) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
   const isVideo = src.endsWith('.mp4') || src.endsWith('.mov');
 
   // Background card — no drag, no autoplay on videos (perf: don't decode video until it's the top)
   if (!isTop) {
     return (
-      <div
-        className="absolute inset-0 rounded-2xl overflow-hidden"
-        style={{ willChange: 'transform' }}
-      >
+      <div className="absolute inset-0 rounded-2xl overflow-hidden">
         {isVideo ? (
-          // Static poster placeholder for background card — avoid decoding 2 videos at once
           <div className="w-full h-full bg-black/40 flex items-center justify-center">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
               <div className="w-0 h-0 border-l-[16px] border-l-white/60 border-y-[10px] border-y-transparent ml-1" />
@@ -118,9 +128,10 @@ const TinderCard = memo(function TinderCard({
             src={src}
             alt="Portfólio"
             fill
-            quality={75}
+            quality={70}
             className="object-cover opacity-70"
-            sizes="(max-width: 768px) 100vw, 40vw"
+            sizes="(max-width: 768px) 85vw, 35vw"
+            loading="lazy"
           />
         )}
         <div className="absolute inset-0 bg-black/30" />
@@ -131,7 +142,7 @@ const TinderCard = memo(function TinderCard({
   return (
     <motion.div
       className="absolute inset-0 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing touch-none"
-      style={{ x, rotate, zIndex: 10, willChange: 'transform' }}
+      style={{ x, rotate, zIndex: 10 }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.7}
@@ -140,25 +151,47 @@ const TinderCard = memo(function TinderCard({
       animate={{ scale: 1, opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      onAnimationComplete={() => {
+        // Play video only after card animation completes
+        videoRef.current?.play().catch(() => { });
+      }}
     >
       {isVideo ? (
-        <video
-          src={src}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="object-cover w-full h-full pointer-events-none"
-        />
+        <>
+          <video
+            ref={videoRef}
+            src={src}
+            muted={isMuted !== false}
+            loop
+            playsInline
+            preload="metadata"
+            className="object-cover w-full h-full pointer-events-none bg-black"
+          />
+          {/* Mute/Unmute button */}
+          {onToggleMute && (
+            <button
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); onToggleMute(); }}
+              className="absolute bottom-4 right-4 z-20 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-colors pointer-events-auto"
+            >
+              {isMuted ? (
+                <VolumeX size={16} className="text-white/70" />
+              ) : (
+                <Volume2 size={16} className="text-white" />
+              )}
+            </button>
+          )}
+        </>
       ) : (
         <Image
           src={src}
           alt="Portfólio"
           fill
-          quality={85}
+          quality={80}
           className="object-cover pointer-events-none"
-          sizes="(max-width: 768px) 100vw, 40vw"
-          priority
+          sizes="(max-width: 768px) 85vw, 35vw"
+          priority={isFirst}
+          loading={isFirst ? undefined : 'lazy'}
         />
       )}
 
@@ -199,20 +232,44 @@ function PhotographerDeck({
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [liked, setLiked] = useState<number[]>([]);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const hasVideos = data.portfolio.some((f) => f.endsWith('.mp4') || f.endsWith('.mov'));
+  const [isMuted, setIsMuted] = useState(true);
+  const toggleMute = useCallback(() => setIsMuted((m) => !m), []);
 
-  const allImages = [data.profileImage, ...data.portfolio];
+  // Show tutorial only on first deck (index 0) and only on first visit
+  useEffect(() => {
+    if (index === 0) {
+      try {
+        const seen = localStorage.getItem('portfolio-tutorial-seen');
+        if (!seen) setShowTutorial(true);
+      } catch {
+        setShowTutorial(true);
+      }
+    }
+  }, [index]);
+
+  const dismissTutorial = useCallback(() => {
+    setShowTutorial(false);
+    try { localStorage.setItem('portfolio-tutorial-seen', '1'); } catch { }
+  }, []);
+
+  const allImages = useMemo(() => [data.profileImage, ...data.portfolio], [data.profileImage, data.portfolio]);
   const total = allImages.length;
   const isFinished = currentIndex >= total;
 
-  // Fixed: removed currentIndex from deps — functional updater handles it
   const handleSwipe = useCallback(
     (dir: 'left' | 'right') => {
-      if (dir === 'right') {
-        setLiked((prev) => [...prev, currentIndex]);
-      }
-      setCurrentIndex((prev) => prev + 1);
+      // Dismiss tutorial on first interaction
+      if (showTutorial) dismissTutorial();
+      setCurrentIndex((prev) => {
+        if (dir === 'right') {
+          setLiked((l) => l.includes(prev) ? l : [...l, prev]);
+        }
+        return prev + 1;
+      });
     },
-    [currentIndex]
+    [showTutorial, dismissTutorial]
   );
 
   const handleReset = useCallback(() => {
@@ -306,6 +363,9 @@ function PhotographerDeck({
               src={allImages[currentIndex]}
               onSwipe={handleSwipe}
               isTop={true}
+              isFirst={currentIndex === 0}
+              isMuted={hasVideos ? isMuted : undefined}
+              onToggleMute={hasVideos ? toggleMute : undefined}
             />
           ) : (
             <motion.div
@@ -319,7 +379,7 @@ function PhotographerDeck({
               <p className="text-white/50 text-sm mb-1">
                 Gostaste de{' '}
                 <span className="text-[var(--color-accent)] font-bold">{liked.length}</span>{' '}
-                de {total} fotos
+                de {total} {hasVideos ? 'vídeos' : 'fotos'}
               </p>
               <p className="text-white/30 text-xs mb-6">do portfólio de {data.name}</p>
               <button
@@ -328,6 +388,56 @@ function PhotographerDeck({
               >
                 <RotateCcw size={14} />
                 Ver novamente
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Tutorial overlay — first visit only, first deck only */}
+        <AnimatePresence>
+          {showTutorial && (
+            <motion.div
+              key="tutorial-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 z-30 rounded-2xl bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center p-6"
+              onClick={dismissTutorial}
+            >
+              {/* Swipe hint animation */}
+              <div className="relative flex items-center justify-center gap-8 mb-6">
+                {/* Left — NOPE */}
+                <div className="flex flex-col items-center gap-1">
+                  <ChevronLeft size={28} className="text-red-500/80" />
+                  <span className="text-red-500 text-xs font-bold uppercase tracking-wider">Nope</span>
+                </div>
+
+                {/* Animated hand icon */}
+                <motion.div
+                  animate={{ x: [0, 30, 0, -30, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <Hand size={36} className="text-white/90" />
+                </motion.div>
+
+                {/* Right — LIKE */}
+                <div className="flex flex-col items-center gap-1">
+                  <ChevronRight size={28} className="text-[var(--color-accent)]/80" />
+                  <span className="text-[var(--color-accent)] text-xs font-bold uppercase tracking-wider">Like</span>
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <p className="text-white text-base font-semibold mb-1">Arrasta para explorar</p>
+              <p className="text-white/40 text-xs mb-5">ou usa os botões em baixo</p>
+
+              {/* Dismiss button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); dismissTutorial(); }}
+                className="px-5 py-2 rounded-full bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40 transition-colors"
+              >
+                Entendi
               </button>
             </motion.div>
           )}
@@ -395,7 +505,7 @@ export function PortfolioSplit() {
           <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] block mb-4">
             Dois Olhares
           </span>
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
             Dois Olhares.{' '}
             <span className="text-[var(--color-accent)]">Zero</span>{' '}Limites.
           </h2>

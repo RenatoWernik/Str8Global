@@ -26,7 +26,7 @@ export function StudioRenting() {
           </span>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
             {rentalCopy.studio.title}
           </h2>
         </ScrollReveal>

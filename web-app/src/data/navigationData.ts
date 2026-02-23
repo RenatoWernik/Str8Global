@@ -28,7 +28,6 @@ export const mainNav: NavItem[] = [
   { id: 'cursos', label: 'Cursos', href: '/cursos' },
   { id: 'espaco', label: 'Espaço', href: '/espaco' },
   { id: 'aluguel', label: 'Aluguer', href: '/aluguel' },
-  { id: 'servicos', label: 'Serviços', href: '/servicos' },
 ];
 
 // Footer navigation (main + contact anchor)

@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TextReveal } from '@/components/animations/TextReveal';
 import { TypewriterText } from '@/components/animations/TypewriterText';
 import { PremiumLogo } from '@/components/animations/PremiumLogo';
@@ -10,34 +9,21 @@ import { HighlightText } from '@/components/ui/HighlightText';
 import { Globe } from '@/components/ui/globe';
 
 export function Hero() {
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ['start start', 'end start'],
-    });
-
-    // Move the video down slightly as the user scrolls
-    const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-
     return (
-        <section ref={containerRef} className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
-            {/* Interactive Aurora & Globe Background with Parallax */}
-            <motion.div
-                className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center"
-                style={{ y: backgroundY }}
-            >
+        <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
+            {/* Globe Background — static position, no parallax scroll listener */}
+            <div className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center">
 
                 {/* Interactive Globe enlarged and positioned lower to be cut by the section end */}
                 <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
-                    <div className="relative w-[250%] md:w-[200%] max-w-[1200px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+                    <div className="relative w-[180%] sm:w-[220%] md:w-[200%] max-w-[800px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
                         <Globe className="opacity-100" />
                     </div>
                 </div>
 
                 {/* Dark overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-black/60 z-10 pointer-events-none" />
-            </motion.div>
+            </div>
 
             {/* Accent gradient overlay */}
             <div
@@ -56,10 +42,10 @@ export function Hero() {
             />
 
             {/* Main Content */}
-            <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
+            <div className="relative z-10 text-center px-4 sm:px-6 max-w-6xl mx-auto">
                 {/* Premium Animated Logo - larger on both mobile and desktop */}
                 <div className="mb-8 md:mb-10 flex justify-center">
-                    <PremiumLogo size={280} className="w-[220px] h-[220px] md:w-[280px] md:h-[280px]" />
+                    <PremiumLogo size={280} className="w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px]" />
                 </div>
 
                 {/* Agency Label */}
@@ -73,7 +59,7 @@ export function Hero() {
                 </motion.p>
 
                 {/* Main Headline */}
-                <h1 className="text-4xl md:text-7xl lg:text-9xl font-bold leading-[1.1] tracking-tighter mb-6 md:mb-8">
+                <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-9xl font-bold leading-[1.1] tracking-tighter mb-6 md:mb-8">
                     <span className="block">
                         <TextReveal delay={1.7}>Criamos</TextReveal>
                     </span>
@@ -93,7 +79,7 @@ export function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2.2, duration: 0.8 }}
-                    className="text-base md:text-xl text-white/60 max-w-2xl mx-auto"
+                    className="text-sm sm:text-base md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
                 >
                     <HighlightText text={siteCopy.hero.subheadline} />
                 </motion.p>

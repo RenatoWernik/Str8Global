@@ -67,7 +67,7 @@ export default function AluguelPage() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold mb-8">
               {rentalCopy.cta.title.split(' ').slice(0, 2).join(' ')}
               <br />
               <span className="text-[var(--color-accent)]">
@@ -87,7 +87,7 @@ export default function AluguelPage() {
               href="/#contacto"
               whileHover={{ scale: 1.05, gap: '1rem' }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-[var(--color-accent)] text-black font-bold text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[var(--color-accent)] text-black font-bold text-base sm:text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
             >
               {rentalCopy.cta.button}
               <ArrowRight size={20} />

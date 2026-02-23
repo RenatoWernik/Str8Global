@@ -19,7 +19,7 @@ export function InfiniteCarousel({
     direction = 'left',
     pauseOnHover = true,
 }: InfiniteCarouselProps) {
-    const duplicatedChildren = [...children, ...children];
+    const duplicatedChildren = [...children, ...children, ...children, ...children, ...children, ...children];
 
     return (
         <div
@@ -55,8 +55,8 @@ export function InfiniteCarousel({
             </motion.div>
 
             {/* Gradient masks */}
-            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent pointer-events-none z-10" />
-            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 left-0 w-12 md:w-24 bg-gradient-to-r from-black to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 right-0 w-12 md:w-24 bg-gradient-to-l from-black to-transparent pointer-events-none z-10" />
         </div>
     );
 }

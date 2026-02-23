@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { InfiniteCarousel } from '@/components/animations/InfiniteCarousel';
 import { HighlightText } from '@/components/ui/HighlightText';
 import { clients, siteCopy } from '@/data/mockData';
@@ -14,7 +15,7 @@ export function ClientsSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="text-4xl md:text-6xl font-bold text-center mb-4"
+                    className="text-3xl sm:text-4xl md:text-6xl font-bold text-center mb-4 text-white"
                 >
                     {siteCopy.clients.title}
                 </motion.h2>
@@ -31,7 +32,7 @@ export function ClientsSection() {
 
             <InfiniteCarousel speed={40} direction="left">
                 {clients.map((client) => (
-                    <ClientLogo key={client.id} name={client.name} />
+                    <ClientLogo key={client.id} client={client} />
                 ))}
             </InfiniteCarousel>
 
@@ -39,23 +40,26 @@ export function ClientsSection() {
 
             <InfiniteCarousel speed={35} direction="right">
                 {[...clients].reverse().map((client) => (
-                    <ClientLogo key={client.id} name={client.name} />
+                    <ClientLogo key={`rev-${client.id}`} client={client} />
                 ))}
             </InfiniteCarousel>
         </section>
     );
 }
 
-function ClientLogo({ name }: { name: string }) {
+function ClientLogo({ client }: { client: { name: string; logo: string } }) {
+    const isLarge = client.name === 'Worten' || client.name === 'KuantoKusta';
     return (
-        <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="flex items-center justify-center w-40 h-20 bg-white/5 rounded-lg border border-white/10 hover:border-[var(--color-accent)] transition-colors cursor-pointer group"
-        >
-            <span className="text-white/40 group-hover:text-[var(--color-accent)] font-bold text-lg transition-colors">
-                {name}
-            </span>
-        </motion.div>
+        <div className="flex items-center justify-center w-40 h-20 sm:w-56 sm:h-28 bg-white/5 rounded-lg border border-white/10 hover:border-[var(--color-accent)] hover:scale-110 transition-all duration-200 cursor-pointer group relative overflow-hidden">
+            <Image
+                src={client.logo}
+                alt={client.name}
+                fill
+                sizes="(max-width: 640px) 160px, 224px"
+                className={`object-contain transition-all duration-300 ${isLarge ? 'p-1 sm:p-2 scale-110' : 'p-3 sm:p-4'
+                    }`}
+            />
+        </div>
     );
 }
 

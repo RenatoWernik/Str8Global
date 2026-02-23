@@ -39,7 +39,7 @@ export function CoworkStudio() {
           </span>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
             {rentalCopy.coworkStudio.title}
           </h2>
         </ScrollReveal>
@@ -185,7 +185,7 @@ function PlanCard({
           {pricing ? (
             <div className="mb-6">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl md:text-5xl font-bold text-[var(--color-accent)]">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-accent)]">
                   {pricing.price}€
                 </span>
                 <span className="text-white/40 text-sm">

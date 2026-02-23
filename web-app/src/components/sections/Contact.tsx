@@ -19,7 +19,7 @@ export function Contact() {
                     viewport={{ once: true }}
                     className="text-center mb-24"
                 >
-                    <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
+                    <h2 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold mb-8">
                         O Próximo Passo
                         <br />
                         É <span className="text-[var(--color-accent)]">Seu</span>
@@ -36,7 +36,7 @@ export function Contact() {
                     <motion.button
                         whileHover={{ scale: 1.05, gap: '1rem' }}
                         whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center gap-3 px-10 py-5 bg-[var(--color-accent)] text-black font-bold text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
+                        className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[var(--color-accent)] text-black font-bold text-base sm:text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
                     >
                         {siteCopy.cta.button}
                         <ArrowRight size={20} />

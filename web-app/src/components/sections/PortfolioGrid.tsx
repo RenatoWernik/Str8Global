@@ -45,7 +45,7 @@ export function PortfolioGrid() {
                     </motion.p>
 
                     {/* Dynamic Asymmetric Bento Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[250px] md:auto-rows-[300px]">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[280px] md:auto-rows-[300px]">
                         {projects.map((project, index) => {
                             // Determine dynamic span sizes based on position to create a bento box feel
                             const getSpanClass = () => {
@@ -235,7 +235,7 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: isTouchDevice || isActive ? 0 : 10, opacity: isTouchDevice || isActive ? 1 : 0.8 }}
                 transition={{ duration: 0.4 }}
-                className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-40 pointer-events-none flex flex-col justify-end h-full"
+                className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-40 pointer-events-none flex flex-col justify-end h-full"
             >
                 {/* Year Badge */}
                 <div className="flex items-center gap-3 mb-3">
@@ -247,7 +247,7 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
                     </span>
                 </div>
 
-                <h3 className="text-2xl md:text-4xl font-bold mb-2 text-white drop-shadow-lg leading-tight group-hover:text-[var(--color-accent)] transition-colors duration-300">
+                <h3 className="text-xl sm:text-2xl md:text-4xl font-bold mb-2 text-white drop-shadow-lg leading-tight group-hover:text-[var(--color-accent)] transition-colors duration-300">
                     {project.title}
                 </h3>
 

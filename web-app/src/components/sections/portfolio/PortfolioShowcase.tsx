@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 const stats = [
@@ -35,29 +34,17 @@ const services = [
 ];
 
 function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
-
   return (
     <motion.div
-      ref={ref}
       className="relative text-center p-6 group"
       initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.6 }}
     >
-      <motion.div
-        className="absolute inset-0 rounded-xl border border-white/5 bg-white/[0.02]"
-        whileHover={{
-          borderColor: 'rgba(255,16,240,0.3)',
-          backgroundColor: 'rgba(255,16,240,0.03)',
-        }}
-        transition={{ duration: 0.3 }}
-      />
+      <div className="absolute inset-0 rounded-xl border border-white/5 bg-white/[0.02] group-hover:border-[rgba(255,16,240,0.3)] group-hover:bg-[rgba(255,16,240,0.03)] transition-colors duration-300" />
       <div className="relative z-10">
-        <span
-          className="text-4xl md:text-5xl font-bold block mb-2"
-        >
+        <span className="text-4xl md:text-5xl font-bold block mb-2">
           {stat.value}
         </span>
         <p className="text-white/50 text-sm uppercase tracking-wider">
@@ -75,20 +62,17 @@ function ServiceCard({
   service: (typeof services)[0];
   index: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
-
   return (
     <motion.div
-      ref={ref}
       className="group relative p-6 md:p-8 rounded-2xl border border-white/5 bg-white/[0.01] hover:border-[var(--color-accent)]/20 transition-colors cursor-pointer overflow-hidden"
       initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       transition={{ delay: index * 0.15, duration: 0.6 }}
       whileHover={{ y: -4 }}
     >
       {/* Hover glow */}
-      <motion.div
+      <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{
           background:
@@ -106,35 +90,20 @@ function ServiceCard({
         <p className="text-white/50 text-sm leading-relaxed">
           {service.description}
         </p>
-        <motion.div
-          className="mt-4 flex items-center gap-2 text-[var(--color-accent)] text-sm opacity-0 group-hover:opacity-100 transition-opacity"
-          initial={false}
-        >
+        <div className="mt-4 flex items-center gap-2 text-[var(--color-accent)] text-sm opacity-0 group-hover:opacity-100 transition-opacity">
           <span>Saber mais</span>
           <ArrowRight size={14} />
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
 }
 
 export function PortfolioShowcase() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-
   return (
-    <section ref={sectionRef} className="relative bg-black overflow-hidden">
-      {/* Parallax background element */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{ y: bgY }}
-      >
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/20 to-transparent" />
-      </motion.div>
+    <section className="relative bg-black overflow-hidden">
+      {/* Static accent line */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/20 to-transparent pointer-events-none" />
 
       {/* Stats section */}
       <div className="py-16 md:py-24 border-y border-white/5">
@@ -142,34 +111,6 @@ export function PortfolioShowcase() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {stats.map((stat, i) => (
               <StatCard key={stat.label} stat={stat} index={i} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Services grid */}
-      <div className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] block mb-4">
-              O Que Fazemos
-            </span>
-            <h2 className="text-4xl md:text-6xl font-bold">
-              Serviços de{' '}
-              <span className="text-[var(--color-accent)]">
-                Elite
-              </span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            {services.map((service, i) => (
-              <ServiceCard key={service.title} service={service} index={i} />
             ))}
           </div>
         </div>
@@ -187,7 +128,7 @@ export function PortfolioShowcase() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold mb-8">
               O Próximo Projecto
               <br />
               é{' '}<span className="text-[var(--color-accent)]">
@@ -208,7 +149,7 @@ export function PortfolioShowcase() {
               href="/#contacto"
               whileHover={{ scale: 1.05, gap: '1rem' }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-[var(--color-accent)] text-black font-bold text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[var(--color-accent)] text-black font-bold text-base sm:text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
             >
               Contactar
               <ArrowRight size={20} />

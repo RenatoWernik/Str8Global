@@ -19,7 +19,7 @@ export function SelectedWorks() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="text-3xl md:text-6xl font-bold text-center mb-4"
+                    className="text-2xl sm:text-3xl md:text-6xl font-bold text-center mb-4"
                 >
                     {siteCopy.selectedWorks.title}
                 </motion.h2>
@@ -51,10 +51,11 @@ function ProjectSlide({ project, index }: ProjectSlideProps) {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        const mq = window.matchMedia('(max-width: 767px)');
+        setIsMobile(mq.matches);
+        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
     }, []);
 
     const { scrollYProgress } = useScroll({
@@ -87,7 +88,8 @@ function ProjectSlide({ project, index }: ProjectSlideProps) {
                     className="object-cover"
                     sizes="100vw"
                     priority={index === 0}
-                    quality={100}
+                    quality={80}
+                    loading={index === 0 ? undefined : 'lazy'}
                 />
             </motion.div>
         </motion.div>

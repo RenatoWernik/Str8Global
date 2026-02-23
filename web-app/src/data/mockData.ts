@@ -146,14 +146,11 @@ export const selectedWorksProjectsData: Project[] = [
 
 
 export const clients: Client[] = [
-    { id: '1', name: 'Nike', logo: '/logos/nike.svg' },
-    { id: '2', name: 'Apple', logo: '/logos/apple.svg' },
-    { id: '3', name: 'Google', logo: '/logos/google.svg' },
-    { id: '4', name: 'Adidas', logo: '/logos/adidas.svg' },
-    { id: '5', name: 'Samsung', logo: '/logos/samsung.svg' },
-    { id: '6', name: 'Sony', logo: '/logos/sony.svg' },
-    { id: '7', name: 'Mercedes', logo: '/logos/mercedes.svg' },
-    { id: '8', name: 'BMW', logo: '/logos/bmw.svg' },
+    { id: '1', name: 'KuantoKusta', logo: '/logos/Kuantokusta.png' },
+    { id: '2', name: 'Mr. Big Evolution', logo: '/logos/MrBig.png' },
+    { id: '3', name: 'Cartão Universo', logo: '/logos/Universo.webp' },
+    { id: '4', name: 'Worten', logo: '/logos/Worten.png' },
+    { id: '5', name: 'Rádio Popular', logo: '/logos/radiopopular.jpg' },
 ];
 
 export const services: Service[] = [

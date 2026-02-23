@@ -23,14 +23,17 @@ interface GSAPProviderProps {
 
 export function GSAPProvider({ children }: GSAPProviderProps) {
     useEffect(() => {
-        // Refresh ScrollTrigger on resize
+        // Debounced refresh — avoid dozens of ScrollTrigger.refresh() during resize
+        let timeout: ReturnType<typeof setTimeout>;
         const handleResize = () => {
-            ScrollTrigger.refresh();
+            clearTimeout(timeout);
+            timeout = setTimeout(() => ScrollTrigger.refresh(), 200);
         };
 
         window.addEventListener('resize', handleResize);
 
         return () => {
+            clearTimeout(timeout);
             window.removeEventListener('resize', handleResize);
             ScrollTrigger.killAll();
         };

@@ -39,7 +39,7 @@ export function CoworkStandalone() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
         >
           {rentalCopy.cowork.title}
         </motion.h2>
@@ -189,7 +189,7 @@ function CoworkCard({
           {price !== null ? (
             <div className="mb-6">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl md:text-5xl font-bold text-[var(--color-accent)]">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-accent)]">
                   {price}€
                 </span>
                 <span className="text-white/40 text-sm">

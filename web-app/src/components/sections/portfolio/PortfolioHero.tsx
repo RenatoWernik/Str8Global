@@ -24,7 +24,7 @@ export function PortfolioHero() {
           Os Nossos Fotógrafos
         </span>
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6">
           Portfólio
           <span className="text-[var(--color-accent)]"> Str8</span>
           Global
