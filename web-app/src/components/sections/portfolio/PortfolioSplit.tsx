@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect, useMemo, memo } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo, memo, forwardRef } from 'react';
 import {
   motion,
   useInView,
@@ -74,22 +74,24 @@ const photographers: [PhotographerData, PhotographerData] = [
 ];
 
 /* ─── Tinder Card ─── */
-// memo prevents re-renders when parent state changes but props are the same
-const TinderCard = memo(function TinderCard({
-  src,
-  onSwipe,
-  isTop,
-  isFirst,
-  isMuted,
-  onToggleMute,
-}: {
+interface TinderCardProps {
   src: string;
   onSwipe: (dir: 'left' | 'right') => void;
   isTop: boolean;
   isFirst?: boolean;
   isMuted?: boolean;
   onToggleMute?: () => void;
-}) {
+}
+
+// memo prevents re-renders when parent state changes but props are the same
+const TinderCard = memo(forwardRef<HTMLDivElement, TinderCardProps>(function TinderCard({
+  src,
+  onSwipe,
+  isTop,
+  isFirst,
+  isMuted,
+  onToggleMute,
+}, ref) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
@@ -116,7 +118,7 @@ const TinderCard = memo(function TinderCard({
   // Background card — no drag, no autoplay on videos (perf: don't decode video until it's the top)
   if (!isTop) {
     return (
-      <div className="absolute inset-0 rounded-2xl overflow-hidden">
+      <div ref={ref} className="absolute inset-0 rounded-2xl overflow-hidden">
         {isVideo ? (
           <div className="w-full h-full bg-black/40 flex items-center justify-center">
             <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -141,6 +143,7 @@ const TinderCard = memo(function TinderCard({
 
   return (
     <motion.div
+      ref={ref}
       className="absolute inset-0 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing touch-none"
       style={{ x, rotate, zIndex: 10 }}
       drag="x"
@@ -215,7 +218,7 @@ const TinderCard = memo(function TinderCard({
       </motion.div>
     </motion.div>
   );
-});
+}));
 
 /* ─── Photographer Tinder Deck ─── */
 
