@@ -13,6 +13,7 @@ import {
   type CoworkStudioPlan,
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
+import { HighlightText } from '@/components/ui/HighlightText';
 
 const periodLabels: Record<CoworkStudioPeriod, string> = {
   diaria: 'Diária',
@@ -40,11 +41,11 @@ export function CoworkStudio() {
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
           <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            {rentalCopy.coworkStudio.title}
+            <HighlightText text={rentalCopy.coworkStudio.title} />
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/50 text-lg max-w-xl mb-12">
+          <p className="text-white/70 text-lg max-w-xl mb-12">
             {rentalCopy.coworkStudio.subtitle}
           </p>
         </ScrollReveal>

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Check, MessageCircle } from 'lucide-react';
 import { coworkPlans, coworkAmenities, rentalCopy, CONTACTS, getWhatsAppUrl, type CoworkPlan } from '@/data/rentalData';
+import { HighlightText } from '@/components/ui/HighlightText';
 
 type CoworkPeriod = 'diaria' | 'semanal' | 'mensal';
 
@@ -41,14 +42,14 @@ export function CoworkStandalone() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
         >
-          {rentalCopy.cowork.title}
+          <HighlightText text={rentalCopy.cowork.title} />
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/50 text-lg max-w-xl mb-12"
+          className="text-white/70 text-lg max-w-xl mb-12"
         >
           {rentalCopy.cowork.subtitle}
         </motion.p>

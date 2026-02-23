@@ -48,7 +48,7 @@ export function Hero() {
                     <PremiumLogo size={280} className="w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] md:w-[280px] md:h-[280px]" />
                 </div>
 
-                {/* Agency Label */}
+                {/* Agency Label — SEO optimized tagline */}
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -58,10 +58,13 @@ export function Hero() {
                     {siteCopy.brand.tagline}
                 </motion.p>
 
-                {/* Main Headline */}
+                {/* Main Headline — H1 for SEO */}
                 <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-9xl font-bold leading-[1.1] tracking-tighter mb-6 md:mb-8">
                     <span className="block">
-                        <TextReveal delay={1.7}>Criamos</TextReveal>
+                        <TextReveal delay={1.7}>A Sua Marca</TextReveal>
+                    </span>
+                    <span className="block">
+                        <TextReveal delay={1.8}>Merece</TextReveal>
                     </span>
                     <span className="block min-h-[1.2em]">
                         <TypewriterText
@@ -69,17 +72,14 @@ export function Hero() {
                             className="text-[var(--color-accent)]"
                         />
                     </span>
-                    <span className="block">
-                        <TextReveal delay={1.9} className="flex-nowrap">Que Convertem.</TextReveal>
-                    </span>
                 </h1>
 
-                {/* Subtitle */}
+                {/* Subtitle — SEO rich description */}
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2.2, duration: 0.8 }}
-                    className="text-sm sm:text-base md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
+                    className="text-sm sm:text-base md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed"
                 >
                     <HighlightText text={siteCopy.hero.subheadline} />
                 </motion.p>
@@ -92,7 +92,7 @@ export function Hero() {
                 transition={{ delay: 0.5 }}
                 className="absolute top-8 left-8 text-xs text-white/30 font-mono z-10 hidden md:block"
             >
-                {siteCopy.brand.name.toUpperCase()} © 2024
+                {siteCopy.brand.name.toUpperCase()} © {new Date().getFullYear()}
             </motion.div>
             <motion.div
                 initial={{ opacity: 0 }}
@@ -100,7 +100,7 @@ export function Hero() {
                 transition={{ delay: 0.5 }}
                 className="absolute top-8 right-8 text-xs text-white/30 font-mono z-10 hidden md:block"
             >
-                PORTUGAL
+                A SERVIR LISBOA & CASCAIS
             </motion.div>
         </section>
     );

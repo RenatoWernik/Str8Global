@@ -2,33 +2,35 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { CTASection } from '@/components/sections/CTASection';
+import { ctaCopy } from '@/data/ctaData';
 
 const stats = [
-  { value: '500+', label: 'Projetos Realizados' },
-  { value: '120+', label: 'Clientes Satisfeitos' },
-  { value: '5+', label: 'Anos de Experiência' },
+  { value: '500+', label: 'Projectos Entregues' },
+  { value: '120+', label: 'Marcas Aceleradas' },
+  { value: '5+', label: 'Anos de Mercado' },
   { value: '2', label: 'Fotógrafos de Elite' },
 ];
 
 const services = [
   {
     title: 'Fotografia Comercial',
-    description: 'Imagens premium para marcas que querem destacar-se no mercado.',
+    description: 'Imagens que não decoram — posicionam. Fotografia profissional em Lisboa para marcas que querem ser a única escolha lógica.',
     icon: '01',
   },
   {
-    title: 'Eventos & Cobertura',
-    description: 'Captação profissional de momentos que marcam a diferença.',
+    title: 'Cobertura de Eventos',
+    description: 'O seu evento merece cobertura com nível de cinema. Captação profissional em Lisboa e Cascais que prolonga o impacto além do último aplauso.',
     icon: '02',
   },
   {
-    title: 'Retratos & Lifestyle',
-    description: 'Sessões personalizadas que revelam a essência de cada pessoa.',
+    title: 'Retratos & Marcas Pessoais',
+    description: 'Autoridade não se proclama — transmite-se. Sessões de retrato que reflectem quem já é: o líder incontestável do seu sector.',
     icon: '03',
   },
   {
-    title: 'Conteúdo Digital',
-    description: 'Material visual otimizado para redes sociais e campanhas digitais.',
+    title: 'Conteúdo para Redes Sociais',
+    description: 'Material visual arquitectado com precisão cirúrgica para dominar feeds. Produção de conteúdo em Lisboa optimizado para engagement e conversão.',
     icon: '04',
   },
 ];
@@ -47,7 +49,7 @@ function StatCard({ stat, index }: { stat: (typeof stats)[0]; index: number }) {
         <span className="text-4xl md:text-5xl font-bold block mb-2">
           {stat.value}
         </span>
-        <p className="text-white/50 text-sm uppercase tracking-wider">
+        <p className="text-white/60 text-sm uppercase tracking-wider">
           {stat.label}
         </p>
       </div>
@@ -87,7 +89,7 @@ function ServiceCard({
         <h3 className="text-xl md:text-2xl font-bold mb-3 group-hover:text-[var(--color-accent)] transition-colors">
           {service.title}
         </h3>
-        <p className="text-white/50 text-sm leading-relaxed">
+        <p className="text-white/70 text-sm leading-relaxed">
           {service.description}
         </p>
         <div className="mt-4 flex items-center gap-2 text-[var(--color-accent)] text-sm opacity-0 group-hover:opacity-100 transition-opacity">
@@ -117,46 +119,13 @@ export function PortfolioShowcase() {
       </div>
 
       {/* CTA Section */}
-      <div className="relative py-20 md:py-32 px-6 overflow-hidden">
-        {/* Background accent glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--color-accent)] rounded-full blur-[200px] opacity-10" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold mb-8">
-              O Próximo Projecto
-              <br />
-              é{' '}<span className="text-[var(--color-accent)]">
-                Seu
-              </span>
-            </h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-white/60 text-lg max-w-xl mx-auto mb-8"
-            >
-              A sua marca merece mais do que &quot;fotos bonitas&quot;. Merece resultados.
-              Fale connosco — o pior que pode acontecer é ficar impressionado.
-            </motion.p>
-            <motion.a
-              href="/#contacto"
-              whileHover={{ scale: 1.05, gap: '1rem' }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[var(--color-accent)] text-black font-bold text-base sm:text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
-            >
-              Contactar
-              <ArrowRight size={20} />
-            </motion.a>
-          </motion.div>
-        </div>
-      </div>
+      <CTASection
+        badge={ctaCopy.portfolio.badge}
+        headline={ctaCopy.portfolio.headline}
+        subtitle={ctaCopy.portfolio.subtitle}
+        buttonText={ctaCopy.portfolio.buttonText}
+        buttonHref={ctaCopy.portfolio.buttonHref}
+      />
     </section>
   );
 }

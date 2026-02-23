@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects, siteCopy, Project } from '@/data/mockData';
+import { HighlightText } from '@/components/ui/HighlightText';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { Play, X } from 'lucide-react';
@@ -32,14 +33,14 @@ export function PortfolioGrid() {
                         transition={{ duration: 0.8 }}
                         className="text-3xl md:text-6xl font-bold text-center mb-4"
                     >
-                        {siteCopy.portfolio.title}
+                        <HighlightText text={siteCopy.portfolio.title} />
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.1 }}
-                        className="text-white/50 text-center text-base md:text-lg max-w-xl mx-auto mb-10 md:mb-16"
+                        className="text-white/70 text-center text-base md:text-lg max-w-xl mx-auto mb-10 md:mb-16"
                     >
                         {siteCopy.portfolio.subtitle}
                     </motion.p>
@@ -210,8 +211,8 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
                 </motion.div>
             )}
 
-            {/* Gradient Overlay for Text Readability */}
-            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
 
             {/* Play Button Indicator (Center) */}
             {project.video && (
@@ -224,45 +225,18 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
                     transition={{ duration: 0.3 }}
                     className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
                 >
-                    <div className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                        <Play size={24} className="text-white fill-white ml-1" />
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                        <Play size={22} className="text-white fill-white ml-1" />
                     </div>
                 </motion.div>
             )}
 
-            {/* Content Container (Bottom Left) */}
-            <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: isTouchDevice || isActive ? 0 : 10, opacity: isTouchDevice || isActive ? 1 : 0.8 }}
-                transition={{ duration: 0.4 }}
-                className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 z-40 pointer-events-none flex flex-col justify-end h-full"
-            >
-                {/* Year Badge */}
-                <div className="flex items-center gap-3 mb-3">
-                    <span className="px-3 py-1 rounded-full bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/30 text-[var(--color-accent)] text-[10px] md:text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
-                        {project.year}
-                    </span>
-                    <span className="text-xs text-white/60 tracking-wider">
-                        {project.client}
-                    </span>
-                </div>
-
-                <h3 className="text-xl sm:text-2xl md:text-4xl font-bold mb-2 text-white drop-shadow-lg leading-tight group-hover:text-[var(--color-accent)] transition-colors duration-300">
-                    {project.title}
+            {/* Client name only — clean and minimal */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 md:p-6 z-40 pointer-events-none">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white drop-shadow-lg leading-tight group-hover:text-[var(--color-accent)] transition-colors duration-300">
+                    {project.client}
                 </h3>
-
-                <p className="text-sm md:text-base text-white/80 line-clamp-2 md:line-clamp-3 max-w-2xl font-medium">
-                    {project.description}
-                </p>
-            </motion.div>
-
-            {/* Decorative Corner Framing (Top Right) */}
-            <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-[var(--color-accent)] z-30 pointer-events-none"
-            />
+            </div>
         </motion.div>
     );
 }

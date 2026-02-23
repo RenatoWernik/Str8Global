@@ -17,14 +17,14 @@ export function ClientsSection() {
                     transition={{ duration: 0.8 }}
                     className="text-3xl sm:text-4xl md:text-6xl font-bold text-center mb-4 text-white"
                 >
-                    {siteCopy.clients.title}
+                    <HighlightText text={siteCopy.clients.title} />
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.1 }}
-                    className="text-white/50 text-center text-lg max-w-xl mx-auto"
+                    className="text-white/70 text-center text-lg max-w-xl mx-auto"
                 >
                     <HighlightText text={siteCopy.clients.subtitle} />
                 </motion.p>

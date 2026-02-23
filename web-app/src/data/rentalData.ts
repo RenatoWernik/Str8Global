@@ -249,36 +249,36 @@ export const coworkAmenities = [
 
 export const rentalCopy = {
   hero: {
-    label: 'Aluguer',
+    label: 'Aluguer de Equipamento & Estúdios em Lisboa',
     title: 'Equipamento & Espaço',
     subtitle:
-      'Não precisa de comprar o melhor gear do mercado. Precisa é de o usar. Alugue equipamento pro, estúdios de topo e espaço cowork — tudo num lugar só.',
+      'Não compre equipamento que vai ficar numa prateleira. Alugue gear profissional de cinema, estúdios de fotografia totalmente equipados e espaço cowork criativo em Lisboa — tudo sob o mesmo tecto, sem atrito.',
   },
   gear: {
-    label: 'Aluguer de Equipamento',
-    title: 'Gear De Combate',
-    subtitle: 'O arsenal que usamos nos nossos próprios projectos — agora disponível para si. Sem gear medíocre, sem surpresas.',
+    label: 'Aluguer de Equipamento Profissional',
+    title: 'Arsenal de **Elite**',
+    subtitle: 'O mesmo gear que usamos nas produções das maiores marcas em Lisboa e Cascais — agora nas suas mãos. Câmaras, drones, iluminação e áudio de nível profissional. Zero compromissos.',
   },
   studio: {
-    label: 'Aluguer de Estúdios',
-    title: 'Estúdios Que Impressionam',
-    subtitle: 'Fotografar na sala de estar ou no nosso estúdio — o seu cliente nota a diferença. À hora, equipados, prontos.',
+    label: 'Aluguer de Estúdios em Lisboa',
+    title: 'Estúdios de Nível **Cinema**',
+    subtitle: 'O seu conteúdo merece um cenário à altura da sua ambição. Estúdios de fotografia e podcast em Lisboa — equipados, calibrados e prontos para produção de alto nível.',
   },
   coworkStudio: {
-    label: 'Cowork + Estúdio',
-    title: 'Cowork + Estúdio',
+    label: 'Cowork + Estúdio de Produção',
+    title: 'Crie & **Produza**',
     subtitle:
-      'Trabalhe, crie e produza sem sair do edifício. O melhor dos dois mundos para quem leva a sério o que faz.',
+      'Trabalhe no seu negócio e produza conteúdo profissional sem sair do edifício. O ecossistema completo para criadores e marcas que exigem mais do que uma secretária.',
   },
   cowork: {
-    label: 'Co-Work',
-    title: 'O Seu QG Criativo',
-    subtitle: 'Mais do que uma mesa — é a energia de estar rodeado de quem cria todos os dias. Flexível, sem burocracia.',
+    label: 'Espaço Cowork Criativo em Lisboa',
+    title: 'O Seu QG **Criativo**',
+    subtitle: 'Mais do que uma mesa — é o ambiente que acelera ideias. Coworking criativo em Lisboa para empreendedores, freelancers e equipas que recusam a mediocridade.',
   },
   cta: {
-    title: 'Pronto Para Começar?',
+    title: 'O Próximo Passo É **Seu**',
     subtitle:
-      'Reserve, visite ou peça orçamento. O pior que pode acontecer é ficar impressionado.',
-    button: 'Contactar',
+      'Reserve o seu espaço, escolha o gear ou visite o nosso hub criativo em Lisboa. O pior que pode acontecer é ficar impressionado.',
+    button: 'Reservar Agora',
   },
 };

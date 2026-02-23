@@ -27,7 +27,7 @@ export function Footer() {
               Str8Global
             </Link>
             <p className="mt-3 text-sm text-white/50 leading-relaxed">
-              Agência de Marketing & Fotografia Premium. Criamos conteúdo que converte — de estratégia a execução.
+              Agência de marketing premium a servir Lisboa, Cascais e Grande Lisboa. Estúdio de fotografia, produção de vídeo, podcast e coworking criativo. O ecossistema completo para marcas que querem dominar.
             </p>
           </div>
 
@@ -113,7 +113,7 @@ export function Footer() {
             © {currentYear} Str8Global. Todos os direitos reservados.
           </p>
           <p className="text-xs text-white/20">
-            Lisboa, Portugal
+            A servir Lisboa, Cascais e Grande Lisboa
           </p>
         </div>
       </div>

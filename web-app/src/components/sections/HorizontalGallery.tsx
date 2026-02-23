@@ -42,7 +42,7 @@ export function HorizontalGallery() {
     const x = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
 
     return (
-        <section ref={containerRef} className="relative h-[200vh] md:h-[250vh] bg-black">
+        <section ref={containerRef} className="relative h-[200vh] md:h-[250vh] bg-white">
             <div className="sticky top-0 h-screen overflow-hidden">
                 {/* Header */}
                 <div className="absolute top-8 md:top-12 left-4 md:left-6 right-4 md:right-6 z-10 flex justify-between items-center">
@@ -50,7 +50,7 @@ export function HorizontalGallery() {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="text-xl sm:text-2xl md:text-5xl font-bold"
+                        className="text-xl sm:text-2xl md:text-5xl font-bold text-black"
                     >
                         A Nossa Visão
                     </motion.h2>
@@ -58,7 +58,7 @@ export function HorizontalGallery() {
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
-                        className="text-white/50 text-xs md:text-sm hidden md:block"
+                        className="text-black/40 text-xs md:text-sm hidden md:block"
                     >
                         {siteCopy.nav.scroll} para explorar
                     </motion.span>
@@ -75,7 +75,7 @@ export function HorizontalGallery() {
                 </motion.div>
 
                 {/* Progress bar */}
-                <div className="absolute bottom-8 md:bottom-12 left-4 md:left-6 right-4 md:right-6 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                <div className="absolute bottom-8 md:bottom-12 left-4 md:left-6 right-4 md:right-6 h-[2px] bg-black/10 rounded-full overflow-hidden">
                     <motion.div
                         style={{ scaleX: scrollYProgress }}
                         className="h-full bg-[var(--color-accent)] origin-left"
@@ -113,10 +113,10 @@ const GalleryItem = memo(function GalleryItem({ item, index, isMobile }: Gallery
             />
 
             {/* Gradient overlay — CSS only, no state-driven animation */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300" />
 
             {/* Content — CSS transitions only */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 translate-y-5 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:translate-y-5 md:opacity-0"
+            <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 md:p-6 translate-y-5 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:translate-y-5 md:opacity-0"
                 style={isMobile ? { transform: 'translateY(0)', opacity: 1 } : undefined}
             >
                 <span className="text-[10px] md:text-xs uppercase tracking-widest text-[var(--color-accent)] mb-1 block">

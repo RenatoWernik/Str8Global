@@ -39,7 +39,7 @@ export function PortfolioHero() {
           transition={{ duration: 0.6 }}
           className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block pointer-events-auto"
         >
-          Os Nossos Fotógrafos
+          Fotografia & Produção Visual Premium
         </motion.span>
 
         <motion.h1
@@ -48,9 +48,8 @@ export function PortfolioHero() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 pointer-events-auto"
         >
-          Portfólio
-          <span className="text-[var(--color-accent)]"> Str8</span>
-          Global
+          Portfólio{' '}
+          <span className="text-[var(--color-accent)]">Str8</span>Global
         </motion.h1>
 
         <motion.p
@@ -59,8 +58,8 @@ export function PortfolioHero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-white/80 text-lg md:text-xl max-w-2xl pointer-events-auto font-medium drop-shadow-md"
         >
-          Dois olhares, uma visão. Conheça o trabalho dos nossos fotógrafos e descubra
-          o estilo que melhor se adapta ao seu projeto.
+          Dois olhares de elite. Uma visão sem compromissos. Fotografia profissional e produção de vídeo cinematográfico
+          em Lisboa e Cascais — conheça o trabalho que transforma marcas em referências do mercado.
         </motion.p>
       </div>
 

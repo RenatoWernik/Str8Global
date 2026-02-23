@@ -53,7 +53,7 @@ export const contactInfo: ContactInfo = {
     { name: 'Igor', number: '351966128922', display: '+351 966 128 922' },
     { name: 'Marta', number: '351933029438', display: '+351 933 029 438' },
   ],
-  location: 'Lisboa, Portugal',
+  location: 'Agualva-Cacém — a servir Lisboa e Cascais',
   instagram: [
     { label: 'Igor', handle: '@igoracfilipe', href: 'https://instagram.com/igoracfilipe' },
     { label: 'Marta', handle: '@martadoliveiraa', href: 'https://instagram.com/martadoliveiraa' },

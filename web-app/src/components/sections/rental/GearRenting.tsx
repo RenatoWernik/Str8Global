@@ -14,6 +14,7 @@ import {
   type GearItem,
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
+import { HighlightText } from '@/components/ui/HighlightText';
 
 const categories = Object.keys(gearCategoryLabels) as GearCategoryId[];
 
@@ -36,11 +37,11 @@ export function GearRenting() {
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.1}>
           <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            {rentalCopy.gear.title}
+            <HighlightText text={rentalCopy.gear.title} />
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/50 text-lg max-w-xl mb-12">
+          <p className="text-white/70 text-lg max-w-xl mb-12">
             {rentalCopy.gear.subtitle}
           </p>
         </ScrollReveal>

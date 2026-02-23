@@ -3,7 +3,8 @@
 import dynamic from 'next/dynamic';
 import { Hero } from '@/components/sections';
 
-// Lazy load all sections below the fold
+// Lazy load all sections below the fold — ssr: false for performance
+// SEO metadata is handled in layout.tsx (Server Component)
 const Services = dynamic(() => import('@/components/sections/Services'), { ssr: false });
 const SelectedWorks = dynamic(() => import('@/components/sections/SelectedWorks'), { ssr: false });
 const HorizontalGallery = dynamic(() => import('@/components/sections/HorizontalGallery'), { ssr: false });

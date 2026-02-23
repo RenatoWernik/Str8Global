@@ -3,11 +3,10 @@
 import { motion } from 'framer-motion';
 import { services, siteCopy } from '@/data/mockData';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import {
     Target, Camera, Video, Plane, Package, Calendar, Mic, Share2, ArrowRight
 } from 'lucide-react';
-import dynamic from 'next/dynamic';
 
 const iconMap: Record<string, React.ReactNode> = {
     strategy: <Target size={40} strokeWidth={1.5} />,
@@ -20,31 +19,9 @@ const iconMap: Record<string, React.ReactNode> = {
     social: <Share2 size={40} strokeWidth={1.5} />,
 };
 
-// Lazy load ScrollStack — only needed on mobile
-const ScrollStack = dynamic(() => import('@/components/ui/ScrollStack'), { ssr: false });
-const ScrollStackItemModule = dynamic(
-    () => import('@/components/ui/ScrollStack').then(mod => {
-        const Wrapper = ({ children }: { children: React.ReactNode }) => (
-            <mod.ScrollStackItem>{children}</mod.ScrollStackItem>
-        );
-        Wrapper.displayName = 'ScrollStackItem';
-        return Wrapper;
-    }),
-    { ssr: false }
-);
-
 export function Services() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const mq = window.matchMedia('(max-width: 767px)');
-        setIsMobile(mq.matches);
-        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-        mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
-    }, []);
 
     return (
         <section ref={containerRef} className="relative bg-[#020202] py-20 md:py-32 overflow-hidden">
@@ -72,7 +49,7 @@ export function Services() {
                             transition={{ duration: 0.6 }}
                             className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block font-medium"
                         >
-                            Serviços
+                            O Ecossistema
                         </motion.span>
                         <motion.h2
                             initial={{ opacity: 0, x: -50 }}
@@ -81,7 +58,7 @@ export function Services() {
                             transition={{ duration: 0.8, delay: 0.1 }}
                             className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold leading-tight"
                         >
-                            {siteCopy.services.title}
+                            <HighlightText text={siteCopy.services.title} />
                         </motion.h2>
                     </div>
                     <motion.p
@@ -95,45 +72,25 @@ export function Services() {
                     </motion.p>
                 </div>
 
-                {/* Desktop: Bento Grid (md+) */}
-                {!isMobile && (
-                    <div className="grid grid-flow-row-dense grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[minmax(250px,auto)] md:auto-rows-[minmax(280px,auto)] lg:auto-rows-[minmax(280px,auto)]">
-                        {services.map((service, index) => (
-                            <ServiceCard
-                                key={service.id}
-                                service={service}
-                                index={index}
-                                isActive={activeIndex === index}
-                                onActivate={() => setActiveIndex(index)}
-                                onMouseLeave={() => setActiveIndex(null)}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {/* Mobile: ScrollStack stacking cards (<768px) */}
-                {isMobile && (
-                    <ScrollStack
-                        itemDistance={40}
-                        itemStackDistance={20}
-                        stackPosition="25%"
-                        scaleEndPosition="8%"
-                        baseScale={0.92}
-                        itemScale={0.02}
-                    >
-                        {services.map((service, index) => (
-                            <ScrollStackItemModule key={service.id}>
-                                <MobileServiceCard service={service} index={index} />
-                            </ScrollStackItemModule>
-                        ))}
-                    </ScrollStack>
-                )}
+                {/* Bento Grid — responsive, always visible */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[minmax(220px,auto)] md:auto-rows-[minmax(280px,auto)]">
+                    {services.map((service, index) => (
+                        <ServiceCard
+                            key={service.id}
+                            service={service}
+                            index={index}
+                            isActive={activeIndex === index}
+                            onActivate={() => setActiveIndex(index)}
+                            onMouseLeave={() => setActiveIndex(null)}
+                        />
+                    ))}
+                </div>
             </div>
         </section>
     );
 }
 
-/* ─── Desktop Service Card ─── */
+/* ─── Service Card — works on both mobile and desktop ─── */
 
 interface ServiceCardProps {
     service: (typeof services)[0];
@@ -146,23 +103,21 @@ interface ServiceCardProps {
 function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: ServiceCardProps) {
     const cardRef = useRef<HTMLDivElement>(null);
 
-    let spanClass = 'col-span-1 row-span-1';
+    let spanClass = 'col-span-1';
     let isLarge = false;
 
     if (index === 0 || index === 3 || index === 4 || index === 7) {
-        spanClass = 'col-span-1 md:col-span-2 lg:col-span-2 row-span-1';
+        spanClass = 'col-span-1 md:col-span-2 lg:col-span-2';
         isLarge = true;
-    } else {
-        spanClass = 'col-span-1 md:col-span-1 lg:col-span-1 row-span-1';
     }
 
     return (
         <motion.div
             ref={cardRef}
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: index * 0.05, ease: [0.25, 1, 0.5, 1] }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.5, delay: index * 0.06, ease: [0.25, 1, 0.5, 1] }}
             className={`group relative ${spanClass} cursor-pointer`}
             onMouseEnter={onActivate}
             onMouseLeave={onMouseLeave}
@@ -175,10 +130,7 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                     boxShadow: isActive ? '0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(255,16,240,0.1)' : '0 10px 30px rgba(0,0,0,0.3), 0 0 0px rgba(255,16,240,0)',
                 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className={`
-                  relative flex flex-col h-full w-full rounded-2xl md:rounded-3xl overflow-hidden
-                  bg-[#0a0a0a] border border-white/5
-                `}
+                className="relative flex flex-col h-full w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/5"
             >
                 {/* LED border glow */}
                 <div
@@ -203,7 +155,7 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                     <motion.span
                         animate={{ opacity: isActive ? 0.08 : 0.03, scale: isActive ? 1.05 : 1 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="absolute bottom-[-5%] right-[0%] text-[8rem] md:text-[10rem] lg:text-[12rem] font-black text-white pointer-events-none select-none leading-none tracking-tighter"
+                        className="absolute bottom-[-5%] right-[0%] text-[7rem] md:text-[10rem] lg:text-[12rem] font-black text-white pointer-events-none select-none leading-none tracking-tighter"
                     >
                         {String(index + 1).padStart(2, '0')}
                     </motion.span>
@@ -217,33 +169,27 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                                     rotate: isActive ? 5 : 0,
                                 }}
                                 transition={{ duration: 0.4, type: 'spring' }}
-                                className="mb-6 inline-flex p-3 rounded-xl bg-white/5 border border-white/10 shadow-lg"
+                                className="mb-4 md:mb-6 inline-flex p-2.5 md:p-3 rounded-xl bg-white/5 border border-white/10 shadow-lg"
                             >
-                                {iconMap[service.icon] || <Target size={32} strokeWidth={1.5} />}
+                                <span className="[&>svg]:w-7 [&>svg]:h-7 md:[&>svg]:w-10 md:[&>svg]:h-10">
+                                    {iconMap[service.icon] || <Target size={32} strokeWidth={1.5} />}
+                                </span>
                             </motion.div>
 
                             <motion.h3
                                 animate={{ color: isActive ? '#ffffff' : 'rgba(255,255,255,0.9)' }}
                                 transition={{ duration: 0.4 }}
-                                style={
-                                    service.title === 'Cinematografia' || service.title === 'Fotografia Premium' || service.title === 'Estúdio & Podcasting'
-                                        ? { fontSize: isLarge ? '1.25rem' : '1.125rem' }
-                                        : undefined
-                                }
-                                className={`font-bold mb-2 md:mb-3 tracking-tight ${service.title === 'Cinematografia' || service.title === 'Fotografia Premium' || service.title === 'Estúdio & Podcasting'
-                                    ? ''
-                                    : (isLarge ? 'text-lg md:text-xl lg:text-2xl' : 'text-base md:text-lg lg:text-xl')
-                                    }`}
+                                className={`font-bold mb-2 md:mb-3 tracking-tight ${isLarge ? 'text-base md:text-xl lg:text-2xl' : 'text-base md:text-lg lg:text-xl'}`}
                             >
                                 {service.title}
                             </motion.h3>
                         </div>
 
-                        <div className="mt-auto pt-4 relative">
+                        <div className="mt-auto pt-3 md:pt-4 relative">
                             <motion.p
                                 animate={{ opacity: isActive ? 0.9 : 0.6, y: isActive ? -5 : 0 }}
                                 transition={{ duration: 0.4 }}
-                                className={`leading-relaxed max-w-xl font-medium ${isLarge ? 'text-base md:text-lg' : 'text-sm md:text-base'}`}
+                                className={`leading-relaxed max-w-xl font-medium ${isLarge ? 'text-sm md:text-base lg:text-lg' : 'text-sm md:text-base'}`}
                             >
                                 <HighlightText text={service.description} />
                             </motion.p>
@@ -254,7 +200,7 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                                 transition={{ duration: 0.4, delay: 0.1 }}
                                 className="absolute -bottom-2 flex items-center gap-2 text-[var(--color-accent)] text-sm md:text-base font-bold pointer-events-auto"
                             >
-                                <span>Ver Operação</span>
+                                <span>Saber Mais</span>
                                 <ArrowRight size={18} />
                             </motion.div>
                         </div>
@@ -262,45 +208,6 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                 </div>
             </motion.div>
         </motion.div>
-    );
-}
-
-/* ─── Mobile Service Card (for ScrollStack) ─── */
-
-function MobileServiceCard({ service, index }: { service: (typeof services)[0]; index: number }) {
-    return (
-        <div className="relative rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/8">
-            <div className="absolute inset-[1px] z-[1] rounded-[15px] bg-[#0c0c0e]" />
-            <div className="absolute top-0 left-0 right-0 h-16 z-[2] bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none rounded-t-[15px]" />
-
-            <div className="relative z-[3] p-5 flex flex-col min-h-[200px]">
-                {/* Number watermark */}
-                <span className="absolute bottom-[-8%] right-[2%] text-[7rem] font-black text-white/[0.04] pointer-events-none select-none leading-none tracking-tighter">
-                    {String(index + 1).padStart(2, '0')}
-                </span>
-
-                {/* Icon + Title row */}
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[var(--color-accent)]">
-                        {iconMap[service.icon] || <Target size={28} strokeWidth={1.5} />}
-                    </div>
-                    <h3 className="text-base font-bold tracking-tight text-white/90">
-                        {service.title}
-                    </h3>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm leading-relaxed text-white/50 font-medium mb-4">
-                    <HighlightText text={service.description} />
-                </p>
-
-                {/* CTA */}
-                <div className="mt-auto flex items-center gap-2 text-[var(--color-accent)] text-sm font-bold">
-                    <span>Ver Operação</span>
-                    <ArrowRight size={16} />
-                </div>
-            </div>
-        </div>
     );
 }
 

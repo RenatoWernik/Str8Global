@@ -1,10 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 import { RentalHero, GearRenting, StudioRenting, CoworkStudio, CoworkStandalone } from '@/components/sections/rental';
-import { rentalCopy, type RentalTab } from '@/data/rentalData';
+import { type RentalTab } from '@/data/rentalData';
+import { CTASection } from '@/components/sections/CTASection';
+import { ctaCopy } from '@/data/ctaData';
 
 export default function AluguelPage() {
   const [activeTab, setActiveTab] = useState<RentalTab>('gear');
@@ -56,45 +56,13 @@ export default function AluguelPage() {
       </div>
 
       {/* CTA Section */}
-      <section className="relative bg-black pt-20 pb-32 px-6 overflow-hidden">
-        {/* Background accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[var(--color-accent)] rounded-full blur-[200px] opacity-10" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold mb-8">
-              {rentalCopy.cta.title.split(' ').slice(0, 2).join(' ')}
-              <br />
-              <span className="text-[var(--color-accent)]">
-                {rentalCopy.cta.title.split(' ').slice(2).join(' ')}
-              </span>
-            </h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-white/60 text-lg max-w-xl mx-auto mb-8"
-            >
-              {rentalCopy.cta.subtitle}
-            </motion.p>
-            <motion.a
-              href="/#contacto"
-              whileHover={{ scale: 1.05, gap: '1rem' }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-[var(--color-accent)] text-black font-bold text-base sm:text-lg rounded-full hover:bg-[var(--color-accent-hover)] transition-colors"
-            >
-              {rentalCopy.cta.button}
-              <ArrowRight size={20} />
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
+      <CTASection
+        badge={ctaCopy.aluguel.badge}
+        headline={ctaCopy.aluguel.headline}
+        subtitle={ctaCopy.aluguel.subtitle}
+        buttonText={ctaCopy.aluguel.buttonText}
+        buttonHref={ctaCopy.aluguel.buttonHref}
+      />
     </main>
   );
 }

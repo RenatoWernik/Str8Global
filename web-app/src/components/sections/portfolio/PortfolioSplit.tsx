@@ -28,9 +28,9 @@ interface PhotographerData {
 const photographers: [PhotographerData, PhotographerData] = [
   {
     name: 'Igor',
-    role: 'O Mestre da Execução',
+    role: 'O Arquitecto Visual',
     description:
-      'O olhar pragmático por trás das câmaras. Capta momentos, resolve desafios e garante que cada sessão acontece sem stress. Objetivo, focado e sempre pronto para tornar as tuas ideias em fotografias que vais postar em todo o lado. Apaixonado por fotografia desportiva, vídeo e operações aéreas com Drone.',
+      'O olhar cirúrgico por trás das câmaras. Quando o Igor aponta a lente, cada frame é uma decisão estratégica — não um acaso. Especialista em fotografia desportiva, produção de vídeo cinematográfico e operações aéreas com drone em Lisboa e Cascais. Objectivo, implacável e obcecado com a imagem que fecha negócios.',
     specialties: ['Desporto', 'Vídeo', 'Drone', 'Documental'],
     profileImage: '/images/portfolio/igor/Capa.jpg',
     portfolio: [
@@ -53,10 +53,10 @@ const photographers: [PhotographerData, PhotographerData] = [
   },
   {
     name: 'Marta Oliveira',
-    role: 'A Mente Criativa',
+    role: 'A Estrategista Criativa',
     description:
-      'A mente criativa por trás de cada sessão. Transforma ideias em conteúdos para marcas com pura estratégia, sempre com boa energia e aquele olhar super atento aos detalhes que faz absolutamente toda a diferença. Se isto não é ser imparável, então não sabemos o que é.',
-    specialties: ['Estratégia Visual', 'Conteúdo para Marcas', 'Direção de Arte'],
+      'A mente que transforma conceitos em conteúdo que domina feeds. Direcção de arte, estratégia visual e produção para marcas que recusam o medíocre. Cada sessão é uma operação de posicionamento — com a energia, o olhar e a atenção ao detalhe que separa o profissional do amador.',
+    specialties: ['Estratégia Visual', 'Conteúdo para Marcas', 'Direcção de Arte'],
     profileImage: '/images/portfolio/marta/capa.jpg',
     portfolio: [
       '/images/portfolio/marta/1.mp4',
@@ -484,7 +484,7 @@ function PhotographerDeck({
       </div>
 
       {/* Description */}
-      <p className="text-white/40 text-sm mt-4 leading-relaxed">{data.description}</p>
+      <p className="text-white/60 text-sm mt-4 leading-relaxed">{data.description}</p>
     </motion.div>
   );
 }
@@ -506,14 +506,15 @@ export function PortfolioSplit() {
           className="text-center"
         >
           <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] block mb-4">
-            Dois Olhares
+            A Equipa
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4">
             Dois Olhares.{' '}
-            <span className="text-[var(--color-accent)]">Zero</span>{' '}Limites.
+            <span className="text-[var(--color-accent)]">Uma</span>{' '}Visão.
           </h2>
-          <p className="text-white/40 text-sm md:text-base max-w-md mx-auto">
-            Desliza ou usa os botões para explorar o portfólio de cada fotógrafo. Spoiler: vais querer os dois.
+          <p className="text-white/70 text-sm md:text-base max-w-md mx-auto">
+            Desliza para explorar o portfólio de cada fotógrafo. Um executa, a outra arquitecta.
+            Juntos, constroem a percepção que a sua marca merece.
           </p>
         </motion.div>
       </div>

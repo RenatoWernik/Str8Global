@@ -27,7 +27,7 @@ export function Industries() {
                             Indústrias
                         </span>
                         <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                            {siteCopy.industries.title}
+                            <HighlightText text={siteCopy.industries.title} />
                         </h2>
                     </motion.div>
                     <motion.div
@@ -37,7 +37,7 @@ export function Industries() {
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="flex items-end"
                     >
-                        <p className="text-white/50 text-lg lg:text-xl max-w-md">
+                        <p className="text-white/70 text-lg lg:text-xl max-w-md">
                             <HighlightText text={siteCopy.industries.subtitle} />
                         </p>
                     </motion.div>

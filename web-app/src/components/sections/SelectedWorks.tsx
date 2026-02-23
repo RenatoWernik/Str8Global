@@ -12,23 +12,23 @@ const selectedWorksProjects = selectedWorksProjectsData.slice(0, 5);
 
 export function SelectedWorks() {
     return (
-        <section className="relative bg-black">
+        <section className="relative bg-white">
             <div className="py-16 md:py-24 px-4 md:px-6">
                 <motion.h2
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="text-2xl sm:text-3xl md:text-6xl font-bold text-center mb-4"
+                    className="text-2xl sm:text-3xl md:text-6xl font-bold text-center mb-4 text-black"
                 >
-                    {siteCopy.selectedWorks.title}
+                    <HighlightText text={siteCopy.selectedWorks.title} />
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.1 }}
-                    className="text-white/50 text-center text-base md:text-lg max-w-xl mx-auto"
+                    className="text-black/70 text-center text-base md:text-lg max-w-xl mx-auto"
                 >
                     <HighlightText text={siteCopy.selectedWorks.subtitle} />
                 </motion.p>
