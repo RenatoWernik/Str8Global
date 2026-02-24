@@ -52,7 +52,7 @@ export const projects: Project[] = [
         category: 'Campanha Digital',
         description: 'Produção de vídeo e conteúdo visual para a maior campanha do ano. Energia bruta, movimento e impacto visual que dominaram o feed.',
         image: '/images/portfolio/thumb_worten.jpg',
-        video: '/videos/portfolio/Worten - Black Friday(1).mp4',
+        video: '/videos/portfolio/worten-black-friday.mp4',
         year: '2024',
         client: 'Worten',
         size: 'normal'
@@ -74,7 +74,7 @@ export const projects: Project[] = [
         category: 'Comercial',
         description: 'Produção lifestyle e urbana para Wowme/Sonae. Fotografia e vídeo profissional que traduzem estatuto e modernidade numa campanha à altura da marca.',
         image: '/images/portfolio/thumb_wells.jpg',
-        video: '/videos/portfolio/Wowme - Cartão universo Wells.mp4',
+        video: '/videos/portfolio/wowme-cartao-universo.mp4',
         year: '2024',
         client: 'Wowme / Sonae',
         size: 'large'
