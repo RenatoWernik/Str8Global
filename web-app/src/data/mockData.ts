@@ -41,7 +41,7 @@ export const projects: Project[] = [
         category: 'Publicidade TV',
         description: 'Campanha publicitária nacional produzida pela nossa agência de marketing em Lisboa. Apetite appeal cinematográfico e dinamismo que geram conversão imediata.',
         image: '/images/portfolio/thumb_airfryer_alt_2s.jpg',
-        video: '/videos/portfolio/Rádio Popular - AirFryer Pizza Pro.mov',
+        video: '/videos/portfolio/radio-popular-airfryer.mp4',
         year: '2024',
         client: 'Rádio Popular',
         size: 'large'
@@ -63,7 +63,7 @@ export const projects: Project[] = [
         category: 'Institucional',
         description: 'Vídeo institucional com narrativa cinematográfica. Produção de vídeo profissional que posiciona o comparador líder em Portugal como referência incontestável.',
         image: '/images/portfolio/thumb_kuantokusta.jpg',
-        video: '/videos/portfolio/KuantoKusta.mov',
+        video: '/videos/portfolio/kuantokusta.mp4',
         year: '2025',
         client: 'KuantoKusta',
         size: 'normal'
@@ -85,7 +85,7 @@ export const projects: Project[] = [
         category: 'Evento',
         description: 'Aftermovie oficial com qualidade de cinema. Captação da emoção e atmosfera única do festival — o tipo de vídeo que transforma espectadores em bilhetes vendidos.',
         image: '/images/portfolio/thumb_love.jpg',
-        video: '/videos/portfolio/weekend of love.mov',
+        video: '/videos/portfolio/weekend-of-love.mp4',
         year: '2024',
         client: 'Festival WoL',
         size: 'tall'
@@ -149,7 +149,7 @@ export const services: Service[] = [
     },
     {
         id: '3',
-        title: 'Cinematografia',
+        title: 'Cinema',
         description: 'A sua história merece **qualidade de cinema**, não de amador. Produção de vídeo profissional em Lisboa e Cascais — narrativas cinematográficas que __prendem, emocionam e convertem__ em resultados mensuráveis.',
         icon: 'video',
     },

@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { siteCopy } from '@/data/mockData';
 import Image from 'next/image';
-import { useRef, useState, useEffect, memo } from 'react';
+import { useRef, useEffect, useState, memo, useCallback } from 'react';
 
 const galleryImages = [
     { id: '1', image: '/images/gallery/1.JPG', title: 'Legado de Roma', category: 'Arquitetura' },
@@ -20,24 +20,28 @@ const galleryImages = [
 
 export function HorizontalGallery() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [isMobile, setIsMobile] = useState(false);
+    const trackRef = useRef<HTMLDivElement>(null);
+    const [scrollDistance, setScrollDistance] = useState(0);
+
+    // Measure actual track width instead of guessing with isMobile
+    const measureTrack = useCallback(() => {
+        if (trackRef.current) {
+            const trackWidth = trackRef.current.scrollWidth;
+            const viewportWidth = window.innerWidth;
+            setScrollDistance(Math.max(0, trackWidth - viewportWidth + 100));
+        }
+    }, []);
 
     useEffect(() => {
-        const mq = window.matchMedia('(max-width: 767px)');
-        setIsMobile(mq.matches);
-        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-        mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
-    }, []);
+        measureTrack();
+        window.addEventListener('resize', measureTrack, { passive: true });
+        return () => window.removeEventListener('resize', measureTrack);
+    }, [measureTrack]);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ['start start', 'end end'],
     });
-
-    const totalWidth = galleryImages.length * (isMobile ? 300 : 420);
-    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
-    const scrollDistance = totalWidth - viewportWidth + 100;
 
     const x = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
 
@@ -66,11 +70,12 @@ export function HorizontalGallery() {
 
                 {/* Horizontal scroll container */}
                 <motion.div
+                    ref={trackRef}
                     style={{ x }}
-                    className="flex h-full items-center gap-4 md:gap-6 pl-4 md:pl-6 absolute top-0 left-0"
+                    className="flex h-full items-center gap-4 md:gap-6 pl-4 md:pl-6 absolute top-0 left-0 will-change-transform"
                 >
                     {galleryImages.map((item, index) => (
-                        <GalleryItem key={item.id} item={item} index={index} isMobile={isMobile} />
+                        <GalleryItem key={item.id} item={item} index={index} />
                     ))}
                 </motion.div>
 
@@ -78,7 +83,7 @@ export function HorizontalGallery() {
                 <div className="absolute bottom-8 md:bottom-12 left-4 md:left-6 right-4 md:right-6 h-[2px] bg-black/10 rounded-full overflow-hidden">
                     <motion.div
                         style={{ scaleX: scrollYProgress }}
-                        className="h-full bg-[var(--color-accent)] origin-left"
+                        className="h-full bg-[var(--color-accent)] origin-left will-change-transform"
                     />
                 </div>
             </div>
@@ -89,10 +94,9 @@ export function HorizontalGallery() {
 interface GalleryItemProps {
     item: (typeof galleryImages)[0];
     index: number;
-    isMobile: boolean;
 }
 
-const GalleryItem = memo(function GalleryItem({ item, index, isMobile }: GalleryItemProps) {
+const GalleryItem = memo(function GalleryItem({ item, index }: GalleryItemProps) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -100,7 +104,7 @@ const GalleryItem = memo(function GalleryItem({ item, index, isMobile }: Gallery
             viewport={{ once: true, margin: "-10%" }}
             transition={{ duration: 0.6, delay: index * 0.02 }}
             className="relative w-[240px] sm:w-[280px] md:w-[400px] h-[55vh] sm:h-[60vh] md:h-[70vh] flex-shrink-0 rounded-xl md:rounded-2xl overflow-hidden group cursor-pointer"
-            whileHover={{ scale: isMobile ? 1 : 0.98 }}
+            whileHover={{ scale: 0.98 }}
         >
             <Image
                 src={item.image}
@@ -112,13 +116,11 @@ const GalleryItem = memo(function GalleryItem({ item, index, isMobile }: Gallery
                 loading={index < 3 ? 'eager' : 'lazy'}
             />
 
-            {/* Gradient overlay — CSS only, no state-driven animation */}
+            {/* Gradient overlay — CSS only */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300" />
 
-            {/* Content — CSS transitions only */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 md:p-6 translate-y-5 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 md:translate-y-5 md:opacity-0"
-                style={isMobile ? { transform: 'translateY(0)', opacity: 1 } : undefined}
-            >
+            {/* Content — CSS-only responsive (no isMobile state) */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 md:p-6 translate-y-0 opacity-100 md:translate-y-5 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-all duration-300">
                 <span className="text-[10px] md:text-xs uppercase tracking-widest text-[var(--color-accent)] mb-1 block">
                     {item.category}
                 </span>

@@ -108,7 +108,6 @@ function GearCard({ item, index }: { item: GearItem; index: number }) {
           relative p-6 rounded-2xl overflow-hidden h-full flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
-          backdrop-blur-sm
           hover:border-[var(--color-accent)]/30
           transition-all duration-300
         `}

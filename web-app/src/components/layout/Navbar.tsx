@@ -69,7 +69,7 @@ function ContactButton({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute right-0 top-full mt-3 w-60 bg-black/95 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(255,16,240,0.08)]"
+            className="absolute right-0 top-full mt-3 w-60 bg-black/95 border border-white/10 rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(255,16,240,0.08)]"
           >
             <div className="p-1.5">
               <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 px-3 pt-2.5 pb-2 font-medium">
@@ -116,9 +116,18 @@ export function Navbar() {
   const [showContactOptions, setShowContactOptions] = useState(false);
   const lenis = useLenis();
 
-  // Scroll detection
+  // Scroll detection — throttled with RAF
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 100);
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 100);
+          ticking = false;
+        });
+      }
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -165,7 +174,7 @@ export function Navbar() {
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
           isScrolled
-            ? 'bg-black/80 backdrop-blur-lg border-b border-white/5'
+            ? 'bg-black/90 backdrop-blur-sm border-b border-white/5'
             : 'bg-transparent'
         }`}
         initial={{ y: -100 }}
@@ -266,7 +275,7 @@ export function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex flex-col justify-center items-center"
+            className="fixed inset-0 z-[60] bg-black flex flex-col justify-center items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

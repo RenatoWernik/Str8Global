@@ -36,7 +36,7 @@ export function Contact() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.1 }}
                             whileHover={{ y: -6, borderColor: 'rgba(255,16,240,0.3)' }}
-                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm overflow-hidden transition-colors duration-500 block"
+                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10  overflow-hidden transition-colors duration-500 block"
                         >
                             <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="relative z-10">
@@ -56,7 +56,7 @@ export function Contact() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.2 }}
-                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm overflow-hidden hover:border-[var(--color-accent)]/30 transition-all duration-500"
+                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10  overflow-hidden hover:border-[var(--color-accent)]/30 transition-all duration-500"
                         >
                             <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="relative z-10">
@@ -83,7 +83,7 @@ export function Contact() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.3 }}
-                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm overflow-hidden hover:border-[var(--color-accent)]/30 transition-all duration-500"
+                            className="group relative p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10  overflow-hidden hover:border-[var(--color-accent)]/30 transition-all duration-500"
                         >
                             <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="relative z-10">

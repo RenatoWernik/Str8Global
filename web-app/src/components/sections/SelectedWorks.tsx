@@ -1,11 +1,10 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { selectedWorksProjectsData, siteCopy } from '@/data/mockData';
 import { HighlightText } from '@/components/ui/HighlightText';
 import Image from 'next/image';
-import { Play } from 'lucide-react';
 
 // Use first 5 projects from the list
 const selectedWorksProjects = selectedWorksProjectsData.slice(0, 5);
@@ -48,24 +47,14 @@ interface ProjectSlideProps {
 
 function ProjectSlide({ project, index }: ProjectSlideProps) {
     const ref = useRef(null);
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const mq = window.matchMedia('(max-width: 767px)');
-        setIsMobile(mq.matches);
-        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-        mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
-    }, []);
 
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ['start end', 'end start'],
     });
 
-    // Reduced parallax on mobile
-    const yRange = isMobile ? [50, -50] : [100, -100];
-    const y = useTransform(scrollYProgress, [0, 1], yRange);
+    // Single parallax range — moderate value works well on all devices
+    const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
     const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
     const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.9, 1, 1, 0.9]);
 

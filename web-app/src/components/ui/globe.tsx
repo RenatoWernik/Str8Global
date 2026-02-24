@@ -41,11 +41,13 @@ export function Globe({
     className?: string;
     config?: any;
 }) {
-    let phi = 0;
-    let width = 0;
+    const phiRef = useRef(0);
+    const widthRef = useRef(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const pointerInteracting = useRef(null);
+    const pointerInteracting = useRef<number | null>(null);
     const pointerInteractionMovement = useRef(0);
+    const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
     const [{ r }, api] = useSpring(() => ({
         r: 0,
         config: {
@@ -56,14 +58,14 @@ export function Globe({
         },
     }));
 
-    const updatePointerInteraction = (value: any) => {
+    const updatePointerInteraction = (value: number | null) => {
         pointerInteracting.current = value;
         if (canvasRef.current) {
-            canvasRef.current.style.cursor = value ? "grabbing" : "grab";
+            canvasRef.current.style.cursor = value !== null ? "grabbing" : "grab";
         }
     };
 
-    const updateMovement = (clientX: any) => {
+    const updateMovement = (clientX: number) => {
         if (pointerInteracting.current !== null) {
             const delta = clientX - pointerInteracting.current;
             pointerInteractionMovement.current = delta;
@@ -73,27 +75,34 @@ export function Globe({
 
     const onRender = useCallback(
         (state: any) => {
-            if (!pointerInteracting.current) {
-                phi += 0.005;
+            if (pointerInteracting.current === null) {
+                phiRef.current += 0.005;
             }
-            state.phi = phi + r.get();
-            state.width = width;
-            state.height = width;
+            state.phi = phiRef.current + r.get();
+            state.width = widthRef.current;
+            state.height = widthRef.current;
         },
         [r],
     );
 
-    const onResize = () => {
-        if (canvasRef.current) {
-            width = canvasRef.current.offsetWidth;
-        }
-    };
-
     useEffect(() => {
-        window.addEventListener("resize", onResize);
-        onResize();
-        // Use a fallback if element hasn't laid out yet
-        const initWidth = width || 600;
+        // Debounced resize handler
+        const onResize = () => {
+            clearTimeout(resizeTimerRef.current);
+            resizeTimerRef.current = setTimeout(() => {
+                if (canvasRef.current) {
+                    widthRef.current = canvasRef.current.offsetWidth;
+                }
+            }, 150);
+        };
+
+        window.addEventListener("resize", onResize, { passive: true });
+
+        if (canvasRef.current) {
+            widthRef.current = canvasRef.current.offsetWidth;
+        }
+        const initWidth = widthRef.current || 600;
+
         const globe = createGlobe(canvasRef.current!, {
             ...config,
             width: initWidth,
@@ -104,7 +113,12 @@ export function Globe({
         setTimeout(() => {
             if (canvasRef.current) canvasRef.current.style.opacity = "1";
         });
-        return () => globe.destroy();
+
+        return () => {
+            globe.destroy();
+            window.removeEventListener("resize", onResize);
+            clearTimeout(resizeTimerRef.current);
+        };
     }, []);
 
     return (

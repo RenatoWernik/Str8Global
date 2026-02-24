@@ -77,7 +77,7 @@ export interface CoworkPlan {
 export type RentalTab = 'gear' | 'studios' | 'cowork-studio' | 'cowork';
 
 export const rentalTabs: { id: RentalTab; label: string; icon: string }[] = [
-  { id: 'gear', label: 'Gear Renting', icon: 'Camera' },
+  { id: 'gear', label: 'Aluguer de Equipamentos', icon: 'Camera' },
   { id: 'studios', label: 'Aluguer de Estúdios', icon: 'Video' },
   { id: 'cowork-studio', label: 'Cowork + Estúdio', icon: 'Building' },
   { id: 'cowork', label: 'Co-Work', icon: 'Laptop' },

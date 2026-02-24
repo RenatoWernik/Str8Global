@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 interface InfiniteCarouselProps {
     children: ReactNode[];
@@ -19,7 +19,11 @@ export function InfiniteCarousel({
     direction = 'left',
     pauseOnHover = true,
 }: InfiniteCarouselProps) {
-    const duplicatedChildren = [...children, ...children, ...children, ...children, ...children, ...children];
+    // Only duplicate 3x (minimum for seamless loop) and memoize
+    const duplicatedChildren = useMemo(
+        () => [...children, ...children, ...children],
+        [children]
+    );
 
     return (
         <div
@@ -30,9 +34,9 @@ export function InfiniteCarousel({
             )}
         >
             <motion.div
-                className="flex gap-8 w-max"
+                className="flex gap-8 w-max will-change-transform"
                 animate={{
-                    x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
+                    x: direction === 'left' ? ['0%', '-33.333%'] : ['-33.333%', '0%'],
                 }}
                 transition={{
                     x: {

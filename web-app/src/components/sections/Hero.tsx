@@ -6,7 +6,12 @@ import { TypewriterText } from '@/components/animations/TypewriterText';
 import { PremiumLogo } from '@/components/animations/PremiumLogo';
 import { siteCopy } from '@/data/mockData';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { Globe } from '@/components/ui/globe';
+import dynamic from 'next/dynamic';
+
+const Globe = dynamic(
+    () => import('@/components/ui/globe').then(mod => ({ default: mod.Globe })),
+    { ssr: false, loading: () => <div className="w-full h-full" /> }
+);
 
 export function Hero() {
     return (

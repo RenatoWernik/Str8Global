@@ -88,7 +88,7 @@ export function PortfolioGrid() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 md:p-8"
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/98 p-4 md:p-8"
                         onClick={() => setSelectedProject(null)}
                     >
                         <button
@@ -129,38 +129,25 @@ interface GridItemProps {
 
 function GridItem({ project, index, className, onSelect }: GridItemProps) {
     const [isActive, setIsActive] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isTouchDevice, setIsTouchDevice] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
-
-    // Detect touch device
-    useEffect(() => {
-        setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    }, []);
-
-    // Click handler - open modal rather than inline play/pause
-    const handleClick = () => {
-        onSelect();
-    };
+    const hoverTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
     const handleMouseEnter = () => {
-        if (!isTouchDevice) {
-            setIsActive(true);
-            // Only auto-play preview on hover if not already playing
-            if (videoRef.current && project.video && !isPlaying) {
-                videoRef.current.play().catch(() => { }); // Catch play interruption promise rejection
-            }
+        setIsActive(true);
+        // Debounced video play to avoid rapid start/stop
+        if (videoRef.current && project.video) {
+            hoverTimerRef.current = setTimeout(() => {
+                videoRef.current?.play().catch(() => { });
+            }, 150);
         }
     };
 
     const handleMouseLeave = () => {
-        if (!isTouchDevice) {
-            setIsActive(false);
-            // Only stop if playing via hover preview (not clicked to play)
-            if (videoRef.current && project.video && !isPlaying) {
-                videoRef.current.pause();
-                videoRef.current.currentTime = 0;
-            }
+        setIsActive(false);
+        clearTimeout(hoverTimerRef.current);
+        if (videoRef.current && project.video) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
         }
     };
 
@@ -173,7 +160,7 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
             className={`relative overflow-hidden rounded-2xl cursor-pointer group bg-white/5 border border-white/10 hover:border-[var(--color-accent)]/50 transition-colors duration-500 ${className}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={handleClick}
+            onClick={onSelect}
         >
             {/* Image */}
             <motion.div
@@ -195,7 +182,7 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
             {project.video && (
                 <motion.div
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: isActive || isPlaying ? 1 : 0 }}
+                    animate={{ opacity: isActive ? 1 : 0 }}
                     transition={{ duration: 0.4 }}
                     className="absolute inset-0 z-10 bg-black"
                 >
@@ -225,7 +212,7 @@ function GridItem({ project, index, className, onSelect }: GridItemProps) {
                     transition={{ duration: 0.3 }}
                     className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"
                 >
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-black/60 border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                         <Play size={22} className="text-white fill-white ml-1" />
                     </div>
                 </motion.div>

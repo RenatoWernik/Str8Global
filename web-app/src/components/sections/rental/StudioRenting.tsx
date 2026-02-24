@@ -69,7 +69,6 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
           relative h-full p-6 md:p-8 rounded-2xl overflow-hidden flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
-          backdrop-blur-sm
           hover:border-white/20 transition-all duration-300
         `}
       >
@@ -92,7 +91,7 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
         <div className="relative z-10 flex flex-col h-full mt-4">
           {/* Icon + Name */}
           <div className="flex items-center gap-4 mb-8">
-            <div className={`p-3 rounded-xl bg-black/50 border border-white/10 text-[var(--color-accent)] backdrop-blur-md`}>
+            <div className={`p-3 rounded-xl bg-black/70 border border-white/10 text-[var(--color-accent)]`}>
               {studioIcons[studio.icon] || <Aperture size={32} strokeWidth={1.5} />}
             </div>
             <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">{studio.name}</h3>

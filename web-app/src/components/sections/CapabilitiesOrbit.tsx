@@ -230,7 +230,7 @@ function OrbitalDesktop({ isInView }: { isInView: boolean }) {
                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.9, y: 10 }}
                                     transition={{ duration: 0.25 }}
-                                    className={`absolute z-50 w-56 p-4 rounded-xl bg-[#0c0c0e]/95 border border-[var(--color-accent)]/30 backdrop-blur-md shadow-[0_0_30px_rgba(255,16,240,0.1)] ${labelSide === 'left' ? 'left-10' : 'right-10'} top-1/2 -translate-y-1/2`}
+                                    className={`absolute z-50 w-56 p-4 rounded-xl bg-[#0c0c0e] border border-[var(--color-accent)]/30 shadow-[0_0_30px_rgba(255,16,240,0.1)] ${labelSide === 'left' ? 'left-10' : 'right-10'} top-1/2 -translate-y-1/2`}
                                 >
                                     <div className="flex items-center gap-2.5 mb-2">
                                         <Icon size={18} className="text-[var(--color-accent)]" />

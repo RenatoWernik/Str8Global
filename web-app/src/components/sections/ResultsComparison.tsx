@@ -142,7 +142,7 @@ export function ResultsComparison() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-[var(--color-accent)] rounded-full blur-[250px] opacity-[0.03] pointer-events-none" />
 
                 {/* Chart card */}
-                <div className="relative z-10 p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+                <div className="relative z-10 p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white/[0.02] border border-white/5">
 
                     {/* Legend */}
                     <div className="flex items-center justify-center gap-6 md:gap-8 mb-4 md:mb-6">

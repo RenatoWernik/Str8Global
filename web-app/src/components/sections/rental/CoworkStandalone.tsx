@@ -148,7 +148,6 @@ function CoworkCard({
         className={`
           relative h-full p-6 md:p-8 rounded-2xl overflow-hidden flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-sm
           transition-all duration-300
           ${isFeatured
             ? 'border border-[var(--color-accent)]/50 hover:border-[var(--color-accent)]/70 shadow-[0_0_30px_rgba(255,16,240,0.1)]'
