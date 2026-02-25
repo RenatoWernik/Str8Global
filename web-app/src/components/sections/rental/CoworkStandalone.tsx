@@ -2,9 +2,21 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Check, MessageCircle } from 'lucide-react';
+import { Check, MessageCircle, Users } from 'lucide-react';
+import Image from 'next/image';
 import { coworkPlans, coworkAmenities, rentalCopy, CONTACTS, getWhatsAppUrl, type CoworkPlan } from '@/data/rentalData';
 import { HighlightText } from '@/components/ui/HighlightText';
+import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+
+const MONTHS_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+function formatDatePT(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
 
 type CoworkPeriod = 'diaria' | 'semanal' | 'mensal';
 
@@ -16,7 +28,22 @@ const periodLabels: Record<CoworkPeriod, string> = {
 
 const periods: CoworkPeriod[] = ['diaria', 'semanal', 'mensal'];
 
-export function CoworkStandalone() {
+// Plan IDs for Google Sheets mapping
+const planIds: Record<string, string> = {
+  Starter: 'cowork-starter',
+  Prime: 'cowork-prime',
+  Premium: 'cowork-premium',
+};
+
+interface CoworkStandaloneProps {
+  selectedDate: string | null;
+  onDateChange: (date: string) => void;
+  loading: boolean;
+  getCoworkSpots: (planId: string) => number;
+  hasData: boolean;
+}
+
+export function CoworkStandalone({ selectedDate, onDateChange, loading, getCoworkSpots, hasData }: CoworkStandaloneProps) {
   const [activePeriod, setActivePeriod] = useState<CoworkPeriod>('mensal');
 
   return (
@@ -49,10 +76,22 @@ export function CoworkStandalone() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/70 text-lg max-w-xl mb-12"
+          className="text-white/70 text-lg max-w-xl mb-8"
         >
           {rentalCopy.cowork.subtitle}
         </motion.p>
+
+        {/* Date picker */}
+        <div className="mb-12">
+          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
+            Verificar disponibilidade para:
+          </p>
+          <RentalDatePicker
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+            loading={loading}
+          />
+        </div>
 
         {/* Period toggle */}
         <motion.div
@@ -88,7 +127,15 @@ export function CoworkStandalone() {
         {/* Plans grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {coworkPlans.map((plan, index) => (
-            <CoworkCard key={plan.name} plan={plan} period={activePeriod} index={index} />
+            <CoworkCard
+              key={plan.name}
+              plan={plan}
+              period={activePeriod}
+              index={index}
+              selectedDate={selectedDate}
+              loading={loading}
+              spotsOccupied={hasData && selectedDate ? getCoworkSpots(planIds[plan.name]) : 0}
+            />
           ))}
         </div>
 
@@ -118,23 +165,30 @@ export function CoworkStandalone() {
   );
 }
 
-import Image from 'next/image';
-
 function CoworkCard({
   plan,
   period,
   index,
+  selectedDate,
+  loading,
+  spotsOccupied,
 }: {
   plan: CoworkPlan;
   period: CoworkPeriod;
   index: number;
+  selectedDate: string | null;
+  loading: boolean;
+  spotsOccupied: number;
 }) {
   const [showContacts, setShowContacts] = useState(false);
   const price = plan.pricing[period];
   const isFeatured = plan.featured;
 
-  // Generate base message for WhatsApp
-  const messageBody = `Olá! Tenho interesse no plano Co-Work "${plan.name}". Podem dar-me mais informações?`;
+  const messageBody = selectedDate
+    ? `Olá! Tenho interesse no plano Co-Work "${plan.name}".\n\n` +
+      `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
+      `Podem dar-me mais informações e forma de pagamento?`
+    : `Olá! Tenho interesse no plano Co-Work "${plan.name}". Podem dar-me mais informações?`;
 
   return (
     <motion.div
@@ -155,7 +209,7 @@ function CoworkCard({
           }
         `}
       >
-        {/* Image Background (if exists) */}
+        {/* Image Background */}
         {plan.image && (
           <div className="absolute inset-x-0 top-0 h-48 z-0">
             <Image
@@ -181,6 +235,16 @@ function CoworkCard({
         )}
 
         <div className="relative z-10 flex flex-col h-full mt-2">
+          {/* Spots indicator */}
+          {selectedDate && spotsOccupied > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 w-fit mb-3">
+              <Users size={12} className="text-amber-400" />
+              <span className="text-[11px] font-medium text-amber-400">
+                {spotsOccupied} lugar(es) ocupado(s)
+              </span>
+            </div>
+          )}
+
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
           <p className="text-white/40 text-sm mb-8">{plan.deskDescription}</p>

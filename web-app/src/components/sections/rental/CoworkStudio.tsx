@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Check, MessageCircle } from 'lucide-react';
+import { Check, MessageCircle, Users } from 'lucide-react';
+import Image from 'next/image';
 import {
   coworkStudioPlans,
   coworkStudioAmenities,
@@ -14,6 +15,17 @@ import {
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
+import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+
+const MONTHS_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+function formatDatePT(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
 
 const periodLabels: Record<CoworkStudioPeriod, string> = {
   diaria: 'Diária',
@@ -23,7 +35,22 @@ const periodLabels: Record<CoworkStudioPeriod, string> = {
 
 const periods: CoworkStudioPeriod[] = ['diaria', 'semanal', 'mensal'];
 
-export function CoworkStudio() {
+// Plan IDs for Google Sheets mapping
+const planIds: Record<string, string> = {
+  Starter: 'coworkstudio-starter',
+  Prime: 'coworkstudio-prime',
+  Premium: 'coworkstudio-premium',
+};
+
+interface CoworkStudioProps {
+  selectedDate: string | null;
+  onDateChange: (date: string) => void;
+  loading: boolean;
+  getCoworkSpots: (planId: string) => number;
+  hasData: boolean;
+}
+
+export function CoworkStudio({ selectedDate, onDateChange, loading, getCoworkSpots, hasData }: CoworkStudioProps) {
   const [activePeriod, setActivePeriod] = useState<CoworkStudioPeriod>('mensal');
 
   return (
@@ -45,10 +72,22 @@ export function CoworkStudio() {
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-12">
+          <p className="text-white/70 text-lg max-w-xl mb-8">
             {rentalCopy.coworkStudio.subtitle}
           </p>
         </ScrollReveal>
+
+        {/* Date picker */}
+        <div className="mb-12">
+          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
+            Verificar disponibilidade para:
+          </p>
+          <RentalDatePicker
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+            loading={loading}
+          />
+        </div>
 
         {/* Period toggle */}
         <motion.div
@@ -84,7 +123,15 @@ export function CoworkStudio() {
         {/* Plans grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {coworkStudioPlans.map((plan, index) => (
-            <PlanCard key={plan.name} plan={plan} period={activePeriod} index={index} />
+            <PlanCard
+              key={plan.name}
+              plan={plan}
+              period={activePeriod}
+              index={index}
+              selectedDate={selectedDate}
+              loading={loading}
+              spotsOccupied={hasData && selectedDate ? getCoworkSpots(planIds[plan.name]) : 0}
+            />
           ))}
         </div>
 
@@ -114,23 +161,30 @@ export function CoworkStudio() {
   );
 }
 
-import Image from 'next/image';
-
 function PlanCard({
   plan,
   period,
   index,
+  selectedDate,
+  loading,
+  spotsOccupied,
 }: {
   plan: CoworkStudioPlan;
   period: CoworkStudioPeriod;
   index: number;
+  selectedDate: string | null;
+  loading: boolean;
+  spotsOccupied: number;
 }) {
   const [showContacts, setShowContacts] = useState(false);
   const pricing = plan.pricing[period];
   const isFeatured = plan.featured;
 
-  // Generate base message for WhatsApp
-  const messageBody = `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`;
+  const messageBody = selectedDate
+    ? `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}".\n\n` +
+      `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
+      `Podem dar-me mais informações e forma de pagamento?`
+    : `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`;
 
   return (
     <motion.div
@@ -151,7 +205,7 @@ function PlanCard({
           }
         `}
       >
-        {/* Image Background (if exists) */}
+        {/* Image Background */}
         {plan.image && (
           <div className="absolute inset-x-0 top-0 h-48 z-0">
             <Image
@@ -177,6 +231,16 @@ function PlanCard({
         )}
 
         <div className="relative z-10 flex flex-col h-full mt-2">
+          {/* Spots indicator */}
+          {selectedDate && spotsOccupied > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 w-fit mb-3">
+              <Users size={12} className="text-amber-400" />
+              <span className="text-[11px] font-medium text-amber-400">
+                {spotsOccupied} lugar(es) ocupado(s)
+              </span>
+            </div>
+          )}
+
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
           <p className="text-white/40 text-sm mb-8">{plan.description}</p>

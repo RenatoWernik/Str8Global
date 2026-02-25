@@ -15,10 +15,30 @@ import {
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
+import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+import { AvailabilityBadge } from '@/components/ui/AvailabilityBadge';
+
+const MONTHS_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+function formatDatePT(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
 
 const categories = Object.keys(gearCategoryLabels) as GearCategoryId[];
 
-export function GearRenting() {
+interface GearRentingProps {
+  selectedDate: string | null;
+  onDateChange: (date: string) => void;
+  loading: boolean;
+  isItemAvailable: (itemId: string) => { available: boolean; nextAvailable?: string };
+  hasData: boolean;
+}
+
+export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailable, hasData }: GearRentingProps) {
   const [activeCategory, setActiveCategory] = useState<GearCategoryId>('cameras');
 
   const filteredItems = gearItems.filter((item) => item.category === activeCategory);
@@ -41,10 +61,22 @@ export function GearRenting() {
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-12">
+          <p className="text-white/70 text-lg max-w-xl mb-8">
             {rentalCopy.gear.subtitle}
           </p>
         </ScrollReveal>
+
+        {/* Date picker */}
+        <div className="mb-12">
+          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
+            Verificar disponibilidade para:
+          </p>
+          <RentalDatePicker
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+            loading={loading}
+          />
+        </div>
 
         {/* Category pills */}
         <div className="flex flex-wrap gap-3 mb-12">
@@ -77,7 +109,14 @@ export function GearRenting() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {filteredItems.map((item, index) => (
-              <GearCard key={item.id} item={item} index={index} />
+              <GearCard
+                key={item.id}
+                item={item}
+                index={index}
+                selectedDate={selectedDate}
+                loading={loading}
+                availability={hasData && selectedDate ? isItemAvailable(item.id) : null}
+              />
             ))}
           </motion.div>
         </AnimatePresence>
@@ -86,15 +125,39 @@ export function GearRenting() {
   );
 }
 
-function GearCard({ item, index }: { item: GearItem; index: number }) {
+function GearCard({
+  item,
+  index,
+  selectedDate,
+  loading,
+  availability,
+}: {
+  item: GearItem;
+  index: number;
+  selectedDate: string | null;
+  loading: boolean;
+  availability: { available: boolean; nextAvailable?: string } | null;
+}) {
   const [showContacts, setShowContacts] = useState(false);
 
-  // Generate base message for WhatsApp
-  const messageBody =
-    `Olá! Gostaria de alugar o seguinte equipamento:\n\n` +
-    `Equipamento: ${item.name}${item.note ? ` (${item.note})` : ''}\n` +
-    `Preço: ${item.dailyPrice}€/dia\n\n` +
-    `Podem indicar-me a disponibilidade?`;
+  const isAvailable = availability ? availability.available : true;
+
+  // Generate WhatsApp message with date
+  const messageBody = selectedDate
+    ? `Olá! Gostaria de alugar o seguinte equipamento:\n\n` +
+      `📦 Equipamento: ${item.name}${item.note ? ` (${item.note})` : ''}\n` +
+      `💰 Preço: ${item.dailyPrice}€/dia\n` +
+      `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
+      `Podem confirmar a disponibilidade e forma de pagamento?`
+    : `Olá! Gostaria de alugar o seguinte equipamento:\n\n` +
+      `Equipamento: ${item.name}${item.note ? ` (${item.note})` : ''}\n` +
+      `Preço: ${item.dailyPrice}€/dia\n\n` +
+      `Podem indicar-me a disponibilidade?`;
+
+  const alternativeMessage =
+    `Olá! Gostaria de alugar o ${item.name} mas vi que está reservado` +
+    (selectedDate ? ` para ${formatDatePT(selectedDate)}` : '') +
+    `. Têm alternativas disponíveis?`;
 
   return (
     <motion.div
@@ -110,11 +173,23 @@ function GearCard({ item, index }: { item: GearItem; index: number }) {
           border border-white/10
           hover:border-[var(--color-accent)]/30
           transition-all duration-300
+          ${!isAvailable && selectedDate ? 'opacity-75' : ''}
         `}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
         <div className="relative z-10 flex flex-col h-full">
+          {/* Availability badge */}
+          {selectedDate && (
+            <div className="mb-3">
+              <AvailabilityBadge
+                available={isAvailable}
+                nextAvailable={availability?.nextAvailable}
+                loading={loading}
+              />
+            </div>
+          )}
+
           {item.image && (
             <div className="relative h-48 w-full mb-6 bg-white/[0.02] rounded-xl overflow-hidden group-hover:bg-white/[0.04] transition-colors duration-500">
               <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent z-10" />
@@ -154,13 +229,17 @@ function GearCard({ item, index }: { item: GearItem; index: number }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   onClick={() => setShowContacts(true)}
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
-                    bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
-                    border border-white/10 hover:border-transparent
-                    transition-all duration-300 w-full"
+                  className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+                    border transition-all duration-300 w-full
+                    ${!isAvailable && selectedDate
+                      ? 'bg-white/[0.03] text-white/60 border-white/10 hover:bg-white/[0.06] hover:text-white'
+                      : 'bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border-white/10 hover:border-transparent'
+                    }`}
                 >
                   <MessageCircle size={16} />
-                  <span>Alugar via WhatsApp</span>
+                  <span>
+                    {!isAvailable && selectedDate ? 'Consultar Alternativas' : 'Alugar via WhatsApp'}
+                  </span>
                 </motion.button>
               ) : (
                 <motion.div
@@ -171,7 +250,10 @@ function GearCard({ item, index }: { item: GearItem; index: number }) {
                   className="flex flex-col gap-2 w-full"
                 >
                   <a
-                    href={getWhatsAppUrl(CONTACTS.IGOR.number, messageBody)}
+                    href={getWhatsAppUrl(
+                      CONTACTS.IGOR.number,
+                      isAvailable || !selectedDate ? messageBody : alternativeMessage,
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
@@ -182,7 +264,10 @@ function GearCard({ item, index }: { item: GearItem; index: number }) {
                     <span>Falar com {CONTACTS.IGOR.name}</span>
                   </a>
                   <a
-                    href={getWhatsAppUrl(CONTACTS.MARTA.number, messageBody)}
+                    href={getWhatsAppUrl(
+                      CONTACTS.MARTA.number,
+                      isAvailable || !selectedDate ? messageBody : alternativeMessage,
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium

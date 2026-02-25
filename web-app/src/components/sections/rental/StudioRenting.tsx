@@ -3,9 +3,22 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Aperture, Focus, Mic, MessageCircle } from 'lucide-react';
+import Image from 'next/image';
 import { studios, rentalCopy, CONTACTS, getWhatsAppUrl, type Studio, type StudioTier } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
+import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+import { AvailabilityBadge } from '@/components/ui/AvailabilityBadge';
+
+const MONTHS_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+function formatDatePT(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+}
 
 const studioIcons: Record<string, React.ReactNode> = {
   Aperture: <Aperture size={32} strokeWidth={1.5} />,
@@ -13,7 +26,15 @@ const studioIcons: Record<string, React.ReactNode> = {
   Mic: <Mic size={32} strokeWidth={1.5} />,
 };
 
-export function StudioRenting() {
+interface StudioRentingProps {
+  selectedDate: string | null;
+  onDateChange: (date: string) => void;
+  loading: boolean;
+  isItemAvailable: (itemId: string) => { available: boolean; nextAvailable?: string };
+  hasData: boolean;
+}
+
+export function StudioRenting({ selectedDate, onDateChange, loading, isItemAvailable, hasData }: StudioRentingProps) {
   return (
     <section className="relative bg-black py-20 md:py-32 overflow-hidden">
       {/* Background orbs */}
@@ -32,15 +53,34 @@ export function StudioRenting() {
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-16">
+          <p className="text-white/70 text-lg max-w-xl mb-8">
             {rentalCopy.studio.subtitle}
           </p>
         </ScrollReveal>
 
+        {/* Date picker */}
+        <div className="mb-16">
+          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
+            Verificar disponibilidade para:
+          </p>
+          <RentalDatePicker
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+            loading={loading}
+          />
+        </div>
+
         {/* Studios grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {studios.map((studio, index) => (
-            <StudioCard key={studio.id} studio={studio} index={index} />
+            <StudioCard
+              key={studio.id}
+              studio={studio}
+              index={index}
+              selectedDate={selectedDate}
+              loading={loading}
+              availability={hasData && selectedDate ? isItemAvailable(studio.id) : null}
+            />
           ))}
         </div>
       </div>
@@ -48,13 +88,28 @@ export function StudioRenting() {
   );
 }
 
-import Image from 'next/image';
-
-function StudioCard({ studio, index }: { studio: Studio; index: number }) {
+function StudioCard({
+  studio,
+  index,
+  selectedDate,
+  loading,
+  availability,
+}: {
+  studio: Studio;
+  index: number;
+  selectedDate: string | null;
+  loading: boolean;
+  availability: { available: boolean; nextAvailable?: string } | null;
+}) {
   const [showContacts, setShowContacts] = useState(false);
 
-  // Generate base message for WhatsApp
-  const messageBody = `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`;
+  const isAvailable = availability ? availability.available : true;
+
+  const messageBody = selectedDate
+    ? `Olá! Gostaria de reservar o ${studio.name}.\n\n` +
+      `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
+      `Podem confirmar a disponibilidade e forma de pagamento?`
+    : `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`;
 
   return (
     <motion.div
@@ -70,9 +125,10 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
           hover:border-white/20 transition-all duration-300
+          ${!isAvailable && selectedDate ? 'opacity-75' : ''}
         `}
       >
-        {/* Image Background (if exists) */}
+        {/* Image Background */}
         {studio.image && (
           <div className="absolute inset-x-0 top-0 h-48 z-0">
             <Image
@@ -89,9 +145,20 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
         <div className="relative z-10 flex flex-col h-full mt-4">
+          {/* Availability badge */}
+          {selectedDate && (
+            <div className="mb-4">
+              <AvailabilityBadge
+                available={isAvailable}
+                nextAvailable={availability?.nextAvailable}
+                loading={loading}
+              />
+            </div>
+          )}
+
           {/* Icon + Name */}
           <div className="flex items-center gap-4 mb-8">
-            <div className={`p-3 rounded-xl bg-black/70 border border-white/10 text-[var(--color-accent)]`}>
+            <div className="p-3 rounded-xl bg-black/70 border border-white/10 text-[var(--color-accent)]">
               {studioIcons[studio.icon] || <Aperture size={32} strokeWidth={1.5} />}
             </div>
             <h3 className="text-2xl md:text-3xl font-bold drop-shadow-md">{studio.name}</h3>
@@ -114,13 +181,17 @@ function StudioCard({ studio, index }: { studio: Studio; index: number }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   onClick={() => setShowContacts(true)}
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
-                    bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black
-                    border border-white/10 hover:border-transparent
-                    transition-all duration-300"
+                  className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+                    border transition-all duration-300
+                    ${!isAvailable && selectedDate
+                      ? 'bg-white/[0.03] text-white/60 border-white/10 hover:bg-white/[0.06] hover:text-white'
+                      : 'bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border-white/10 hover:border-transparent'
+                    }`}
                 >
                   <MessageCircle size={16} />
-                  <span>Reservar via WhatsApp</span>
+                  <span>
+                    {!isAvailable && selectedDate ? 'Consultar Alternativas' : 'Reservar via WhatsApp'}
+                  </span>
                 </motion.button>
               ) : (
                 <motion.div

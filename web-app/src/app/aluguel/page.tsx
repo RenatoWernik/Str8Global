@@ -5,9 +5,13 @@ import { RentalHero, GearRenting, StudioRenting, CoworkStudio, CoworkStandalone 
 import { type RentalTab } from '@/data/rentalData';
 import { CTASection } from '@/components/sections/CTASection';
 import { ctaCopy } from '@/data/ctaData';
+import { useRentalAvailability } from '@/hooks/useRentalAvailability';
 
 export default function AluguelPage() {
   const [activeTab, setActiveTab] = useState<RentalTab>('gear');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const { loading, isItemAvailable, getCoworkSpots, hasData } = useRentalAvailability(selectedDate);
 
   const gearRef = useRef<HTMLDivElement>(null);
   const studiosRef = useRef<HTMLDivElement>(null);
@@ -37,22 +41,46 @@ export default function AluguelPage() {
 
       {/* Gear Renting Section */}
       <div ref={gearRef}>
-        <GearRenting />
+        <GearRenting
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          loading={loading}
+          isItemAvailable={isItemAvailable}
+          hasData={hasData}
+        />
       </div>
 
       {/* Studio Renting Section */}
       <div ref={studiosRef}>
-        <StudioRenting />
+        <StudioRenting
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          loading={loading}
+          isItemAvailable={isItemAvailable}
+          hasData={hasData}
+        />
       </div>
 
       {/* Cowork + Estúdio Section */}
       <div ref={coworkStudioRef}>
-        <CoworkStudio />
+        <CoworkStudio
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          loading={loading}
+          getCoworkSpots={getCoworkSpots}
+          hasData={hasData}
+        />
       </div>
 
       {/* Cowork Standalone Section */}
       <div ref={coworkRef}>
-        <CoworkStandalone />
+        <CoworkStandalone
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          loading={loading}
+          getCoworkSpots={getCoworkSpots}
+          hasData={hasData}
+        />
       </div>
 
       {/* CTA Section */}
