@@ -21,7 +21,7 @@ export function Hero() {
 
                 {/* Interactive Globe enlarged and positioned lower to be cut by the section end */}
                 <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
-                    <div className="relative w-[180%] sm:w-[220%] md:w-[200%] max-w-[800px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+                    <div className="relative w-[120%] sm:w-[180%] md:w-[200%] max-w-[800px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
                         <Globe className="opacity-100" />
                     </div>
                 </div>

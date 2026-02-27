@@ -44,9 +44,12 @@ export function Globe({
     const phiRef = useRef(0);
     const widthRef = useRef(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const pointerInteracting = useRef<number | null>(null);
     const pointerInteractionMovement = useRef(0);
     const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const isVisibleRef = useRef(true);
+    const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null);
 
     const [{ r }, api] = useSpring(() => ({
         r: 0,
@@ -75,6 +78,9 @@ export function Globe({
 
     const onRender = useCallback(
         (state: any) => {
+            // Pause render loop when globe is off-screen
+            if (!isVisibleRef.current) return;
+
             if (pointerInteracting.current === null) {
                 phiRef.current += 0.005;
             }
@@ -84,6 +90,22 @@ export function Globe({
         },
         [r],
     );
+
+    // Intersection Observer: pause globe when scrolled out of view
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                isVisibleRef.current = entry.isIntersecting;
+            },
+            { threshold: 0 }
+        );
+
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         // Debounced resize handler
@@ -103,12 +125,18 @@ export function Globe({
         }
         const initWidth = widthRef.current || 600;
 
+        // Reduce quality on mobile for better performance
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const mobileOverrides = isMobile ? { mapSamples: 800, devicePixelRatio: 0.75 } : {};
+
         const globe = createGlobe(canvasRef.current!, {
             ...config,
+            ...mobileOverrides,
             width: initWidth,
             height: initWidth,
             onRender,
         });
+        globeRef.current = globe;
 
         setTimeout(() => {
             if (canvasRef.current) canvasRef.current.style.opacity = "1";
@@ -116,6 +144,7 @@ export function Globe({
 
         return () => {
             globe.destroy();
+            globeRef.current = null;
             window.removeEventListener("resize", onResize);
             clearTimeout(resizeTimerRef.current);
         };
@@ -123,6 +152,7 @@ export function Globe({
 
     return (
         <div
+            ref={containerRef}
             className={cn(
                 "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-full",
                 className,

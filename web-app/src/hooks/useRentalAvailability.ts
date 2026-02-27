@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface ItemAvailability {
   available: boolean;
@@ -9,6 +9,7 @@ interface ItemAvailability {
 
 interface CoworkAvailability {
   spotsOccupied: number;
+  totalSpots?: number;
 }
 
 interface AvailabilityData {
@@ -20,31 +21,47 @@ export function useRentalAvailability(selectedDate: string | null) {
   const [data, setData] = useState<AvailabilityData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchAvailability = useCallback(async (date: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch(`/api/rental/availability?date=${date}`);
-      if (!res.ok) throw new Error('Failed to fetch availability');
-      const json: AvailabilityData = await res.json();
-      setData(json);
-    } catch (err) {
-      console.error('Availability fetch error:', err);
-      setError('Erro ao verificar disponibilidade');
-      // Fallback: everything available
-      setData({ items: {}, cowork: {} });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    if (selectedDate) {
-      fetchAvailability(selectedDate);
-    }
-  }, [selectedDate, fetchAvailability]);
+    if (!selectedDate) return;
+
+    // Debounce 300ms to avoid rapid API calls when user taps date picker fast
+    const timer = setTimeout(() => {
+      // Abort any in-flight request
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      setLoading(true);
+      setError(null);
+
+      fetch(`/api/rental/availability?date=${selectedDate}`, { signal: controller.signal })
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch availability');
+          return res.json() as Promise<AvailabilityData>;
+        })
+        .then(json => {
+          setData(json);
+        })
+        .catch(err => {
+          if (err instanceof DOMException && err.name === 'AbortError') return;
+          console.error('Availability fetch error:', err);
+          setError('Erro ao verificar disponibilidade');
+          setData({ items: {}, cowork: {} });
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) {
+            setLoading(false);
+          }
+        });
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      abortRef.current?.abort();
+    };
+  }, [selectedDate]);
 
   const isItemAvailable = useCallback(
     (itemId: string): { available: boolean; nextAvailable?: string } => {
@@ -57,11 +74,11 @@ export function useRentalAvailability(selectedDate: string | null) {
   );
 
   const getCoworkSpots = useCallback(
-    (planId: string): number => {
+    (planId: string): { spotsOccupied: number; totalSpots?: number } => {
       if (!data || !data.cowork[planId]) {
-        return 0;
+        return { spotsOccupied: 0 };
       }
-      return data.cowork[planId].spotsOccupied;
+      return data.cowork[planId];
     },
     [data],
   );
@@ -74,3 +91,4 @@ export function useRentalAvailability(selectedDate: string | null) {
     hasData: data !== null,
   };
 }
+

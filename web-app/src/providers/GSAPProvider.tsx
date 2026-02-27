@@ -23,6 +23,13 @@ interface GSAPProviderProps {
 
 export function GSAPProvider({ children }: GSAPProviderProps) {
     useEffect(() => {
+        // Kill all GSAP animations if user prefers reduced motion
+        const mm = gsap.matchMedia();
+        mm.add('(prefers-reduced-motion: reduce)', () => {
+            gsap.globalTimeline.timeScale(0);
+            ScrollTrigger.getAll().forEach(st => st.kill());
+        });
+
         // Debounced refresh — avoid dozens of ScrollTrigger.refresh() during resize
         let timeout: ReturnType<typeof setTimeout>;
         const handleResize = () => {
@@ -35,6 +42,7 @@ export function GSAPProvider({ children }: GSAPProviderProps) {
         return () => {
             clearTimeout(timeout);
             window.removeEventListener('resize', handleResize);
+            mm.revert();
             ScrollTrigger.killAll();
         };
     }, []);

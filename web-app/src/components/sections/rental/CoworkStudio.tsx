@@ -46,7 +46,7 @@ interface CoworkStudioProps {
   selectedDate: string | null;
   onDateChange: (date: string) => void;
   loading: boolean;
-  getCoworkSpots: (planId: string) => number;
+  getCoworkSpots: (planId: string) => { spotsOccupied: number; totalSpots?: number };
   hasData: boolean;
 }
 
@@ -56,8 +56,8 @@ export function CoworkStudio({ selectedDate, onDateChange, loading, getCoworkSpo
   return (
     <section className="relative bg-black py-20 md:py-32 overflow-hidden">
       {/* Background orbs */}
-      <div className="absolute top-20 right-20 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
-      <div className="absolute bottom-40 left-0 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-10 pointer-events-none" />
+      <div className="hidden md:block absolute top-20 right-20 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      <div className="hidden md:block absolute bottom-40 left-0 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
@@ -130,7 +130,10 @@ export function CoworkStudio({ selectedDate, onDateChange, loading, getCoworkSpo
               index={index}
               selectedDate={selectedDate}
               loading={loading}
-              spotsOccupied={hasData && selectedDate ? getCoworkSpots(planIds[plan.name]) : 0}
+              {...(hasData && selectedDate
+                ? { spotsOccupied: getCoworkSpots(planIds[plan.name]).spotsOccupied, apiTotalSpots: getCoworkSpots(planIds[plan.name]).totalSpots }
+                : { spotsOccupied: 0 }
+              )}
             />
           ))}
         </div>
@@ -168,6 +171,7 @@ function PlanCard({
   selectedDate,
   loading,
   spotsOccupied,
+  apiTotalSpots,
 }: {
   plan: CoworkStudioPlan;
   period: CoworkStudioPeriod;
@@ -175,15 +179,17 @@ function PlanCard({
   selectedDate: string | null;
   loading: boolean;
   spotsOccupied: number;
+  apiTotalSpots?: number;
 }) {
   const [showContacts, setShowContacts] = useState(false);
   const pricing = plan.pricing[period];
   const isFeatured = plan.featured;
+  const totalSpots = apiTotalSpots ?? plan.totalSpots;
 
   const messageBody = selectedDate
     ? `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}".\n\n` +
-      `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
-      `Podem dar-me mais informações e forma de pagamento?`
+    `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
+    `Podem dar-me mais informações e forma de pagamento?`
     : `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}". Podem dar-me mais informações?`;
 
   return (
@@ -231,14 +237,28 @@ function PlanCard({
         )}
 
         <div className="relative z-10 flex flex-col h-full mt-2">
-          {/* Spots indicator */}
-          {selectedDate && spotsOccupied > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 w-fit mb-3">
-              <Users size={12} className="text-amber-400" />
-              <span className="text-[11px] font-medium text-amber-400">
-                {spotsOccupied} lugar(es) ocupado(s)
-              </span>
-            </div>
+          {/* Availability indicator */}
+          {selectedDate && (
+            (() => {
+              const available = totalSpots - spotsOccupied;
+              const isFull = available <= 0;
+              return (
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full w-fit mb-3 ${isFull
+                  ? 'bg-red-500/10 border border-red-500/20'
+                  : 'bg-emerald-500/10 border border-emerald-500/20'
+                  }`}>
+                  <Users size={12} className={isFull ? 'text-red-400' : 'text-emerald-400'} />
+                  <span className={`text-[11px] font-medium ${isFull ? 'text-red-400' : 'text-emerald-400'}`}>
+                    {isFull
+                      ? 'Lotado — sem lugares disponíveis'
+                      : spotsOccupied === 0
+                        ? `${plan.totalSpots} lugares disponíveis`
+                        : `${available} de ${plan.totalSpots} lugares disponíveis`
+                    }
+                  </span>
+                </div>
+              );
+            })()
           )}
 
           {/* Plan name */}

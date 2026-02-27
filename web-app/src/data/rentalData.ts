@@ -53,6 +53,7 @@ export type CoworkStudioPeriod = 'diaria' | 'semanal' | 'mensal';
 export interface CoworkStudioPlan {
   name: string;
   description: string;
+  totalSpots: number;
   pricing: Record<CoworkStudioPeriod, { price: number; studioHours: string } | null>;
   featured?: boolean;
   image?: string;
@@ -61,6 +62,7 @@ export interface CoworkStudioPlan {
 export interface CoworkPlan {
   name: string;
   deskDescription: string;
+  totalSpots: number;
   pricing: {
     diaria: number | null;
     semanal: number;
@@ -170,6 +172,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Starter',
     description: 'Mesa 180x160cm partilhada',
+    totalSpots: 4,
     image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: { price: 25, studioHours: '1h estúdio' },
@@ -180,6 +183,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Prime',
     description: 'Mesa conferência partilhada',
+    totalSpots: 6,
     image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: { price: 30, studioHours: '1h estúdio' },
@@ -191,6 +195,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Premium',
     description: 'Mesa elevatória privada',
+    totalSpots: 2,
     image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: null,
@@ -217,12 +222,14 @@ export const coworkPlans: CoworkPlan[] = [
   {
     name: 'Starter',
     deskDescription: 'Mesa 180x60cm partilhada',
+    totalSpots: 4,
     image: '/images/studio/studio-04.jpg',
     pricing: { diaria: 12, semanal: 45, mensal: 120 },
   },
   {
     name: 'Prime',
     deskDescription: 'Mesa de conferência partilhada',
+    totalSpots: 6,
     image: '/images/studio/studio-04.jpg',
     pricing: { diaria: 15, semanal: 60, mensal: 150 },
     featured: true,
@@ -230,6 +237,7 @@ export const coworkPlans: CoworkPlan[] = [
   {
     name: 'Premium',
     deskDescription: 'Mesa elevatória privada',
+    totalSpots: 2,
     image: '/images/studio/studio-04.jpg',
     pricing: { diaria: null, semanal: 75, mensal: 180 },
   },

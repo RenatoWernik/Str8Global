@@ -6,13 +6,13 @@ import { Navbar, Footer } from "@/components/layout";
 import { Analytics } from "@vercel/analytics/next";
 
 const oswald = Oswald({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-title",
   display: "swap",
 });
 
 const outfit = Outfit({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-body",
   display: "swap",
 });
@@ -320,6 +320,12 @@ export default function RootLayout({
   return (
     <html lang="pt-PT" className="bg-black">
       <head>
+        {/* Performance: preconnect to external origins */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

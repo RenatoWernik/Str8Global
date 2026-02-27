@@ -1,8 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useRef } from 'react';
 
 interface InfiniteCarouselProps {
     children: ReactNode[];
@@ -19,6 +19,9 @@ export function InfiniteCarousel({
     direction = 'left',
     pauseOnHover = true,
 }: InfiniteCarouselProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { margin: '100px', once: false });
+
     // Only duplicate 3x (minimum for seamless loop) and memoize
     const duplicatedChildren = useMemo(
         () => [...children, ...children, ...children],
@@ -27,6 +30,7 @@ export function InfiniteCarousel({
 
     return (
         <div
+            ref={containerRef}
             className={cn(
                 'relative overflow-hidden',
                 pauseOnHover && 'group',
@@ -35,9 +39,9 @@ export function InfiniteCarousel({
         >
             <motion.div
                 className="flex gap-8 w-max will-change-transform"
-                animate={{
+                animate={isInView ? {
                     x: direction === 'left' ? ['0%', '-33.333%'] : ['-33.333%', '0%'],
-                }}
+                } : undefined}
                 transition={{
                     x: {
                         repeat: Infinity,
@@ -66,3 +70,4 @@ export function InfiniteCarousel({
 }
 
 export default InfiniteCarousel;
+

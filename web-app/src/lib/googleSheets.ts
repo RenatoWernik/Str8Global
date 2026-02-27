@@ -96,6 +96,37 @@ export async function getCoworkReservations(): Promise<CoworkReservation[]> {
 }
 
 /**
+ * Fetch cowork capacity config from the "Capacidade" sheet.
+ * Expected columns: A = planId, B = totalSpots
+ * Falls back to empty map if sheet doesn't exist.
+ */
+export async function getCoworkCapacity(): Promise<Record<string, number>> {
+  try {
+    const sheets = getSheets();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Capacidade!A2:B',
+    });
+
+    const rows = response.data.values || [];
+    const capacity: Record<string, number> = {};
+
+    for (const row of rows) {
+      const planId = (row[0] || '').toString().trim();
+      const spots = parseInt((row[1] || '0').toString().trim(), 10);
+      if (planId && spots > 0) {
+        capacity[planId] = spots;
+      }
+    }
+
+    return capacity;
+  } catch (error) {
+    console.error('Failed to fetch cowork capacity (sheet may not exist):', error);
+    return {};
+  }
+}
+
+/**
  * Check if a date falls within a reservation range
  */
 function isDateInRange(date: string, startDate: string, endDate: string): boolean {
@@ -140,6 +171,7 @@ export interface AvailabilityMap {
 export interface CoworkAvailabilityMap {
   [planId: string]: {
     spotsOccupied: number;
+    totalSpots?: number;
   };
 }
 
@@ -150,9 +182,10 @@ export async function getAvailabilityForDate(date: string): Promise<{
   items: AvailabilityMap;
   cowork: CoworkAvailabilityMap;
 }> {
-  const [reservations, coworkReservations] = await Promise.all([
+  const [reservations, coworkReservations, capacity] = await Promise.all([
     getReservations(),
     getCoworkReservations(),
+    getCoworkCapacity(),
   ]);
 
   // Build item availability map
@@ -168,12 +201,23 @@ export async function getAvailabilityForDate(date: string): Promise<{
 
   // Build cowork availability map
   const cowork: CoworkAvailabilityMap = {};
+
+  // Initialize with capacity data (so plans with 0 reservations still show totalSpots)
+  for (const [planId, totalSpots] of Object.entries(capacity)) {
+    cowork[planId] = { spotsOccupied: 0, totalSpots };
+  }
+
+  // Aggregate occupied spots from reservations
   for (const reservation of coworkReservations) {
     if (isDateInRange(date, reservation.startDate, reservation.endDate)) {
       if (!cowork[reservation.planId]) {
         cowork[reservation.planId] = { spotsOccupied: 0 };
       }
       cowork[reservation.planId].spotsOccupied += reservation.spots;
+      // Preserve totalSpots from capacity if it was already set
+      if (capacity[reservation.planId]) {
+        cowork[reservation.planId].totalSpots = capacity[reservation.planId];
+      }
     }
   }
 
