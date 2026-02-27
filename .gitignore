@@ -1,0 +1,15 @@
+# Large media files (not needed for Next.js build)
+Galeria/
+Renato/
+Fontes/
+*.mov
+Generate_*.mp4
+StudioMobile.mp4
+studio.mp4
+
+# macOS artifacts
+__MACOSX/
+._*
+
+# Temp files
+marcas_files.txt
