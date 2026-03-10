@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Calendar, X } from 'lucide-react';
 import Image from 'next/image';
 import {
   gearItems,
@@ -15,8 +15,7 @@ import {
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
-import { AvailabilityBadge } from '@/components/ui/AvailabilityBadge';
+import { AvailabilityCalendar } from '@/components/ui/AvailabilityCalendar';
 
 const MONTHS_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -30,15 +29,7 @@ function formatDatePT(dateStr: string): string {
 
 const categories = Object.keys(gearCategoryLabels) as GearCategoryId[];
 
-interface GearRentingProps {
-  selectedDate: string | null;
-  onDateChange: (date: string) => void;
-  loading: boolean;
-  isItemAvailable: (itemId: string) => { available: boolean; nextAvailable?: string };
-  hasData: boolean;
-}
-
-export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailable, hasData }: GearRentingProps) {
+export function GearRenting() {
   const [activeCategory, setActiveCategory] = useState<GearCategoryId>('cameras');
 
   const filteredItems = gearItems.filter((item) => item.category === activeCategory);
@@ -46,7 +37,7 @@ export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailab
   return (
     <section className="relative bg-black py-20 md:py-32 overflow-hidden">
       {/* Background orb */}
-      <div className="absolute top-40 right-0 w-80 h-80 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      <div className="hidden md:block absolute top-40 right-0 w-80 h-80 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
@@ -65,18 +56,6 @@ export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailab
             {rentalCopy.gear.subtitle}
           </p>
         </ScrollReveal>
-
-        {/* Date picker */}
-        <div className="mb-12">
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
-            Verificar disponibilidade para:
-          </p>
-          <RentalDatePicker
-            selectedDate={selectedDate}
-            onDateChange={onDateChange}
-            loading={loading}
-          />
-        </div>
 
         {/* Category pills */}
         <div className="flex flex-wrap gap-3 mb-12">
@@ -113,9 +92,6 @@ export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailab
                 key={item.id}
                 item={item}
                 index={index}
-                selectedDate={selectedDate}
-                loading={loading}
-                availability={hasData && selectedDate ? isItemAvailable(item.id) : null}
               />
             ))}
           </motion.div>
@@ -128,19 +104,13 @@ export function GearRenting({ selectedDate, onDateChange, loading, isItemAvailab
 function GearCard({
   item,
   index,
-  selectedDate,
-  loading,
-  availability,
 }: {
   item: GearItem;
   index: number;
-  selectedDate: string | null;
-  loading: boolean;
-  availability: { available: boolean; nextAvailable?: string } | null;
 }) {
   const [showContacts, setShowContacts] = useState(false);
-
-  const isAvailable = availability ? availability.available : true;
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   // Generate WhatsApp message with date
   const messageBody = selectedDate
@@ -154,42 +124,24 @@ function GearCard({
       `Preço: ${item.dailyPrice}€/dia\n\n` +
       `Podem indicar-me a disponibilidade?`;
 
-  const alternativeMessage =
-    `Olá! Gostaria de alugar o ${item.name} mas vi que está reservado` +
-    (selectedDate ? ` para ${formatDatePT(selectedDate)}` : '') +
-    `. Têm alternativas disponíveis?`;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="group relative h-full"
+      style={{ zIndex: calendarOpen ? 20 : 'auto' }}
     >
       <div
-        className={`
-          relative p-6 rounded-2xl overflow-hidden h-full flex flex-col
+        className="relative p-6 rounded-2xl overflow-hidden h-full flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
           hover:border-[var(--color-accent)]/30
-          transition-all duration-300
-          ${!isAvailable && selectedDate ? 'opacity-75' : ''}
-        `}
+          transition-all duration-300"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
         <div className="relative z-10 flex flex-col h-full">
-          {/* Availability badge */}
-          {selectedDate && (
-            <div className="mb-3">
-              <AvailabilityBadge
-                available={isAvailable}
-                nextAvailable={availability?.nextAvailable}
-                loading={loading}
-              />
-            </div>
-          )}
-
           {item.image && (
             <div className="relative h-48 w-full mb-6 bg-white/[0.02] rounded-xl overflow-hidden group-hover:bg-white/[0.04] transition-colors duration-500">
               <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent z-10" />
@@ -220,6 +172,38 @@ function GearCard({
             </div>
           </div>
 
+          {/* Date selection */}
+          <div className="mb-4 relative">
+            <button
+              onClick={() => setCalendarOpen(!calendarOpen)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all w-full justify-center"
+            >
+              <Calendar size={16} className="text-[var(--color-accent)]" />
+              <span>{selectedDate ? formatDatePT(selectedDate) : 'Escolher data'}</span>
+              {selectedDate && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDate(null);
+                  }}
+                  className="ml-auto p-1 hover:bg-white/10 rounded transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </button>
+
+            {calendarOpen && (
+              <AvailabilityCalendar
+                itemId={item.id}
+                itemType="item"
+                selectedDate={selectedDate}
+                onSelect={setSelectedDate}
+                onClose={() => setCalendarOpen(false)}
+              />
+            )}
+          </div>
+
           <div className="mt-auto pt-4 border-t border-white/5 min-h-[76px] relative flex flex-col justify-end">
             <AnimatePresence mode="wait">
               {!showContacts ? (
@@ -229,17 +213,12 @@ function GearCard({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   onClick={() => setShowContacts(true)}
-                  className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
-                    border transition-all duration-300 w-full
-                    ${!isAvailable && selectedDate
-                      ? 'bg-white/[0.03] text-white/60 border-white/10 hover:bg-white/[0.06] hover:text-white'
-                      : 'bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border-white/10 hover:border-transparent'
-                    }`}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
+                    bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border border-white/10 hover:border-transparent
+                    transition-all duration-300"
                 >
                   <MessageCircle size={16} />
-                  <span>
-                    {!isAvailable && selectedDate ? 'Consultar Alternativas' : 'Alugar via WhatsApp'}
-                  </span>
+                  <span>Alugar via WhatsApp</span>
                 </motion.button>
               ) : (
                 <motion.div
@@ -250,10 +229,7 @@ function GearCard({
                   className="flex flex-col gap-2 w-full"
                 >
                   <a
-                    href={getWhatsAppUrl(
-                      CONTACTS.IGOR.number,
-                      isAvailable || !selectedDate ? messageBody : alternativeMessage,
-                    )}
+                    href={getWhatsAppUrl(CONTACTS.IGOR.number, messageBody)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
@@ -264,10 +240,7 @@ function GearCard({
                     <span>Falar com {CONTACTS.IGOR.name}</span>
                   </a>
                   <a
-                    href={getWhatsAppUrl(
-                      CONTACTS.MARTA.number,
-                      isAvailable || !selectedDate ? messageBody : alternativeMessage,
-                    )}
+                    href={getWhatsAppUrl(CONTACTS.MARTA.number, messageBody)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-sm font-medium
