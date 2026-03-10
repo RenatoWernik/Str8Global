@@ -12,6 +12,8 @@ export interface ReservationRow {
     item_type: string;
     start_date: string;
     end_date: string;
+    start_time?: string | null;
+    end_time?: string | null;
     client: string;
     contact: string | null;
     notes: string | null;
@@ -27,6 +29,8 @@ export interface ReservationInsert {
     item_type: string;
     start_date: string;
     end_date: string;
+    start_time?: string | null;
+    end_time?: string | null;
     client: string;
     contact?: string | null;
     notes?: string | null;
@@ -40,6 +44,8 @@ export interface ReservationUpdate {
     item_type?: string;
     start_date?: string;
     end_date?: string;
+    start_time?: string | null;
+    end_time?: string | null;
     client?: string;
     contact?: string | null;
     notes?: string | null;

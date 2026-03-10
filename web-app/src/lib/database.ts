@@ -8,6 +8,52 @@ import type {
 // RESERVATIONS (gear + studios)
 // ============================================================
 
+/**
+ * Check if a studio time slot conflicts with existing reservations
+ * @param itemId - The studio ID
+ * @param date - The date to check (YYYY-MM-DD)
+ * @param startTime - Start time in HH:MM format (e.g. "10:00")
+ * @param endTime - End time in HH:MM format (e.g. "14:00")
+ * @param excludeReservationId - Optional reservation ID to exclude from conflict check (for updates)
+ * @returns true if conflict exists, false if slot is available
+ */
+export async function checkTimeConflict(
+    itemId: string,
+    date: string,
+    startTime: string,
+    endTime: string,
+    excludeReservationId?: string
+): Promise<boolean> {
+    const supabase = createServerClient();
+
+    // Query for active reservations on the same item and date
+    let query = supabase
+        .from('reservations')
+        .select('id, start_time, end_time')
+        .eq('item_id', itemId)
+        .eq('status', 'active')
+        .lte('start_date', date)
+        .gte('end_date', date)
+        .not('start_time', 'is', null)
+        .not('end_time', 'is', null);
+
+    if (excludeReservationId) {
+        query = query.neq('id', excludeReservationId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw new Error(`Failed to check time conflict: ${error.message}`);
+
+    // Check for time overlap: existing.start_time < endTime AND existing.end_time > startTime
+    const hasConflict = (data || []).some((reservation: { start_time: string | null; end_time: string | null }) => {
+        if (!reservation.start_time || !reservation.end_time) return false;
+        return reservation.start_time < endTime && reservation.end_time > startTime;
+    });
+
+    return hasConflict;
+}
+
 export async function getReservations(filters?: {
     status?: string;
     item_type?: string;
@@ -47,6 +93,24 @@ export async function getReservationById(id: string): Promise<Reservation | null
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createReservation(reservation: Record<string, any>): Promise<Reservation> {
+    // Overlap validation for studio reservations with time slots
+    if (
+        reservation.item_type === 'studio' &&
+        reservation.start_time &&
+        reservation.end_time
+    ) {
+        const hasConflict = await checkTimeConflict(
+            reservation.item_id,
+            reservation.start_date,
+            reservation.start_time,
+            reservation.end_time
+        );
+
+        if (hasConflict) {
+            throw new Error('CONFLICT: Time slot overlaps with existing reservation');
+        }
+    }
+
     const supabase = createServerClient();
     const { data, error } = await supabase
         .from('reservations')
@@ -60,6 +124,39 @@ export async function createReservation(reservation: Record<string, any>): Promi
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateReservation(id: string, updates: Record<string, any>): Promise<Reservation> {
+    // If updating time fields or dates on a studio reservation, validate overlap
+    if (
+        updates.start_time !== undefined ||
+        updates.end_time !== undefined ||
+        updates.start_date !== undefined ||
+        updates.end_date !== undefined
+    ) {
+        // Fetch existing reservation to get full context
+        const existing = await getReservationById(id);
+
+        if (existing && existing.item_type === 'studio') {
+            // Merge existing with updates to get complete picture
+            const finalStartTime = updates.start_time !== undefined ? updates.start_time : existing.start_time;
+            const finalEndTime = updates.end_time !== undefined ? updates.end_time : existing.end_time;
+            const finalStartDate = updates.start_date !== undefined ? updates.start_date : existing.start_date;
+
+            // Only check if we have time slots
+            if (finalStartTime && finalEndTime) {
+                const hasConflict = await checkTimeConflict(
+                    existing.item_id,
+                    finalStartDate,
+                    finalStartTime,
+                    finalEndTime,
+                    id // Exclude current reservation from conflict check
+                );
+
+                if (hasConflict) {
+                    throw new Error('CONFLICT: Time slot overlaps with existing reservation');
+                }
+            }
+        }
+    }
+
     const supabase = createServerClient();
     const { data, error } = await supabase
         .from('reservations')
