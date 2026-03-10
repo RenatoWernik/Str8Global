@@ -1,9 +1,11 @@
 # ROADMAP.md
 
 > **Current Milestone**: Restricted Admin Dashboard
-> **Goal**: Replace Google Sheets manual workflow with a premium "Jarvis-style" admin dashboard at `/restricted` for Str8Global owners
+> **Goal**: Replace Google Sheets with Supabase and build a premium "Jarvis-style" admin dashboard at `/restricted` for Str8Global owners
 
 ## Must-Haves
+- [ ] Supabase database setup (tables, RLS, migrations)
+- [ ] Migrate public availability API from Google Sheets to Supabase
 - [ ] Authentication gate (login page + session management)
 - [ ] Rental CRUD operations (create, read, update, delete reservations)
 - [ ] Dashboard with KPIs and metrics
@@ -11,24 +13,23 @@
 - [ ] Revenue analytics charts
 - [ ] Standalone layout (no public Navbar/Footer)
 - [ ] Mobile responsive
-- [ ] Google Sheets read+write integration
 
 ## Nice-to-Haves
 - [ ] Client history / repeat customer tracking
 - [ ] Export data to CSV
 - [ ] Email/WhatsApp notification integration
 - [ ] Seasonal demand heatmap
-- [ ] Real-time data refresh (polling)
+- [ ] Real-time data refresh (Supabase subscriptions)
 
 ## Phases
 
-### Phase 1: Foundation & Auth
+### Phase 1: Supabase Setup & Data Migration
+**Status**: ⬜ Not Started
+**Objective**: Set up Supabase project, create database schema (reservations, cowork_reservations, capacity tables), seed with existing data from Google Sheets, and migrate the public availability API to read from Supabase instead of Sheets.
+
+### Phase 2: Foundation & Auth
 **Status**: ⬜ Not Started
 **Objective**: Set up `/restricted` route with standalone layout (no Navbar/Footer), login page with authentication via env-var credentials, session management with HttpOnly cookies, and protected route middleware.
-
-### Phase 2: Google Sheets Write API
-**Status**: ⬜ Not Started
-**Objective**: Upgrade `@/lib/googleSheets.ts` from read-only to full CRUD. Add API routes for creating, updating, and deleting reservations/cowork entries. Update Google Sheets service account scopes to read+write.
 
 ### Phase 3: Dashboard Layout & Navigation
 **Status**: ⬜ Not Started
@@ -36,7 +37,7 @@
 
 ### Phase 4: Reservation Management UI
 **Status**: ⬜ Not Started
-**Objective**: Build the reservation management section — CRUD forms, reservation list with filters/search, calendar/timeline view. Interactive item selector for new bookings.
+**Objective**: Build the reservation management section — CRUD forms, reservation list with filters/search, calendar/timeline view. Full Supabase CRUD API routes. Interactive item selector for new bookings.
 
 ### Phase 5: Analytics & KPI Dashboard
 **Status**: ⬜ Not Started

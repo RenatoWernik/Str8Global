@@ -2,14 +2,21 @@
 
 ## Overview
 
-Build a hidden `/restricted` route (not visible in navigation or to end users) that serves as a complete rental management dashboard for the Str8Global owners (Igor & Marta). This replaces the current Google Spreadsheet workflow with a premium, "Jarvis-style" command center interface.
+Build a hidden `/restricted` route (not visible in navigation or to end users) that serves as a complete rental management dashboard for the Str8Global owners (Igor & Marta). This replaces the current Google Spreadsheet workflow entirely. **Supabase** is the single source of truth — Google Sheets is fully deprecated.
 
 ## Core Requirements
 
+### Backend — Supabase
+- **Full migration from Google Sheets to Supabase** (PostgreSQL)
+- Database tables: `reservations`, `cowork_reservations`, `capacity`
+- All CRUD operations happen via Supabase client
+- The existing public site's availability API (`/api/rental/availability`) must also read from Supabase
+- Real-time instant data sync (Supabase real-time subscriptions or on-demand fetching)
+
 ### Authentication
 - Simple login form protecting the dashboard
-- Credentials stored as environment variables (not a user DB)
-- Session-based auth via cookies or JWT token
+- Credentials stored as environment variables (not a Supabase auth user)
+- Session-based auth via cookies with signed JWT
 - Auto-redirect unauthenticated users to login
 
 ### Dashboard — Rental Management
@@ -30,7 +37,6 @@ Build a hidden `/restricted` route (not visible in navigation or to end users) t
 - Revenue trends chart
 - Booking frequency patterns
 - Client history and repeat-customer tracking
-- Seasonal demand patterns
 
 ### UX/Visual Requirements
 - Dark theme matching Str8Global brand identity
@@ -41,11 +47,11 @@ Build a hidden `/restricted` route (not visible in navigation or to end users) t
 - Portuguese (PT-PT) language throughout
 
 ## Technical Constraints
-- Backend: Google Sheets API (existing integration) — upgrade to read+write
-- No external database — Sheets remain the single source of truth
+- Backend: **Supabase** (PostgreSQL) — replaces Google Sheets entirely
 - Auth via Next.js API routes + HttpOnly cookies
-- Charts rendered client-side with a lightweight library (Recharts or similar)
-- Must not affect existing public-facing pages or SEO
+- Charts rendered client-side (Recharts or custom SVG)
+- Must migrate existing availability API to read from Supabase
+- Must not affect existing public-facing pages or SEO (except backend swap)
 
 ## Status
 **FINALIZED**
