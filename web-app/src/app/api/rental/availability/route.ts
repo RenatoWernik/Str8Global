@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAvailabilityForDate } from '@/lib/database';
 
+// Legacy single-date availability endpoint
+// Maintained for backward compatibility with existing calendar components
 export const revalidate = 300; // Cache for 5 minutes
 
 export async function GET(request: NextRequest) {

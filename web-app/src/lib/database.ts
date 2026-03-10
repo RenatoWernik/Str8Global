@@ -489,6 +489,67 @@ export async function getMonthlyAvailability(params: {
 }
 
 // ============================================================
+// HOURLY AVAILABILITY
+// ============================================================
+
+/**
+ * Get hourly availability for a studio on a specific date
+ * @param studioId - The studio ID
+ * @param date - Date in YYYY-MM-DD format
+ * @returns Array of hourly slots (8h-23h) with availability status
+ */
+export async function getHourlyAvailability(
+    studioId: string,
+    date: string
+): Promise<Array<{ hour: string; available: boolean; reservation?: string }>> {
+    const supabase = createServerClient();
+
+    // Define hour slots (8h-23h = 15 one-hour slots)
+    const hours = [
+        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
+        '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
+    ];
+
+    // Query active reservations for this studio on this date
+    const { data, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('item_id', studioId)
+        .eq('status', 'active')
+        .lte('start_date', date)
+        .gte('end_date', date);
+
+    if (error) throw new Error(`Failed to fetch hourly availability: ${error.message}`);
+
+    const reservations = (data || []) as Reservation[];
+
+    // Check each hour slot
+    return hours.map(hour => {
+        // Find if any reservation covers this hour
+        const coveringReservation = reservations.find(res => {
+            // If reservation has no time fields, it covers all hours (day-based booking)
+            if (!res.start_time || !res.end_time) {
+                return true;
+            }
+
+            // Check if this hour falls within reservation time range
+            // A reservation covers hour H if: start_time <= H AND end_time > H
+            return res.start_time <= hour && res.end_time > hour;
+        });
+
+        if (coveringReservation) {
+            return {
+                hour,
+                available: false,
+                reservation: coveringReservation.client,
+            };
+        }
+
+        return { hour, available: true };
+    });
+}
+
+// ============================================================
 // ANALYTICS / METRICS
 // ============================================================
 
