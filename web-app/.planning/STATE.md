@@ -91,6 +91,15 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Reusable components ready for GearRenting and CoworkStandalone integration
 - Commits: 5aab3eb, f6fb3b7
 
+**Phase 02 Plan 02 (2026-03-10):** GearRenting Per-Item Calendar Integration
+- Integrated AvailabilityCalendar into each GearCard (per-item calendars)
+- Removed shared RentalDatePicker from section level
+- Each equipment card owns its date selection state (selectedDate, calendarOpen)
+- Calendar shows item-specific unavailable dates with strikethrough
+- WhatsApp CTA includes selected date in pre-filled message
+- Updated aluguel page to remove legacy props from GearRenting
+- Commit: a97ac4e
+
 **Phase 03 Plan 01 (2026-03-10):** Studio Hourly Calendar Foundation
 - Created useHourlyAvailability hook for hourly slot-based availability
 - Created StudioHourlyCalendar component with Google Calendar-style day view
@@ -120,13 +129,13 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 ### Plans Ready for Execution
 
-**Phase 02 — Calendário Público Equip & Cowork (remaining plans):**
+**Phase 02 — Calendário Público Equip & Cowork:**
 - ✅ 02-01: useMonthlyAvailability hook + AvailabilityCalendar component (Wave 1) — COMPLETE
-- 02-02: Integrate into GearRenting — per-item calendars (Wave 2) — IN PROGRESS (parallel execution)
+- ✅ 02-02: Integrate into GearRenting — per-item calendars (Wave 2) — COMPLETE
 - ✅ 02-03: Integrate into CoworkStandalone + update aluguel page (Wave 2) — COMPLETE
 
 **Phase 03 — Calendário Público Estúdio:**
 - ✅ 03-01: useHourlyAvailability hook + StudioHourlyCalendar component (Wave 1) — COMPLETE
 - ✅ 03-02: Integrate into StudioRenting + WhatsApp hour prefill + update aluguel page (Wave 2) — COMPLETE
 
-**Phase 03 is COMPLETE.** All studio hourly booking functionality is live.
+**MILESTONE v1.1 STATUS:** ALL PHASES COMPLETE — Both phases done. Public calendars fully integrated (monthly per-item + hourly per-studio).
