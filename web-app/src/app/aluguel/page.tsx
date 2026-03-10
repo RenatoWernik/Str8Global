@@ -41,24 +41,12 @@ export default function AluguelPage() {
 
       {/* Gear Renting Section */}
       <div ref={gearRef}>
-        <GearRenting
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          loading={loading}
-          isItemAvailable={isItemAvailable}
-          hasData={hasData}
-        />
+        <GearRenting />
       </div>
 
       {/* Studio Renting Section */}
       <div ref={studiosRef}>
-        <StudioRenting
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          loading={loading}
-          isItemAvailable={isItemAvailable}
-          hasData={hasData}
-        />
+        <StudioRenting />
       </div>
 
       {/* Cowork + Estúdio Section */}
@@ -74,13 +62,7 @@ export default function AluguelPage() {
 
       {/* Cowork Standalone Section */}
       <div ref={coworkRef}>
-        <CoworkStandalone
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          loading={loading}
-          getCoworkSpots={getCoworkSpots}
-          hasData={hasData}
-        />
+        <CoworkStandalone />
       </div>
 
       {/* CTA Section */}
