@@ -11,6 +11,11 @@
 **Goal:** Atualizar schema Supabase e API de disponibilidade para suportar reservas por hora (estúdios) e disponibilidade por item/plano.
 
 **Requirements:** DB-01, DB-02, DB-03
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Schema + types + CRUD com validacao de sobreposicao horaria
+- [ ] 01-02-PLAN.md — APIs de disponibilidade mensal e horaria
 
 **Tasks:**
 1. Adicionar colunas `start_time` (TEXT) e `end_time` (TEXT) à tabela `reservations` no Supabase
