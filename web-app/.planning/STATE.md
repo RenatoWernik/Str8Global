@@ -3,10 +3,10 @@
 ## Current Position
 
 - **Milestone**: v1.1 — Novas Versões de Calendários
-- **Phase**: 02 in progress (Plans 01, 03 complete), 03 in progress (Plan 01 complete)
-- **Plan**: Phase 2 Plan 03 complete, Phase 3 Plan 01 complete — 2 more plans to execute
-- **Status**: Both phases Wave 1 complete (foundations built), Wave 2 in progress (integrations ongoing)
-- **Last activity**: 2026-03-10 — Phase 02 Plan 03 executed (CoworkStandalone per-plan calendars)
+- **Phase**: 02 complete (all plans done), 03 complete (all plans done)
+- **Plan**: All plans for v1.1 milestone complete — Ready for milestone verification
+- **Status**: Both phases complete — Public calendars fully integrated (monthly per-item + hourly per-studio)
+- **Last activity**: 2026-03-10 — Phase 02 Plan 02 executed (GearRenting per-item calendars)
 
 ## Project Reference
 
@@ -47,6 +47,13 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Calendar component is the panel only - parent cards provide trigger buttons
 - Unavailable dates shown with strikethrough + reduced opacity (text-white/30)
 - Graceful fallback on API error returns empty set (all available)
+
+**Phase 02 Plan 02 (2026-03-10):**
+- Each GearCard owns its own date selection state independently
+- Removed shared section-level date picker from GearRenting
+- Per-card calendar pattern: "Escolher data" button + local state + calendar dropdown
+- Z-index stacking: card with open calendar gets z-20, dropdown gets z-50
+- Date clearing via X button on date selection button
 
 **Phase 02 Plan 03 (2026-03-10):**
 - Each CoworkCard owns its own date selection state - no shared section-level picker
@@ -97,6 +104,17 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Each plan card owns its date selection state (selectedDate, calendarOpen)
 - Calendar shows days with 0 spots as strikethrough
 - WhatsApp CTA includes selected date in pre-filled message
+- Commit: (parallel execution)
+
+**Phase 03 Plan 02 (2026-03-10):** StudioRenting Per-Studio Hourly Calendar Integration
+- Integrated StudioHourlyCalendar into each StudioCard (per-studio hourly calendars)
+- Removed shared RentalDatePicker and AvailabilityBadge from section level
+- Each card owns its booking state (calendarOpen, selectedDate, selectedHour)
+- "Escolher horário" button shows selected time or default text
+- Auto-show WhatsApp contacts after slot selection
+- WhatsApp message includes both date AND hour when selected
+- Updated aluguel/page.tsx to render StudioRenting without props
+- Commit: 9ea9304
 - Updated aluguel page to remove legacy props from CoworkStandalone
 - Commits: a327bfd, fcee4bb
 
@@ -104,9 +122,11 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Phase 02 — Calendário Público Equip & Cowork (remaining plans):**
 - ✅ 02-01: useMonthlyAvailability hook + AvailabilityCalendar component (Wave 1) — COMPLETE
-- 02-02: Integrate into GearRenting — per-item calendars (Wave 2)
+- 02-02: Integrate into GearRenting — per-item calendars (Wave 2) — IN PROGRESS (parallel execution)
 - ✅ 02-03: Integrate into CoworkStandalone + update aluguel page (Wave 2) — COMPLETE
 
-**Phase 03 — Calendário Público Estúdio (remaining plans):**
+**Phase 03 — Calendário Público Estúdio:**
 - ✅ 03-01: useHourlyAvailability hook + StudioHourlyCalendar component (Wave 1) — COMPLETE
-- 03-02: Integrate into StudioRenting + WhatsApp hour prefill + update aluguel page (Wave 2)
+- ✅ 03-02: Integrate into StudioRenting + WhatsApp hour prefill + update aluguel page (Wave 2) — COMPLETE
+
+**Phase 03 is COMPLETE.** All studio hourly booking functionality is live.
