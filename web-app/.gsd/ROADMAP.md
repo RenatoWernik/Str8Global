@@ -1,48 +1,20 @@
-# ROADMAP.md
+---
+> **Current Milestone**: v1.1 — Novas Versões de Calendários
+> **Goal**: Overhaul calendar UX — per-item/plan day calendars, hourly studio calendar, admin updates, Supabase schema
+---
 
-> **Current Milestone**: Restricted Admin Dashboard
-> **Goal**: Replace Google Sheets with Supabase and build a premium "Jarvis-style" admin dashboard at `/restricted` for Str8Global owners
+## Milestone History
+- Restricted Admin Dashboard ✅ (v1.0)
 
-## Must-Haves
-- [ ] Supabase database setup (tables, RLS, migrations)
-- [ ] Migrate public availability API from Google Sheets to Supabase
-- [ ] Authentication gate (login page + session management)
-- [ ] Rental CRUD operations (create, read, update, delete reservations)
-- [ ] Dashboard with KPIs and metrics
-- [ ] Calendar/timeline view of all bookings
-- [ ] Revenue analytics charts
-- [ ] Standalone layout (no public Navbar/Footer)
-- [ ] Mobile responsive
+## Active Phases
 
-## Nice-to-Haves
-- [ ] Client history / repeat customer tracking
-- [ ] Export data to CSV
-- [ ] Email/WhatsApp notification integration
-- [ ] Seasonal demand heatmap
-- [ ] Real-time data refresh (Supabase subscriptions)
+| # | Phase | Goal | Requirements | Status |
+|---|-------|------|--------------|--------|
+| 1 | Schema & API — Suporte Horário | Supabase schema + APIs monthly/hourly | DB-01, DB-02, DB-03 | ○ Pending |
+| 2 | Calendário Público — Equip & Cowork | Per-item/plan calendars with strikethrough | CAL-01..04 | ○ Pending |
+| 3 | Calendário Público — Estúdio | Hourly Google Calendar-style for studios | STU-01..05 | ○ Pending |
+| 4 | Dashboard Admin — Cal Horário | Admin hourly calendar + item timeline | ADM-01..04 | ○ Pending |
 
-## Phases
+**Dependencies:** Phase 1 → Phase 2 + 3 (parallel) → Phase 4
 
-### Phase 1: Supabase Setup & Data Migration
-**Status**: ⬜ Not Started
-**Objective**: Set up Supabase project, create database schema (reservations, cowork_reservations, capacity tables), seed with existing data from Google Sheets, and migrate the public availability API to read from Supabase instead of Sheets.
-
-### Phase 2: Foundation & Auth
-**Status**: ⬜ Not Started
-**Objective**: Set up `/restricted` route with standalone layout (no Navbar/Footer), login page with authentication via env-var credentials, session management with HttpOnly cookies, and protected route middleware.
-
-### Phase 3: Dashboard Layout & Navigation
-**Status**: ⬜ Not Started
-**Objective**: Build the main dashboard shell — sidebar navigation, top bar with user info, page structure. Dark theme with Jarvis aesthetic. Animated transitions between dashboard sections.
-
-### Phase 4: Reservation Management UI
-**Status**: ⬜ Not Started
-**Objective**: Build the reservation management section — CRUD forms, reservation list with filters/search, calendar/timeline view. Full Supabase CRUD API routes. Interactive item selector for new bookings.
-
-### Phase 5: Analytics & KPI Dashboard
-**Status**: ⬜ Not Started
-**Objective**: Build the metrics/analytics section — revenue cards, occupancy rates, most-rented ranking, category breakdown, trend charts, and month-over-month comparisons.
-
-### Phase 6: Polish & Verification
-**Status**: ⬜ Not Started
-**Objective**: Mobile responsiveness, animations, loading states, error handling, edge cases. Full end-to-end testing. Performance optimization.
+See: `.planning/ROADMAP.md` for full details.
