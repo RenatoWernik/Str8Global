@@ -370,6 +370,125 @@ async function findNextAvailableDate(itemId: string, fromDate: string): Promise<
 }
 
 // ============================================================
+// MONTHLY AVAILABILITY
+// ============================================================
+
+/**
+ * Get monthly availability - returns unavailable dates for a given item or cowork plan
+ * @param params.item_id - Equipment or studio ID
+ * @param params.plan_id - Cowork plan ID
+ * @param params.month - Month in YYYY-MM format
+ * @returns Array of unavailable date strings in YYYY-MM-DD format
+ */
+export async function getMonthlyAvailability(params: {
+    item_id?: string;
+    plan_id?: string;
+    month: string;
+}): Promise<string[]> {
+    const { item_id, plan_id, month } = params;
+
+    if (!item_id && !plan_id) {
+        throw new Error('Either item_id or plan_id is required');
+    }
+
+    // Parse month to get first and last day
+    const [year, monthNum] = month.split('-').map(Number);
+    const firstDay = `${month}-01`;
+    const lastDay = new Date(year, monthNum, 0).toISOString().split('T')[0]; // Last day of month
+
+    const supabase = createServerClient();
+
+    // Handle item availability (gear/studio)
+    if (item_id) {
+        const { data, error } = await supabase
+            .from('reservations')
+            .select('*')
+            .eq('item_id', item_id)
+            .eq('status', 'active')
+            .lte('start_date', lastDay)
+            .gte('end_date', firstDay);
+
+        if (error) throw new Error(`Failed to fetch item availability: ${error.message}`);
+
+        const unavailableDates = new Set<string>();
+
+        for (const reservation of (data || []) as Reservation[]) {
+            const resStart = new Date(reservation.start_date);
+            const resEnd = new Date(reservation.end_date);
+            const monthStart = new Date(firstDay);
+            const monthEnd = new Date(lastDay);
+
+            // Calculate actual overlap range within the month
+            const rangeStart = resStart > monthStart ? resStart : monthStart;
+            const rangeEnd = resEnd < monthEnd ? resEnd : monthEnd;
+
+            // If this is a studio reservation with hourly slots
+            if (reservation.item_type === 'studio' && reservation.start_time && reservation.end_time) {
+                // For hourly reservations, we need to track hours per day
+                // Only mark day as unavailable if ALL hours (8-23h = 15 slots) are booked
+                // For now, we'll mark days with hourly bookings as partially available
+                // (Full logic would require aggregating all reservations per day)
+                continue; // Skip hourly reservations for monthly view
+            } else {
+                // For day-based reservations (gear or studio without times), mark entire range
+                for (let d = new Date(rangeStart); d <= rangeEnd; d.setDate(d.getDate() + 1)) {
+                    unavailableDates.add(d.toISOString().split('T')[0]);
+                }
+            }
+        }
+
+        return Array.from(unavailableDates).sort();
+    }
+
+    // Handle cowork plan availability
+    if (plan_id) {
+        const [reservationsRes, capacity] = await Promise.all([
+            supabase
+                .from('cowork_reservations')
+                .select('*')
+                .eq('plan_id', plan_id)
+                .eq('status', 'active')
+                .lte('start_date', lastDay)
+                .gte('end_date', firstDay),
+            getCoworkCapacity(),
+        ]);
+
+        if (reservationsRes.error) {
+            throw new Error(`Failed to fetch cowork availability: ${reservationsRes.error.message}`);
+        }
+
+        const totalSpots = capacity[plan_id] || 0;
+        const spotsByDate: Record<string, number> = {};
+
+        // Calculate spots occupied per day
+        for (const reservation of (reservationsRes.data || []) as CoworkReservation[]) {
+            const resStart = new Date(reservation.start_date);
+            const resEnd = new Date(reservation.end_date);
+            const monthStart = new Date(firstDay);
+            const monthEnd = new Date(lastDay);
+
+            const rangeStart = resStart > monthStart ? resStart : monthStart;
+            const rangeEnd = resEnd < monthEnd ? resEnd : monthEnd;
+
+            for (let d = new Date(rangeStart); d <= rangeEnd; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                spotsByDate[dateStr] = (spotsByDate[dateStr] || 0) + reservation.spots;
+            }
+        }
+
+        // Find dates where spots are full
+        const unavailableDates = Object.entries(spotsByDate)
+            .filter(([, spots]) => spots >= totalSpots)
+            .map(([date]) => date)
+            .sort();
+
+        return unavailableDates;
+    }
+
+    return [];
+}
+
+// ============================================================
 // ANALYTICS / METRICS
 // ============================================================
 
