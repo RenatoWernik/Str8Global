@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAvailabilityForDate } from '@/lib/googleSheets';
+import { getAvailabilityForDate } from '@/lib/database';
 
 export const revalidate = 300; // Cache for 5 minutes
 
