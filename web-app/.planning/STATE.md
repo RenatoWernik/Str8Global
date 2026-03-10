@@ -4,9 +4,9 @@
 
 - **Milestone**: v1.1 — Novas Versões de Calendários
 - **Phase**: 01-schema-api-suporte-horario
-- **Plan**: 01-01 complete (1 of ~3 plans)
+- **Plan**: 01-02 complete (2 of ~3 plans)
 - **Status**: Ready for next plan
-- **Last activity**: 2026-03-10 — Plan 01-01 complete: hourly reservation schema and overlap validation
+- **Last activity**: 2026-03-10 — Plan 01-02 complete: monthly and hourly availability APIs
 
 ## Project Reference
 
@@ -29,6 +29,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Overlap validation only for studio reservations with time fields set
 - Gear reservations continue using day-based model without time fields
 
+**Phase 01 Plan 02 (2026-03-10):**
+- Monthly API excludes hourly studio bookings from unavailable dates (shows partial availability)
+- Hourly slots span 8h-23h (15 one-hour slots)
+- Error fallback returns empty/all-available to prevent site breakage
+- Cowork capacity tracking aggregates spots per day
+
 ### Recent Completions
 
 **Phase 01 Plan 01 (2026-03-10):** Schema & API Suporte Horario
@@ -36,3 +42,10 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Implemented checkTimeConflict() for overlap validation
 - Updated TypeScript types for hourly reservations
 - Commit: a102418
+
+**Phase 01 Plan 02 (2026-03-10):** Monthly & Hourly Availability APIs
+- Created /api/rental/availability/monthly endpoint for items and cowork plans
+- Created /api/rental/availability/hourly endpoint for studio schedules
+- Added getMonthlyAvailability() and getHourlyAvailability() database helpers
+- Graceful error fallback prevents calendar breakage
+- Commits: e370444, f3beac0
