@@ -3,10 +3,10 @@
 ## Current Position
 
 - **Milestone**: v1.1 — Novas Versões de Calendários
-- **Phase**: 02 in progress (Plan 01 complete), 03 in progress (Plan 01 complete)
-- **Plan**: Phase 2 Plan 01 complete, Phase 3 Plan 01 complete — 3 more plans to execute
-- **Status**: Both phases Wave 1 complete (foundations built), Wave 2 ready (integrations)
-- **Last activity**: 2026-03-10 — Phase 03 Plan 01 executed (studio hourly calendar foundation)
+- **Phase**: 02 in progress (Plans 01, 03 complete), 03 in progress (Plan 01 complete)
+- **Plan**: Phase 2 Plan 03 complete, Phase 3 Plan 01 complete — 2 more plans to execute
+- **Status**: Both phases Wave 1 complete (foundations built), Wave 2 in progress (integrations ongoing)
+- **Last activity**: 2026-03-10 — Phase 02 Plan 03 executed (CoworkStandalone per-plan calendars)
 
 ## Project Reference
 
@@ -48,6 +48,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Unavailable dates shown with strikethrough + reduced opacity (text-white/30)
 - Graceful fallback on API error returns empty set (all available)
 
+**Phase 02 Plan 03 (2026-03-10):**
+- Each CoworkCard owns its own date selection state - no shared section-level picker
+- Calendar uses planIds mapping (cowork-starter, cowork-prime, cowork-premium) for API calls
+- Per-card calendar pattern: button trigger + local state + positioned dropdown
+- Z-index stacking: card with open calendar gets z-20, dropdown gets z-50
+
 **Phase 03 Planning (2026-03-10):**
 - Per-studio hourly calendar replaces shared date picker in StudioRenting
 - StudioHourlyCalendar component: Google Calendar-style day view with 15 slots
@@ -85,12 +91,21 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Reusable components ready for StudioRenting integration
 - Commits: aaa4159, 8e5b904
 
+**Phase 02 Plan 03 (2026-03-10):** CoworkStandalone Per-Plan Calendar Integration
+- Integrated AvailabilityCalendar into each CoworkCard (per-plan calendars)
+- Removed shared RentalDatePicker from section level
+- Each plan card owns its date selection state (selectedDate, calendarOpen)
+- Calendar shows days with 0 spots as strikethrough
+- WhatsApp CTA includes selected date in pre-filled message
+- Updated aluguel page to remove legacy props from CoworkStandalone
+- Commits: a327bfd, fcee4bb
+
 ### Plans Ready for Execution
 
 **Phase 02 — Calendário Público Equip & Cowork (remaining plans):**
 - ✅ 02-01: useMonthlyAvailability hook + AvailabilityCalendar component (Wave 1) — COMPLETE
 - 02-02: Integrate into GearRenting — per-item calendars (Wave 2)
-- 02-03: Integrate into CoworkStandalone + update aluguel page (Wave 2)
+- ✅ 02-03: Integrate into CoworkStandalone + update aluguel page (Wave 2) — COMPLETE
 
 **Phase 03 — Calendário Público Estúdio (remaining plans):**
 - ✅ 03-01: useHourlyAvailability hook + StudioHourlyCalendar component (Wave 1) — COMPLETE
