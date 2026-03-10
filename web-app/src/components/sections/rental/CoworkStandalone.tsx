@@ -2,11 +2,11 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Check, MessageCircle, Users } from 'lucide-react';
+import { Check, MessageCircle, Users, Calendar, X } from 'lucide-react';
 import Image from 'next/image';
 import { coworkPlans, coworkAmenities, rentalCopy, CONTACTS, getWhatsAppUrl, type CoworkPlan } from '@/data/rentalData';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+import { AvailabilityCalendar } from '@/components/ui/AvailabilityCalendar';
 
 const MONTHS_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -35,15 +35,7 @@ const planIds: Record<string, string> = {
   Premium: 'cowork-premium',
 };
 
-interface CoworkStandaloneProps {
-  selectedDate: string | null;
-  onDateChange: (date: string) => void;
-  loading: boolean;
-  getCoworkSpots: (planId: string) => { spotsOccupied: number; totalSpots?: number };
-  hasData: boolean;
-}
-
-export function CoworkStandalone({ selectedDate, onDateChange, loading, getCoworkSpots, hasData }: CoworkStandaloneProps) {
+export function CoworkStandalone() {
   const [activePeriod, setActivePeriod] = useState<CoworkPeriod>('mensal');
 
   return (
@@ -80,18 +72,6 @@ export function CoworkStandalone({ selectedDate, onDateChange, loading, getCowor
         >
           {rentalCopy.cowork.subtitle}
         </motion.p>
-
-        {/* Date picker */}
-        <div className="mb-12">
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
-            Verificar disponibilidade para:
-          </p>
-          <RentalDatePicker
-            selectedDate={selectedDate}
-            onDateChange={onDateChange}
-            loading={loading}
-          />
-        </div>
 
         {/* Period toggle */}
         <motion.div
@@ -132,12 +112,6 @@ export function CoworkStandalone({ selectedDate, onDateChange, loading, getCowor
               plan={plan}
               period={activePeriod}
               index={index}
-              selectedDate={selectedDate}
-              loading={loading}
-              {...(hasData && selectedDate
-                ? { spotsOccupied: getCoworkSpots(planIds[plan.name]).spotsOccupied, apiTotalSpots: getCoworkSpots(planIds[plan.name]).totalSpots }
-                : { spotsOccupied: 0 }
-              )}
             />
           ))}
         </div>
@@ -172,23 +146,16 @@ function CoworkCard({
   plan,
   period,
   index,
-  selectedDate,
-  loading,
-  spotsOccupied,
-  apiTotalSpots,
 }: {
   plan: CoworkPlan;
   period: CoworkPeriod;
   index: number;
-  selectedDate: string | null;
-  loading: boolean;
-  spotsOccupied: number;
-  apiTotalSpots?: number;
 }) {
   const [showContacts, setShowContacts] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const price = plan.pricing[period];
   const isFeatured = plan.featured;
-  const totalSpots = apiTotalSpots ?? plan.totalSpots;
 
   const messageBody = selectedDate
     ? `Olá! Tenho interesse no plano Co-Work "${plan.name}".\n\n` +
@@ -202,7 +169,7 @@ function CoworkCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative h-full"
+      className={`group relative h-full ${calendarOpen ? 'z-20' : 'z-0'}`}
     >
       <div
         className={`
@@ -241,30 +208,6 @@ function CoworkCard({
         )}
 
         <div className="relative z-10 flex flex-col h-full mt-2">
-          {/* Availability indicator */}
-          {selectedDate && (
-            (() => {
-              const available = totalSpots - spotsOccupied;
-              const isFull = available <= 0;
-              return (
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full w-fit mb-3 ${isFull
-                  ? 'bg-red-500/10 border border-red-500/20'
-                  : 'bg-emerald-500/10 border border-emerald-500/20'
-                  }`}>
-                  <Users size={12} className={isFull ? 'text-red-400' : 'text-emerald-400'} />
-                  <span className={`text-[11px] font-medium ${isFull ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {isFull
-                      ? 'Lotado — sem lugares disponíveis'
-                      : spotsOccupied === 0
-                        ? `${plan.totalSpots} lugares disponíveis`
-                        : `${available} de ${plan.totalSpots} lugares disponíveis`
-                    }
-                  </span>
-                </div>
-              );
-            })()
-          )}
-
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
           <p className="text-white/40 text-sm mb-8">{plan.deskDescription}</p>
@@ -289,6 +232,39 @@ function CoworkCard({
               </p>
             </div>
           )}
+
+          {/* Date picker button */}
+          <div className="relative mb-4">
+            {selectedDate ? (
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm text-[var(--color-accent)]">
+                  {formatDatePT(selectedDate)}
+                </span>
+                <button
+                  onClick={() => setSelectedDate(null)}
+                  className="text-white/40 hover:text-white transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : null}
+            <button
+              onClick={() => setCalendarOpen(!calendarOpen)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all"
+            >
+              <Calendar size={16} className="text-[var(--color-accent)]" />
+              <span>{selectedDate ? 'Alterar data' : 'Escolher data'}</span>
+            </button>
+            {calendarOpen && (
+              <AvailabilityCalendar
+                itemId={planIds[plan.name]}
+                itemType="plan"
+                selectedDate={selectedDate}
+                onSelect={setSelectedDate}
+                onClose={() => setCalendarOpen(false)}
+              />
+            )}
+          </div>
 
           {/* WhatsApp CTA */}
           <div className="mt-auto">
