@@ -2,13 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Aperture, Focus, Mic, MessageCircle } from 'lucide-react';
+import { Aperture, Focus, Mic, MessageCircle, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { studios, rentalCopy, CONTACTS, getWhatsAppUrl, type Studio, type StudioTier } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
-import { AvailabilityBadge } from '@/components/ui/AvailabilityBadge';
+import { StudioHourlyCalendar } from '@/components/ui/StudioHourlyCalendar';
 
 const MONTHS_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -26,19 +25,11 @@ const studioIcons: Record<string, React.ReactNode> = {
   Mic: <Mic size={32} strokeWidth={1.5} />,
 };
 
-interface StudioRentingProps {
-  selectedDate: string | null;
-  onDateChange: (date: string) => void;
-  loading: boolean;
-  isItemAvailable: (itemId: string) => { available: boolean; nextAvailable?: string };
-  hasData: boolean;
-}
-
-export function StudioRenting({ selectedDate, onDateChange, loading, isItemAvailable, hasData }: StudioRentingProps) {
+export function StudioRenting() {
   return (
     <section className="relative bg-black py-20 md:py-32 overflow-hidden">
       {/* Background orbs */}
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      <div className="hidden md:block absolute bottom-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Header */}
@@ -53,22 +44,10 @@ export function StudioRenting({ selectedDate, onDateChange, loading, isItemAvail
           </h2>
         </ScrollReveal>
         <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-8">
+          <p className="text-white/70 text-lg max-w-xl mb-12">
             {rentalCopy.studio.subtitle}
           </p>
         </ScrollReveal>
-
-        {/* Date picker */}
-        <div className="mb-16">
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
-            Verificar disponibilidade para:
-          </p>
-          <RentalDatePicker
-            selectedDate={selectedDate}
-            onDateChange={onDateChange}
-            loading={loading}
-          />
-        </div>
 
         {/* Studios grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -77,9 +56,6 @@ export function StudioRenting({ selectedDate, onDateChange, loading, isItemAvail
               key={studio.id}
               studio={studio}
               index={index}
-              selectedDate={selectedDate}
-              loading={loading}
-              availability={hasData && selectedDate ? isItemAvailable(studio.id) : null}
             />
           ))}
         </div>
@@ -91,21 +67,36 @@ export function StudioRenting({ selectedDate, onDateChange, loading, isItemAvail
 function StudioCard({
   studio,
   index,
-  selectedDate,
-  loading,
-  availability,
 }: {
   studio: Studio;
   index: number;
-  selectedDate: string | null;
-  loading: boolean;
-  availability: { available: boolean; nextAvailable?: string } | null;
 }) {
   const [showContacts, setShowContacts] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedHour, setSelectedHour] = useState<string | null>(null);
 
-  const isAvailable = availability ? availability.available : true;
+  // Handle slot selection from calendar
+  const handleSlotSelect = (date: string, hour: string) => {
+    setSelectedDate(date);
+    setSelectedHour(hour);
+    setCalendarOpen(false);
+    setShowContacts(true); // Automatically show WhatsApp contacts
+  };
 
-  const messageBody = selectedDate
+  // Compute next hour for time range display
+  const getNextHour = (hour: string): string => {
+    const hourNum = parseInt(hour.split(':')[0], 10);
+    return `${String(hourNum + 1).padStart(2, '0')}:00`;
+  };
+
+  // WhatsApp message with date AND hour
+  const messageBody = selectedDate && selectedHour
+    ? `Olá! Gostaria de reservar o ${studio.name}.\n\n` +
+      `📅 Data: ${formatDatePT(selectedDate)}\n` +
+      `⏰ Horário: ${selectedHour} - ${getNextHour(selectedHour)}\n\n` +
+      `Podem confirmar a disponibilidade e forma de pagamento?`
+    : selectedDate
     ? `Olá! Gostaria de reservar o ${studio.name}.\n\n` +
       `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
       `Podem confirmar a disponibilidade e forma de pagamento?`
@@ -125,7 +116,7 @@ function StudioCard({
           bg-gradient-to-br from-white/[0.04] to-transparent
           border border-white/10
           hover:border-white/20 transition-all duration-300
-          ${!isAvailable && selectedDate ? 'opacity-75' : ''}
+          ${calendarOpen ? 'z-20' : ''}
         `}
       >
         {/* Image Background */}
@@ -145,17 +136,6 @@ function StudioCard({
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/0 to-transparent group-hover:from-[var(--color-accent)]/5 transition-all duration-500" />
 
         <div className="relative z-10 flex flex-col h-full mt-4">
-          {/* Availability badge */}
-          {selectedDate && (
-            <div className="mb-4">
-              <AvailabilityBadge
-                available={isAvailable}
-                nextAvailable={availability?.nextAvailable}
-                loading={loading}
-              />
-            </div>
-          )}
-
           {/* Icon + Name */}
           <div className="flex items-center gap-4 mb-8">
             <div className="p-3 rounded-xl bg-black/70 border border-white/10 text-[var(--color-accent)]">
@@ -165,11 +145,38 @@ function StudioCard({
           </div>
 
           {/* Tiers */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4 mb-6">
             {studio.tiers.map((tier) => (
               <TierRow key={tier.name} tier={tier} />
             ))}
           </div>
+
+          {/* "Escolher horário" button */}
+          <button
+            onClick={() => setCalendarOpen(!calendarOpen)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all w-full justify-center mb-4"
+          >
+            <Clock size={16} className="text-[var(--color-accent)]" />
+            <span>
+              {selectedDate && selectedHour
+                ? `${formatDatePT(selectedDate)} · ${selectedHour} - ${getNextHour(selectedHour)}`
+                : 'Escolher horário'}
+            </span>
+          </button>
+
+          {/* Hourly calendar panel */}
+          <AnimatePresence>
+            {calendarOpen && (
+              <div className="mb-4">
+                <StudioHourlyCalendar
+                  studioId={studio.id}
+                  studioName={studio.name}
+                  onSlotSelect={handleSlotSelect}
+                  onClose={() => setCalendarOpen(false)}
+                />
+              </div>
+            )}
+          </AnimatePresence>
 
           {/* WhatsApp CTA */}
           <div className="mt-auto pt-6 border-t border-white/5">
@@ -181,17 +188,10 @@ function StudioCard({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   onClick={() => setShowContacts(true)}
-                  className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium
-                    border transition-all duration-300
-                    ${!isAvailable && selectedDate
-                      ? 'bg-white/[0.03] text-white/60 border-white/10 hover:bg-white/[0.06] hover:text-white'
-                      : 'bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border-white/10 hover:border-transparent'
-                    }`}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-medium bg-white/[0.03] text-white hover:bg-[var(--color-accent)] hover:text-black border border-white/10 hover:border-transparent transition-all duration-300"
                 >
                   <MessageCircle size={16} />
-                  <span>
-                    {!isAvailable && selectedDate ? 'Consultar Alternativas' : 'Reservar via WhatsApp'}
-                  </span>
+                  <span>Reservar via WhatsApp</span>
                 </motion.button>
               ) : (
                 <motion.div
