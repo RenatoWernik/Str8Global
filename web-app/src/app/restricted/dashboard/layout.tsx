@@ -81,12 +81,12 @@ export default function DashboardLayout({
                 {/* Logo area */}
                 <div className="p-6 border-b border-white/[0.06]">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/20 flex items-center justify-center">
-                            <span className="text-cyan-400 font-bold text-sm">S8</span>
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/20 flex items-center justify-center shrink-0">
+                            <span className="text-cyan-400 font-bold text-sm tracking-tight text-shadow-glow">S8</span>
                         </div>
-                        <div>
-                            <h1 className="text-sm font-semibold text-white tracking-tight">Str8Global</h1>
-                            <p className="text-[10px] text-white/30 tracking-[0.15em] uppercase">Command Center</p>
+                        <div className="min-w-0">
+                            <h1 className="text-base font-bold text-white tracking-tight truncate">Str8Global</h1>
+                            <p className="text-[9px] text-cyan-400/40 tracking-[0.2em] uppercase font-medium leading-none mt-1">Command Center</p>
                         </div>
                     </div>
                 </div>
@@ -100,8 +100,8 @@ export default function DashboardLayout({
                                 key={href}
                                 href={href}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group relative ${active
-                                        ? 'text-cyan-400 bg-cyan-500/10'
-                                        : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
+                                    ? 'text-cyan-400 bg-cyan-500/10'
+                                    : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
                                     }`}
                             >
                                 {active && (
@@ -174,8 +174,8 @@ export default function DashboardLayout({
                                             href={href}
                                             onClick={() => setSidebarOpen(false)}
                                             className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-200 ${active
-                                                    ? 'text-cyan-400 bg-cyan-500/10'
-                                                    : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
+                                                ? 'text-cyan-400 bg-cyan-500/10'
+                                                : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
                                                 }`}
                                         >
                                             <Icon size={18} />

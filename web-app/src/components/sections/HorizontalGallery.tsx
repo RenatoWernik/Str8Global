@@ -34,8 +34,16 @@ export function HorizontalGallery() {
 
     useEffect(() => {
         measureTrack();
-        window.addEventListener('resize', measureTrack, { passive: true });
-        return () => window.removeEventListener('resize', measureTrack);
+        let timeout: ReturnType<typeof setTimeout>;
+        const debouncedMeasure = () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(measureTrack, 200);
+        };
+        window.addEventListener('resize', debouncedMeasure, { passive: true });
+        return () => {
+            clearTimeout(timeout);
+            window.removeEventListener('resize', debouncedMeasure);
+        };
     }, [measureTrack]);
 
     const { scrollYProgress } = useScroll({

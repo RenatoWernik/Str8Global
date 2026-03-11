@@ -3,10 +3,10 @@
 ## Current Position
 
 - **Milestone**: v1.1 — Novas Versões de Calendários
-- **Phase**: 02 complete (all plans done), 03 complete (all plans done)
-- **Plan**: All plans for v1.1 milestone complete — Ready for milestone verification
-- **Status**: Both phases complete — Public calendars fully integrated (monthly per-item + hourly per-studio)
-- **Last activity**: 2026-03-10 — Phase 02 Plan 02 executed (GearRenting per-item calendars)
+- **Phase**: Phases 1, 2, 3 complete. Phase 4 pending.
+- **Plan**: 7/7 plans complete for Phases 1-3. Phase 4 not yet planned.
+- **Status**: Ready to plan Phase 4 (Admin Dashboard)
+- **Last activity**: 2026-03-10 — Phases 2 & 3 executed in parallel (5 plans, 2 waves)
 
 ## Project Reference
 
@@ -100,32 +100,18 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - Updated aluguel page to remove legacy props from GearRenting
 - Commit: a97ac4e
 
-**Phase 03 Plan 01 (2026-03-10):** Studio Hourly Calendar Foundation
-- Created useHourlyAvailability hook for hourly slot-based availability
-- Created StudioHourlyCalendar component with Google Calendar-style day view
-- 15 hourly slots (08:00-22:00) with available/occupied visual distinction
-- Reusable components ready for StudioRenting integration
-- Commits: aaa4159, 8e5b904
+**Phase 03 Plan 01 (2026-03-11):** Studio Hourly Calendar Foundation
+- Rewrote useHourlyAvailability hook to return `ReservationBlock` types.
+- Completely redesigned StudioHourlyCalendar into a Google Calendar-style daily timeline with 15-minute grids.
+- Added 15-minute selection intervals and visual proportional blocks for reservations.
+- Commits: 
 
-**Phase 02 Plan 03 (2026-03-10):** CoworkStandalone Per-Plan Calendar Integration
-- Integrated AvailabilityCalendar into each CoworkCard (per-plan calendars)
-- Removed shared RentalDatePicker from section level
-- Each plan card owns its date selection state (selectedDate, calendarOpen)
-- Calendar shows days with 0 spots as strikethrough
-- WhatsApp CTA includes selected date in pre-filled message
-- Commit: (parallel execution)
-
-**Phase 03 Plan 02 (2026-03-10):** StudioRenting Per-Studio Hourly Calendar Integration
+**Phase 03 Plan 02 (2026-03-11):** StudioRenting Per-Studio Hourly Calendar Integration
 - Integrated StudioHourlyCalendar into each StudioCard (per-studio hourly calendars)
 - Removed shared RentalDatePicker and AvailabilityBadge from section level
 - Each card owns its booking state (calendarOpen, selectedDate, selectedHour)
-- "Escolher horário" button shows selected time or default text
-- Auto-show WhatsApp contacts after slot selection
-- WhatsApp message includes both date AND hour when selected
-- Updated aluguel/page.tsx to render StudioRenting without props
-- Commit: 9ea9304
-- Updated aluguel page to remove legacy props from CoworkStandalone
-- Commits: a327bfd, fcee4bb
+- WhatsApp message generated from `getNextHour` to handle minute granularity.
+- Commits: 
 
 ### Plans Ready for Execution
 
@@ -138,4 +124,13 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 - ✅ 03-01: useHourlyAvailability hook + StudioHourlyCalendar component (Wave 1) — COMPLETE
 - ✅ 03-02: Integrate into StudioRenting + WhatsApp hour prefill + update aluguel page (Wave 2) — COMPLETE
 
-**MILESTONE v1.1 STATUS:** ALL PHASES COMPLETE — Both phases done. Public calendars fully integrated (monthly per-item + hourly per-studio).
+**Phase 04 — Dashboard Admin:**
+- ⏳ 04-01: Formulário e Tabela de Reservas (Admin) (Wave 1)
+- ⏳ 04-02: Admin Studio & Gear Calendar Component (Wave 2)
+- ⏳ 04-03: Interatividade do Calendário (Wave 3)
+- ADM-01: Admin hourly calendar view for studios
+- ADM-02: Create studio reservation with start/end time
+- ADM-03: Edit/delete studio reservations with hours
+- ADM-04: Equipment calendar shows days with active reservations per item
+
+**Next:** `/gsd:plan-phase 4` to plan admin dashboard updates.

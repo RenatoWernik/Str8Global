@@ -35,9 +35,9 @@ export function CTASection({
 
     return (
         <section className="relative bg-white pt-24 md:pt-32 pb-20 md:pb-28 px-6 overflow-hidden">
-            {/* Subtle accent glow on white */}
-            <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[var(--color-accent)] rounded-full blur-[300px] opacity-[0.06]" />
-            <div className="absolute bottom-[-10%] right-[15%] w-[400px] h-[400px] bg-purple-500 rounded-full blur-[200px] opacity-[0.04]" />
+            {/* Subtle accent glow on white — hidden on mobile to save GPU */}
+            <div className="hidden md:block absolute top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[var(--color-accent)] rounded-full blur-[300px] opacity-[0.06]" />
+            <div className="hidden md:block absolute bottom-[-10%] right-[15%] w-[400px] h-[400px] bg-purple-500 rounded-full blur-[200px] opacity-[0.04]" />
 
             <div className="max-w-7xl mx-auto relative z-10">
 

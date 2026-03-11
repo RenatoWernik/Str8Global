@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface ScrollFloatProps {
     children: ReactNode;
@@ -17,6 +18,12 @@ export function ScrollFloat({
     offset = 50,
     direction = 'up',
 }: ScrollFloatProps) {
+    const prefersReducedMotion = useReducedMotion();
+
+    if (prefersReducedMotion) {
+        return <div className={className}>{children}</div>;
+    }
+
     const yOffset = direction === 'up' ? offset : -offset;
 
     return (

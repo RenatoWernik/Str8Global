@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { HighlightText } from '@/components/ui/HighlightText';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { siteCopy } from '@/data/mockData';
 import {
     Target, Camera, Video, Plane, Mic, Palette, BarChart3, Share2
@@ -37,32 +38,64 @@ function getOrbitalPosition(index: number, total: number, radius: number) {
 
 /* ─── Desktop: Orbital Layout ─── */
 
-function OrbitalDesktop({ isInView }: { isInView: boolean }) {
+function OrbitalDesktop({ isInView, prefersReducedMotion }: { isInView: boolean; prefersReducedMotion: boolean }) {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const [rotation, setRotation] = useState(0);
+    const rotationRef = useRef(0);
+    const groupRef = useRef<SVGGElement>(null);
+    const labelsRef = useRef<(HTMLDivElement | null)[]>([]);
     const animRef = useRef<number>(0);
 
-    // Slow continuous rotation — pauses on hover
+    const radius = 240;
+    const svgSize = 640;
+    const center = svgSize / 2;
+
+    // Keep activeIndex in sync for the RAF loop without re-triggering it
+    const activeIndexRef = useRef(activeIndex);
+    useEffect(() => { activeIndexRef.current = activeIndex; }, [activeIndex]);
+
+    // Slow continuous rotation via direct DOM manipulation (no React re-renders)
     useEffect(() => {
-        if (!isInView) return;
+        if (!isInView || prefersReducedMotion) return;
         let last = performance.now();
 
         const tick = (now: number) => {
             const dt = now - last;
             last = now;
-            if (activeIndex === null) {
-                setRotation(prev => prev + dt * 0.003); // very slow
+            if (activeIndexRef.current === null) {
+                rotationRef.current += dt * 0.003;
             }
+
+            // Update SVG group transform directly
+            const rot = rotationRef.current;
+            const rotRad = (rot * Math.PI) / 180;
+            const cos = Math.cos(rotRad);
+            const sin = Math.sin(rotRad);
+
+            // Update each SVG node group via direct DOM
+            if (groupRef.current) {
+                const groups = groupRef.current.children;
+                for (let i = 0; i < capabilitiesData.length; i++) {
+                    const pos = getOrbitalPosition(i, capabilitiesData.length, radius);
+                    const nx = center + pos.x * cos - pos.y * sin;
+                    const ny = center + pos.x * sin + pos.y * cos;
+                    const g = groups[i] as SVGGElement;
+                    if (g) g.setAttribute('transform', `translate(${nx},${ny})`);
+
+                    // Update HTML label position
+                    const label = labelsRef.current[i];
+                    if (label) {
+                        label.style.left = `${(nx / svgSize) * 100}%`;
+                        label.style.top = `${(ny / svgSize) * 100}%`;
+                    }
+                }
+            }
+
             animRef.current = requestAnimationFrame(tick);
         };
 
         animRef.current = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(animRef.current);
-    }, [isInView, activeIndex]);
-
-    const radius = 240;
-    const svgSize = 640;
-    const center = svgSize / 2;
+    }, [isInView, prefersReducedMotion]);
 
     return (
         <div className="relative w-full max-w-[640px] mx-auto aspect-square hidden md:block">
@@ -99,72 +132,60 @@ function OrbitalDesktop({ isInView }: { isInView: boolean }) {
                     strokeDasharray="4 8"
                 />
 
-                {/* Connection lines + nodes */}
-                {capabilitiesData.map((cap, i) => {
-                    const pos = getOrbitalPosition(i, capabilitiesData.length, radius);
-                    const rotRad = (rotation * Math.PI) / 180;
-                    const cos = Math.cos(rotRad);
-                    const sin = Math.sin(rotRad);
-                    const nx = center + pos.x * cos - pos.y * sin;
-                    const ny = center + pos.x * sin + pos.y * cos;
-                    const isActive = activeIndex === i;
+                {/* Connection lines from center (static, updated via CSS) */}
+                <g ref={groupRef}>
+                    {capabilitiesData.map((cap, i) => {
+                        const pos = getOrbitalPosition(i, capabilitiesData.length, radius);
+                        const nx = center + pos.x;
+                        const ny = center + pos.y;
+                        const isActive = activeIndex === i;
 
-                    return (
-                        <g key={i}>
-                            {/* Connection line from center */}
-                            <line
-                                x1={center}
-                                y1={center}
-                                x2={nx}
-                                y2={ny}
-                                stroke="rgb(255,16,240)"
-                                strokeOpacity={isActive ? 0.3 : 0.06}
-                                strokeWidth={isActive ? 1.5 : 0.5}
-                                style={{ transition: 'stroke-opacity 0.4s, stroke-width 0.4s' }}
-                            />
+                        return (
+                            <g key={i} transform={`translate(${nx},${ny})`}>
+                                {/* Connection line from center */}
+                                <line
+                                    x1={center - nx}
+                                    y1={center - ny}
+                                    x2={0}
+                                    y2={0}
+                                    stroke="rgb(255,16,240)"
+                                    strokeOpacity={isActive ? 0.3 : 0.06}
+                                    strokeWidth={isActive ? 1.5 : 0.5}
+                                    style={{ transition: 'stroke-opacity 0.4s, stroke-width 0.4s' }}
+                                />
 
-                            {/* Energy pulse along line */}
-                            {isInView && (
-                                <circle r={2} fill="rgb(255,16,240)" opacity={0.5}>
-                                    <animateMotion
-                                        dur={`${3 + i * 0.4}s`}
-                                        repeatCount="indefinite"
-                                        path={`M${center},${center} L${nx},${ny}`}
-                                    />
-                                </circle>
-                            )}
+                                {/* Node outer ring */}
+                                <circle
+                                    cx={0}
+                                    cy={0}
+                                    r={isActive ? 38 : 32}
+                                    fill={isActive ? 'rgba(255,16,240,0.08)' : 'rgba(12,12,14,0.9)'}
+                                    stroke={isActive ? 'rgb(255,16,240)' : 'rgba(255,255,255,0.08)'}
+                                    strokeWidth={isActive ? 2 : 1}
+                                    filter={isActive ? 'url(#nodeGlow)' : undefined}
+                                    style={{ transition: 'all 0.4s ease', cursor: 'pointer' }}
+                                    onMouseEnter={() => setActiveIndex(i)}
+                                    onMouseLeave={() => setActiveIndex(null)}
+                                />
 
-                            {/* Node outer ring */}
-                            <circle
-                                cx={nx}
-                                cy={ny}
-                                r={isActive ? 38 : 32}
-                                fill={isActive ? 'rgba(255,16,240,0.08)' : 'rgba(12,12,14,0.9)'}
-                                stroke={isActive ? 'rgb(255,16,240)' : 'rgba(255,255,255,0.08)'}
-                                strokeWidth={isActive ? 2 : 1}
-                                filter={isActive ? 'url(#nodeGlow)' : undefined}
-                                style={{ transition: 'all 0.4s ease', cursor: 'pointer' }}
-                                onMouseEnter={() => setActiveIndex(i)}
-                                onMouseLeave={() => setActiveIndex(null)}
-                            />
-
-                            {/* Node icon placeholder — text abbrev */}
-                            <text
-                                x={nx}
-                                y={ny + 1}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fill={isActive ? 'rgb(255,16,240)' : 'rgba(255,255,255,0.5)'}
-                                fontSize={13}
-                                fontWeight={700}
-                                fontFamily="system-ui"
-                                style={{ transition: 'fill 0.3s', cursor: 'pointer', pointerEvents: 'none' }}
-                            >
-                                {String(i + 1).padStart(2, '0')}
-                            </text>
-                        </g>
-                    );
-                })}
+                                {/* Node number */}
+                                <text
+                                    x={0}
+                                    y={1}
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fill={isActive ? 'rgb(255,16,240)' : 'rgba(255,255,255,0.5)'}
+                                    fontSize={13}
+                                    fontWeight={700}
+                                    fontFamily="system-ui"
+                                    style={{ transition: 'fill 0.3s', cursor: 'pointer', pointerEvents: 'none' }}
+                                >
+                                    {String(i + 1).padStart(2, '0')}
+                                </text>
+                            </g>
+                        );
+                    })}
+                </g>
 
                 {/* Center text */}
                 <text
@@ -196,20 +217,16 @@ function OrbitalDesktop({ isInView }: { isInView: boolean }) {
             {/* Floating labels around the SVG — HTML overlay */}
             {capabilitiesData.map((cap, i) => {
                 const pos = getOrbitalPosition(i, capabilitiesData.length, radius);
-                const rotRad = (rotation * Math.PI) / 180;
-                const cos = Math.cos(rotRad);
-                const sin = Math.sin(rotRad);
-                const normX = (center + pos.x * cos - pos.y * sin) / svgSize;
-                const normY = (center + pos.x * sin + pos.y * cos) / svgSize;
+                const normX = (center + pos.x) / svgSize;
+                const normY = (center + pos.y) / svgSize;
                 const isActive = activeIndex === i;
                 const Icon = cap.icon;
-
-                // Position label to the outside of the node
                 const labelSide = normX > 0.5 ? 'left' : 'right';
 
                 return (
                     <motion.div
                         key={i}
+                        ref={(el) => { labelsRef.current[i] = el; }}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isInView ? { opacity: 1, scale: 1 } : {}}
                         transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
@@ -218,11 +235,11 @@ function OrbitalDesktop({ isInView }: { isInView: boolean }) {
                             left: `${normX * 100}%`,
                             top: `${normY * 100}%`,
                             transform: 'translate(-50%, -50%)',
+                            willChange: 'left, top',
                         }}
                         onMouseEnter={() => setActiveIndex(i)}
                         onMouseLeave={() => setActiveIndex(null)}
                     >
-                        {/* Expanded card on hover */}
                         <AnimatePresence>
                             {isActive && (
                                 <motion.div
@@ -345,7 +362,8 @@ function MobileTimeline({ isInView }: { isInView: boolean }) {
 
 export function CapabilitiesOrbit() {
     const ref = useRef<HTMLDivElement>(null);
-    const isInView = useInView(ref, { once: true, margin: '-80px' });
+    const isInView = useInView(ref, { margin: '-80px' });
+    const prefersReducedMotion = useReducedMotion();
 
     return (
         <div ref={ref}>
@@ -371,7 +389,7 @@ export function CapabilitiesOrbit() {
             </div>
 
             {/* Desktop: Orbital */}
-            <OrbitalDesktop isInView={isInView} />
+            <OrbitalDesktop isInView={isInView} prefersReducedMotion={prefersReducedMotion} />
 
             {/* Desktop: Capability list below orbit */}
             <div className="hidden md:grid grid-cols-4 gap-4 mt-10 max-w-3xl mx-auto">

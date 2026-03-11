@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-export interface HourlySlot {
-  hour: string;        // "08:00", "09:00", ..., "22:00"
-  available: boolean;
-  reservation?: string; // Client name when occupied
+export interface ReservationBlock {
+  start: string; // HH:MM
+  end: string;   // HH:MM
+  label: string;
 }
 
 interface UseHourlyAvailabilityReturn {
-  slots: HourlySlot[];
+  blocks: ReservationBlock[];
   loading: boolean;
   error: string | null;
 }
@@ -18,7 +18,7 @@ export function useHourlyAvailability(
   studioId: string | null,
   date: string | null       // "YYYY-MM-DD" format
 ): UseHourlyAvailabilityReturn {
-  const [slots, setSlots] = useState<HourlySlot[]>([]);
+  const [blocks, setBlocks] = useState<ReservationBlock[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -26,7 +26,7 @@ export function useHourlyAvailability(
   useEffect(() => {
     // Skip fetch if studioId or date is null
     if (!studioId || !date) {
-      setSlots([]);
+      setBlocks([]);
       setLoading(false);
       setError(null);
       return;
@@ -47,21 +47,17 @@ export function useHourlyAvailability(
       })
         .then((res) => {
           if (!res.ok) throw new Error('Failed to fetch hourly availability');
-          return res.json() as Promise<{ date: string; studio_id: string; slots: HourlySlot[] }>;
+          return res.json() as Promise<{ date: string; studio_id: string; blocks: ReservationBlock[] }>;
         })
         .then((json) => {
-          setSlots(json.slots);
+          setBlocks(json.blocks);
         })
         .catch((err) => {
           if (err instanceof DOMException && err.name === 'AbortError') return;
           console.error('Hourly availability fetch error:', err);
           setError('Erro ao verificar disponibilidade horária');
-          // Graceful fallback: return all 15 slots as available
-          const fallbackSlots: HourlySlot[] = [
-            '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
-            '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00',
-          ].map((hour) => ({ hour, available: true }));
-          setSlots(fallbackSlots);
+          // Graceful fallback: return empty blocks (all available)
+          setBlocks([]);
         })
         .finally(() => {
           if (!controller.signal.aborted) {
@@ -77,7 +73,7 @@ export function useHourlyAvailability(
   }, [studioId, date]);
 
   return {
-    slots,
+    blocks,
     loading,
     error,
   };

@@ -10,8 +10,8 @@ export function Industries() {
         <section className="relative bg-black py-32 overflow-hidden">
             {/* Static mesh gradient background — no scroll listener */}
             <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-purple-600 to-transparent rounded-full blur-[100px]" />
-                <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-[var(--color-accent)] to-transparent rounded-full blur-[100px]" />
+                <div className="hidden md:block absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-purple-600 to-transparent rounded-full blur-[100px]" />
+                <div className="hidden md:block absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-[var(--color-accent)] to-transparent rounded-full blur-[100px]" />
             </div>
 
             <div className="max-w-7xl mx-auto px-6 relative z-10">

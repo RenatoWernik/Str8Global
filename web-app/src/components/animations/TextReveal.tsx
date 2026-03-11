@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface TextRevealProps {
     children: string;
@@ -14,6 +15,11 @@ interface TextRevealProps {
 export function TextReveal({ children, className, delay = 0, once = true }: TextRevealProps) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once, margin: '-100px' });
+    const prefersReducedMotion = useReducedMotion();
+
+    if (prefersReducedMotion) {
+        return <span className={cn('inline-flex flex-wrap justify-center', className)}>{children}</span>;
+    }
 
     const words = children.split(' ');
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { HighlightText } from '@/components/ui/HighlightText';
 import { siteCopy } from '@/data/mockData';
@@ -82,28 +82,34 @@ export function ResultsComparison() {
     const withoutAreaPath = buildSmoothAreaPath(withoutData);
     const withAreaPath = buildSmoothAreaPath(withData);
 
-    // Measure total path length for stroke animation
+    // Measure total path length for stroke animation (once)
     const [withoutLen, setWithoutLen] = useState(1200);
     const [withLen, setWithLen] = useState(1200);
     const withoutLineRef = useRef<SVGPathElement>(null);
     const withLineRef = useRef<SVGPathElement>(null);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (withoutLineRef.current) setWithoutLen(withoutLineRef.current.getTotalLength());
         if (withLineRef.current) setWithLen(withLineRef.current.getTotalLength());
     }, []);
 
-    // Hover detection on chart area
+    // Hover detection throttled to ~60fps via RAF
+    const rafRef = useRef(0);
     const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-        const svg = svgRef.current;
-        if (!svg) return;
-        const rect = svg.getBoundingClientRect();
-        const scaleX = CHART.w / rect.width;
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const relX = mouseX - CHART.pl;
-        if (relX < 0 || relX > plotW) { setHoveredIndex(null); return; }
-        const idx = Math.round((relX / plotW) * (months.length - 1));
-        setHoveredIndex(Math.max(0, Math.min(idx, months.length - 1)));
+        if (rafRef.current) return;
+        const clientX = e.clientX;
+        rafRef.current = requestAnimationFrame(() => {
+            rafRef.current = 0;
+            const svg = svgRef.current;
+            if (!svg) return;
+            const rect = svg.getBoundingClientRect();
+            const scaleX = CHART.w / rect.width;
+            const mouseX = (clientX - rect.left) * scaleX;
+            const relX = mouseX - CHART.pl;
+            if (relX < 0 || relX > plotW) { setHoveredIndex(null); return; }
+            const idx = Math.round((relX / plotW) * (months.length - 1));
+            setHoveredIndex(Math.max(0, Math.min(idx, months.length - 1)));
+        });
     }, []);
 
     const handleMouseLeave = useCallback(() => setHoveredIndex(null), []);
@@ -138,8 +144,8 @@ export function ResultsComparison() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="relative max-w-3xl mx-auto"
             >
-                {/* Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-[var(--color-accent)] rounded-full blur-[250px] opacity-[0.03] pointer-events-none" />
+                {/* Glow — hidden on mobile */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-[var(--color-accent)] rounded-full blur-[250px] opacity-[0.03] pointer-events-none hidden md:block" />
 
                 {/* Chart card */}
                 <div className="relative z-10 p-4 md:p-6 rounded-2xl md:rounded-3xl bg-white/[0.02] border border-white/5">

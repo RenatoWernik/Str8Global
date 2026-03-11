@@ -119,10 +119,10 @@ export default function RestrictedLoginPage() {
                                     Acesso Restrito
                                 </span>
                             </div>
-                            <h1 className="text-2xl font-semibold text-white tracking-tight">
+                            <h1 className="text-3xl font-bold text-white tracking-tight">
                                 Str8Global
                             </h1>
-                            <p className="text-sm text-white/30 mt-2">
+                            <p className="text-[11px] text-cyan-400/50 mt-3 tracking-[0.2em] uppercase font-medium">
                                 Painel de Controlo
                             </p>
                         </motion.div>

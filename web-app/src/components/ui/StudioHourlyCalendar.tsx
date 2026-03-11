@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, Lock } from 'lucide-react';
-import { useHourlyAvailability, type HourlySlot } from '@/hooks/useHourlyAvailability';
+import { useHourlyAvailability } from '@/hooks/useHourlyAvailability';
 
 interface StudioHourlyCalendarProps {
   studioId: string;
@@ -33,15 +33,22 @@ function addDays(dateStr: string, days: number): string {
   return d.toISOString().split('T')[0];
 }
 
-function getCurrentHour(): number {
-  return new Date().getHours();
+function parseTimeToMinutes(timeStr: string): number {
+  if (!timeStr || !timeStr.includes(':')) return 0;
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
 }
 
-function isPastHour(dateStr: string, hour: string): boolean {
+function isPastTime(dateStr: string, timeStr: string): boolean {
   const today = getTodayString();
-  if (dateStr !== today) return false;
-  const slotHour = parseInt(hour.split(':')[0], 10);
-  return slotHour < getCurrentHour();
+  if (dateStr < today) return true; // past day
+  if (dateStr > today) return false; // future day
+  
+  const now = new Date();
+  const currentMins = now.getHours() * 60 + now.getMinutes();
+  const slotMins = parseTimeToMinutes(timeStr);
+  
+  return slotMins < currentMins;
 }
 
 export function StudioHourlyCalendar({
@@ -51,7 +58,7 @@ export function StudioHourlyCalendar({
   onClose,
 }: StudioHourlyCalendarProps) {
   const [selectedDate, setSelectedDate] = useState(getTodayString());
-  const { slots, loading, error } = useHourlyAvailability(studioId, selectedDate);
+  const { blocks, loading, error } = useHourlyAvailability(studioId, selectedDate);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const today = getTodayString();
@@ -76,12 +83,6 @@ export function StudioHourlyCalendar({
     setSelectedDate(today);
   };
 
-  const handleSlotClick = (slot: HourlySlot) => {
-    if (!slot.available) return;
-    if (isPastHour(selectedDate, slot.hour)) return;
-    onSlotSelect(selectedDate, slot.hour);
-  };
-
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,6 +97,12 @@ export function StudioHourlyCalendar({
     };
   }, [onClose]);
 
+  // Generate grid hours 08:00 to 22:00 (15 intervals, ending at 23:00)
+  const HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
+  
+  // 15-minute intervals for clickable slots (60 total)
+  const INTERVALS = Array.from({ length: 60 }, (_, i) => i);
+
   return (
     <motion.div
       ref={panelRef}
@@ -106,7 +113,7 @@ export function StudioHourlyCalendar({
       className="relative w-full max-h-[70vh] overflow-y-auto bg-black/95 border border-white/10 backdrop-blur-xl rounded-2xl p-4 md:p-6"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 sticky top-0 bg-black/95 backdrop-blur-xl pb-4 border-b border-white/5">
+      <div className="flex items-center justify-between mb-6 sticky top-0 bg-black/95 backdrop-blur-xl pb-4 border-b border-white/5 z-50">
         <div>
           <h3 className="text-xl md:text-2xl font-bold text-white mb-1">{studioName}</h3>
           <p className="text-sm text-white/50">Disponibilidade por hora</p>
@@ -173,93 +180,114 @@ export function StudioHourlyCalendar({
         <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
           {error}
         </div>
-      )}
+      )}      {/* Timeline view */}
+      {loading ? (
+        <div className="h-[600px] flex items-center justify-center border-l border-white/10 ml-12">
+          <div className="animate-pulse text-white/30">Carregando...</div>
+        </div>
+      ) : (
+        <div className="relative mt-8 mb-4">
+          <div className="relative w-full h-[750px] md:h-[900px] border-l border-white/10 ml-10 lg:ml-12" id="timeline-container">
+            
+            {/* Grid lines */}
+            {HOURS.map((hour, i) => (
+              <div key={`grid-${i}`} className="absolute w-full border-t border-white/10 pointer-events-none z-0" style={{ top: `${(i / 15) * 100}%`, height: `${(1 / 15) * 100}%` }}>
+                <span className="absolute -left-12 -top-2.5 text-xs text-white/50 w-10 text-right">
+                  {String(hour).padStart(2, '0')}:00
+                </span>
+                {/* 15 min dashed lines */}
+                <div className="absolute top-[25%] w-full border-t border-white/[0.03] border-dashed" />
+                <div className="absolute top-[50%] w-full border-t border-white/[0.05] border-dashed" />
+                <div className="absolute top-[75%] w-full border-t border-white/[0.03] border-dashed" />
+              </div>
+            ))}
+            {/* Last bottom line for 23:00 */}
+            <div className="absolute w-full border-t border-white/10 pointer-events-none z-0" style={{ top: '100%' }}>
+              <span className="absolute -left-12 -top-2.5 text-xs text-white/50 w-10 text-right">
+                23:00
+              </span>
+            </div>
 
-      {/* Hourly slots grid */}
-      <div className="space-y-2">
-        {loading ? (
-          // Loading skeletons
-          Array.from({ length: 15 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-white/[0.04] animate-pulse rounded-xl h-12"
-            />
-          ))
-        ) : (
-          // Actual slots
-          slots.map((slot, index) => {
-            const isPast = isPastHour(selectedDate, slot.hour);
-            const isClickable = slot.available && !isPast;
-            const endHour = String(parseInt(slot.hour.split(':')[0], 10) + 1).padStart(2, '0');
+            {/* Clickable 15-min intervals */}
+            {INTERVALS.map((i) => {
+              const mFrom8 = i * 15;
+              const startM = 8 * 60 + mFrom8;
+              const slotEndM = startM + 15;
+              
+              const hour = Math.floor(startM / 60);
+              const min = startM % 60;
+              const timeStr = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+              
+              const isOccupied = blocks.some(b => {
+                const bStart = parseTimeToMinutes(b.start);
+                const bEnd = parseTimeToMinutes(b.end);
+                return bStart < slotEndM && bEnd > startM;
+              });
+              
+              const isPast = isPastTime(selectedDate, timeStr);
+              const isClickable = !isOccupied && !isPast;
 
-            return (
-              <motion.div
-                key={slot.hour}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: index * 0.02 }}
-              >
-                <button
-                  onClick={() => handleSlotClick(slot)}
-                  disabled={!isClickable}
-                  className={`
-                    w-full p-4 rounded-xl border transition-all duration-300 flex items-center justify-between
-                    ${
-                      slot.available
-                        ? isPast
-                          ? 'bg-white/[0.02] border-white/5 opacity-40 cursor-not-allowed'
-                          : 'bg-white/[0.03] border-white/10 hover:border-[var(--color-accent)]/50 hover:bg-[var(--color-accent)]/5 cursor-pointer'
-                        : 'bg-[var(--color-accent)]/10 border-[var(--color-accent)]/20 cursor-not-allowed'
-                    }
-                  `}
+              return (
+                <div
+                  key={`interval-${i}`}
+                  onClick={() => isClickable && onSlotSelect(selectedDate, timeStr)}
+                  className={`absolute w-full group ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed hidden md:block'}`}
+                  style={{ top: `${(i / 60) * 100}%`, height: `${(1 / 60) * 100}%`, zIndex: isClickable ? 10 : 0 }}
                 >
-                  {/* Time label */}
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`
-                        text-sm md:text-base font-medium
-                        ${slot.available ? 'text-white/70' : 'text-white/50'}
-                      `}
-                    >
-                      {slot.hour} - {endHour}:00
-                    </span>
-                  </div>
+                  {isClickable && (
+                    <div className="absolute top-0 left-0 w-full h-[400%] bg-[var(--color-accent)]/[0.04] opacity-0 group-hover:opacity-100 pointer-events-none rounded-r-lg border-l-2 border-[var(--color-accent)]/30 transition-none hidden md:block mix-blend-screen shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]">
+                      <span className="text-[10px] text-white/50 absolute top-1 left-2 bg-black/50 px-1 rounded">{timeStr} - duração 1h</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
-                  {/* Status */}
-                  <div className="flex items-center gap-2">
-                    {slot.available ? (
-                      <span className="text-xs md:text-sm text-white/50 group-hover:text-white/70 transition-colors">
-                        {isPast ? 'Passado' : 'Disponível'}
-                      </span>
-                    ) : (
-                      <>
-                        <span className="text-xs md:text-sm text-[var(--color-accent)]/80 font-medium">
-                          {slot.reservation || 'Reservado'}
-                        </span>
-                        <Lock size={14} className="text-[var(--color-accent)]/60" />
-                      </>
-                    )}
+            {/* Reservation Blocks */}
+            {blocks.map((block, idx) => {
+              const startM = parseTimeToMinutes(block.start);
+              const endM = parseTimeToMinutes(block.end);
+              // Clamp to 08:00 (480) and 23:00 (1380)
+              const visualStartM = Math.max(480, startM);
+              const visualEndM = Math.min(1380, endM);
+              
+              const startFrom8 = visualStartM - 480;
+              const duration = visualEndM - visualStartM;
+              
+              if (duration <= 0) return null;
+              
+              const top = (startFrom8 / 900) * 100;
+              const height = (duration / 900) * 100;
+              
+              return (
+                <div
+                  key={`block-${idx}`}
+                  className="absolute right-2 left-0 bg-[var(--color-accent)]/15 border-l-4 border-[var(--color-accent)] rounded-r-lg pointer-events-none px-3 py-2 flex flex-col justify-start overflow-hidden z-20 backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                  style={{ top: `${top}%`, height: `${height}%` }}
+                >
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <Lock size={12} className="text-[var(--color-accent)]" />
+                    <span className="text-xs font-bold text-[var(--color-accent)] truncate">{block.label}</span>
                   </div>
-                </button>
-              </motion.div>
-            );
-          })
-        )}
-      </div>
-
-      {/* Legend */}
-      {!loading && slots.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap gap-4 text-xs text-white/40">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-white/[0.03] border border-white/10" />
-            <span>Disponível</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20" />
-            <span>Ocupado</span>
+                  <span className="text-[10px] text-white/70 truncate">{block.start} - {block.end}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* Legend */}
+      <div className="mt-8 pt-4 border-t border-white/5 flex flex-wrap gap-4 text-xs text-white/40">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-black border border-white/10" />
+          <span>Livre (Clique para reservar)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/50" />
+          <span>Ocupado</span>
+        </div>
+      </div>
     </motion.div>
   );
 }

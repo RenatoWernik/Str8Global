@@ -493,22 +493,16 @@ export async function getMonthlyAvailability(params: {
 // ============================================================
 
 /**
- * Get hourly availability for a studio on a specific date
+ * Get hourly availability blocks for a studio on a specific date
  * @param studioId - The studio ID
  * @param date - Date in YYYY-MM-DD format
- * @returns Array of hourly slots (8h-23h) with availability status
+ * @returns Array of reservation blocks
  */
 export async function getHourlyAvailability(
     studioId: string,
     date: string
-): Promise<Array<{ hour: string; available: boolean; reservation?: string }>> {
+): Promise<{ blocks: Array<{ start: string; end: string; label: string }> }> {
     const supabase = createServerClient();
-
-    // Define hour slots (8h-23h = 15 one-hour slots)
-    const hours = [
-        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
-        '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
-    ];
 
     // Query active reservations for this studio on this date
     const { data, error } = await supabase
@@ -523,30 +517,24 @@ export async function getHourlyAvailability(
 
     const reservations = (data || []) as Reservation[];
 
-    // Check each hour slot
-    return hours.map(hour => {
-        // Find if any reservation covers this hour
-        const coveringReservation = reservations.find(res => {
-            // If reservation has no time fields, it covers all hours (day-based booking)
-            if (!res.start_time || !res.end_time) {
-                return true;
-            }
-
-            // Check if this hour falls within reservation time range
-            // A reservation covers hour H if: start_time <= H AND end_time > H
-            return res.start_time <= hour && res.end_time > hour;
-        });
-
-        if (coveringReservation) {
+    const blocks = reservations.map(res => {
+        // If reservation has no time fields, it's a day-based booking
+        if (!res.start_time || !res.end_time) {
             return {
-                hour,
-                available: false,
-                reservation: coveringReservation.client,
+                start: '08:00',
+                end: '23:00',
+                label: 'Indisponível — dia inteiro',
             };
         }
 
-        return { hour, available: true };
+        return {
+            start: res.start_time,
+            end: res.end_time,
+            label: 'Reservado', // Anonymized
+        };
     });
+
+    return { blocks };
 }
 
 // ============================================================

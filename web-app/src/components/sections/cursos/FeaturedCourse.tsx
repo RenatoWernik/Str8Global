@@ -24,9 +24,9 @@ export function FeaturedCourse() {
         />
       </div>
 
-      {/* Floating orbs */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-72 h-72 bg-[var(--color-accent)] rounded-full blur-[120px] opacity-10 pointer-events-none" />
+      {/* Floating orbs — hidden on mobile to save GPU */}
+      <div className="hidden md:block absolute top-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      <div className="hidden md:block absolute bottom-20 right-10 w-72 h-72 bg-[var(--color-accent)] rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section header */}

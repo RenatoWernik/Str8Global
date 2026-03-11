@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Oswald, Outfit } from "next/font/google";
 import "./globals.css";
 import { LenisProvider, GSAPProvider } from "@/providers";
-import { Navbar, Footer } from "@/components/layout";
+import { ConditionalNavbar } from "@/components/layout/ConditionalNavbar";
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { Analytics } from "@vercel/analytics/next";
 
 const oswald = Oswald({
@@ -318,7 +319,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-PT" className="bg-black">
+    <html lang="pt-PT" className="bg-black" suppressHydrationWarning>
       <head>
         {/* Performance: preconnect to external origins */}
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -330,15 +331,25 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Blocking script to prevent flash of giant typography on /restricted routes */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (window.location.pathname.startsWith('/restricted')) {
+                document.documentElement.classList.add('restricted-mode');
+              }
+            `
+          }}
+        />
       </head>
       <body
         className={`antialiased bg-black text-white ${oswald.variable} ${outfit.variable}`}
       >
         <LenisProvider>
           <GSAPProvider>
-            <Navbar />
+            <ConditionalNavbar />
             {children}
-            <Footer />
+            <ConditionalFooter />
             <Analytics />
           </GSAPProvider>
         </LenisProvider>

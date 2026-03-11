@@ -65,37 +65,56 @@ body {
 }
 
 /* ==============================
-   Typography
+   Typography (public site only)
+   Scoped: public site headings use giant clamp sizes
    ============================== */
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+html:not(.restricted-mode) body h1,
+html:not(.restricted-mode) body h2,
+html:not(.restricted-mode) body h3,
+html:not(.restricted-mode) body h4,
+html:not(.restricted-mode) body h5,
+html:not(.restricted-mode) body h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
-h1 {
+html:not(.restricted-mode) body h1 {
   font-size: clamp(2.25rem, 11.5vw, 9.2rem);
 }
 
-h2 {
+html:not(.restricted-mode) body h2 {
   font-size: clamp(1.75rem, 6.9vw, 5.75rem);
 }
 
-h3 {
+html:not(.restricted-mode) body h3 {
   font-size: clamp(1.25rem, 4.6vw, 3.45rem);
 }
 
-p {
+html:not(.restricted-mode) body p {
   font-size: clamp(1rem, 1.5vw, 1.25rem);
   opacity: 0.8;
 }
+
+/* ==============================
+   Typography (Restricted Mode)
+   Reasonable defaults that can be overridden by Tailwind
+   ============================== */
+
+html.restricted-mode body h1,
+html.restricted-mode body h2,
+html.restricted-mode body h3,
+html.restricted-mode body h4,
+html.restricted-mode body h5,
+html.restricted-mode body h6 {
+  font-family: var(--font-body);
+  /* More readable sans-serif for dashboard */
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
 
 /* ==============================
    Accent Utilities
@@ -188,4 +207,3 @@ html.lenis body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent-hover);
 }
-

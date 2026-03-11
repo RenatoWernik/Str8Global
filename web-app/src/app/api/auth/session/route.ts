@@ -1,45 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase-auth';
 
-export async function GET(request: NextRequest) {
-    const token = request.cookies.get('str8_session')?.value;
-
-    if (!token) {
-        return NextResponse.json({ authenticated: false }, { status: 401 });
-    }
-
+export async function GET() {
     try {
-        const authSecret = process.env.AUTH_SECRET;
-        if (!authSecret) {
-            return NextResponse.json({ authenticated: false }, { status: 500 });
-        }
+        const supabase = await createClient();
+        const { data: { user }, error } = await supabase.auth.getUser();
 
-        const [payloadB64, signatureB64] = token.split('.');
-        if (!payloadB64 || !signatureB64) {
-            return NextResponse.json({ authenticated: false }, { status: 401 });
-        }
-
-        const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
-
-        // Check expiry
-        if (payload.exp && payload.exp < Date.now()) {
-            return NextResponse.json({ authenticated: false, reason: 'expired' }, { status: 401 });
-        }
-
-        // Verify signature
-        const expectedSignature = Buffer.from(
-            await crypto.subtle.digest(
-                'SHA-256',
-                new TextEncoder().encode(JSON.stringify(payload) + authSecret),
-            ).then(buf => Buffer.from(buf).toString('hex')),
-        ).toString('base64');
-
-        if (signatureB64 !== expectedSignature) {
+        if (error || !user) {
             return NextResponse.json({ authenticated: false }, { status: 401 });
         }
 
         return NextResponse.json({
             authenticated: true,
-            user: { email: payload.email, role: payload.role },
+            user: { email: user.email, role: 'admin' },
         });
     } catch {
         return NextResponse.json({ authenticated: false }, { status: 401 });

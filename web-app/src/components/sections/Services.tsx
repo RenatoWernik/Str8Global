@@ -34,9 +34,9 @@ export function Services() {
                 }} />
             </div>
 
-            {/* Floating orbs */}
-            <div className="absolute top-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
-            <div className="absolute bottom-20 right-10 w-72 h-72 bg-[var(--color-accent)] rounded-full blur-[120px] opacity-10 pointer-events-none" />
+            {/* Floating orbs — hidden on mobile to save GPU */}
+            <div className="absolute top-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none hidden md:block" />
+            <div className="absolute bottom-20 right-10 w-72 h-72 bg-[var(--color-accent)] rounded-full blur-[120px] opacity-10 pointer-events-none hidden md:block" />
 
             <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
                 {/* Header */}
@@ -126,11 +126,9 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
             <motion.div
                 animate={{
                     y: isActive ? -8 : 0,
-                    scale: isActive && !isLarge ? 1.02 : 1,
-                    boxShadow: isActive ? '0 20px 40px rgba(0,0,0,0.5), 0 0 40px rgba(255,16,240,0.1)' : '0 10px 30px rgba(0,0,0,0.3), 0 0 0px rgba(255,16,240,0)',
                 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="relative flex flex-col h-full w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/5"
+                className={`relative flex flex-col h-full w-full rounded-2xl md:rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-shadow duration-400 ease-out ${isActive ? 'shadow-[0_20px_40px_rgba(0,0,0,0.5),0_0_40px_rgba(255,16,240,0.1)]' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
             >
                 {/* LED border glow */}
                 <div

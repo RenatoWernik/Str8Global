@@ -6,7 +6,7 @@
 
 ---
 
-## Phase 1: Schema & API — Suporte Horário
+## Phase 1: Schema & API — Suporte Horário ✓ (2026-03-10)
 
 **Goal:** Atualizar schema Supabase e API de disponibilidade para suportar reservas por hora (estúdios) e disponibilidade por item/plano.
 
@@ -14,8 +14,8 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Schema + types + CRUD com validacao de sobreposicao horaria
-- [ ] 01-02-PLAN.md — APIs de disponibilidade mensal e horaria
+- [x] 01-01-PLAN.md — Schema + types + CRUD com validacao de sobreposicao horaria
+- [x] 01-02-PLAN.md — APIs de disponibilidade mensal e horaria
 
 **Tasks:**
 1. Adicionar colunas `start_time` (TEXT) e `end_time` (TEXT) à tabela `reservations` no Supabase
@@ -33,11 +33,17 @@ Plans:
 
 ---
 
-## Phase 2: Calendário Público — Equipamento & Cowork
+## Phase 2: Calendário Público — Equipamento & Cowork ✓ (2026-03-10)
 
 **Goal:** Substituir o date picker atual por calendários mensais per-item/per-plan com dias indisponíveis riscados.
 
 **Requirements:** CAL-01, CAL-02, CAL-03, CAL-04
+**Plans:** 3 plans
+
+Plans:
+- [x] 02-01-PLAN.md — useMonthlyAvailability hook + AvailabilityCalendar component
+- [x] 02-02-PLAN.md — Integrar no GearRenting (per-item calendars)
+- [x] 02-03-PLAN.md — Integrar no CoworkStandalone + update aluguel page
 
 **Tasks:**
 1. Criar componente `AvailabilityCalendar` — calendário mensal com navegação, dias riscados (indisponíveis), dias passados desactivados
@@ -56,11 +62,16 @@ Plans:
 
 ---
 
-## Phase 3: Calendário Público — Estúdio (Hourly)
+## Phase 3: Calendário Público — Estúdio (Hourly) ✓ (2026-03-10)
 
 **Goal:** Criar calendário de horas estilo Google Calendar para estúdios, permitindo ver disponibilidade por hora e pré-preencher WhatsApp.
 
 **Requirements:** STU-01, STU-02, STU-03, STU-04, STU-05
+**Plans:** 2 plans
+
+Plans:
+- [x] 03-01-PLAN.md — useHourlyAvailability hook + StudioHourlyCalendar component
+- [x] 03-02-PLAN.md — Integrar no StudioRenting + WhatsApp hour prefill
 
 **Tasks:**
 1. Criar componente `StudioHourlyCalendar` — vista diária com grid de horas (8h-23h), slots de 1h

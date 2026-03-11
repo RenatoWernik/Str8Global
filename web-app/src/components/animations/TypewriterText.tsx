@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TypewriterTextProps {
@@ -10,6 +9,7 @@ interface TypewriterTextProps {
     typingSpeed?: number;
     deletingSpeed?: number;
     pauseDuration?: number;
+    initialDelay?: number;
 }
 
 export function TypewriterText({
@@ -17,44 +17,81 @@ export function TypewriterText({
     className,
     typingSpeed = 120,
     deletingSpeed = 60,
-    pauseDuration = 2000
+    pauseDuration = 2000,
+    initialDelay = 0,
 }: TypewriterTextProps) {
-    const [text, setText] = useState('');
-    const [wordIndex, setWordIndex] = useState(0);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [display, setDisplay] = useState('');
+    const [cursorVisible, setCursorVisible] = useState(false);
+
+    const stateRef = useRef({
+        wordIndex: 0,
+        charIndex: 0,
+        isDeleting: false,
+        started: false,
+    });
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        const currentWord = words[wordIndex];
+        const clear = () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
+        };
 
-        let timeout: NodeJS.Timeout;
+        const tick = () => {
+            const s = stateRef.current;
+            const word = words[s.wordIndex];
 
-        if (isDeleting) {
-            timeout = setTimeout(() => {
-                setText(currentWord.substring(0, text.length - 1));
-                if (text.length === 0) {
-                    setIsDeleting(false);
-                    setWordIndex((prev) => (prev + 1) % words.length);
+            if (s.isDeleting) {
+                s.charIndex--;
+                setDisplay(word.substring(0, s.charIndex));
+
+                if (s.charIndex === 0) {
+                    s.isDeleting = false;
+                    s.wordIndex = (s.wordIndex + 1) % words.length;
+                    timerRef.current = setTimeout(tick, typingSpeed);
+                } else {
+                    timerRef.current = setTimeout(tick, deletingSpeed);
                 }
-            }, deletingSpeed);
-        } else {
-            timeout = setTimeout(() => {
-                setText(currentWord.substring(0, text.length + 1));
-                if (text.length === currentWord.length) {
-                    timeout = setTimeout(() => setIsDeleting(true), pauseDuration);
-                }
-            }, typingSpeed);
-        }
+            } else {
+                s.charIndex++;
+                setDisplay(word.substring(0, s.charIndex));
 
-        return () => clearTimeout(timeout);
-    }, [text, isDeleting, wordIndex, words, typingSpeed, deletingSpeed, pauseDuration]);
+                if (s.charIndex === word.length) {
+                    timerRef.current = setTimeout(() => {
+                        s.isDeleting = true;
+                        tick();
+                    }, pauseDuration);
+                } else {
+                    timerRef.current = setTimeout(tick, typingSpeed);
+                }
+            }
+        };
+
+        timerRef.current = setTimeout(() => {
+            stateRef.current.started = true;
+            setCursorVisible(true);
+            tick();
+        }, initialDelay);
+
+        return clear;
+    }, [words, typingSpeed, deletingSpeed, pauseDuration, initialDelay]);
+
+    // Cursor blink
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCursorVisible(v => !v);
+        }, 530);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <span className={cn('inline-block relative', className)}>
-            {text}
-            <motion.span
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                className="inline-block w-[3px] md:w-[5px] h-[0.9em] bg-[var(--color-accent)] align-middle ml-1 md:ml-2 -mt-1 md:-mt-2"
+            {display}
+            <span
+                className="inline-block w-[3px] md:w-[5px] h-[0.9em] bg-[var(--color-accent)] align-middle ml-1 md:ml-2 -mt-1 md:-mt-2 transition-opacity duration-100"
+                style={{ opacity: cursorVisible && stateRef.current.started ? 1 : 0 }}
             />
         </span>
     );

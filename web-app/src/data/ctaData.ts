@@ -39,7 +39,7 @@ export const ctaCopy = {
         subtitle:
             'Formação em marketing digital, fotografia profissional e produção de conteúdo a servir Lisboa e Cascais. Cursos práticos leccionados por quem **entrega resultados reais** para marcas premium em Portugal.',
         buttonText: 'Reservar Lugar',
-        buttonHref: '',
+        buttonHref: 'https://wa.me/351933029438?text=' + encodeURIComponent('Olá Marta! Vim pelo site da Str8Global e gostaria de saber mais sobre os cursos.'),
     },
     espaco: {
         badge: 'Visitas disponíveis',

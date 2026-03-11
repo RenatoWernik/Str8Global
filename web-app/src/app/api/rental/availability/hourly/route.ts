@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const slots = await getHourlyAvailability(studio_id, date);
+    const { blocks } = await getHourlyAvailability(studio_id, date);
 
     return NextResponse.json(
-      { date, studio_id, slots },
+      { date, studio_id, blocks },
       {
         headers: {
           'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
@@ -36,14 +36,9 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error('Failed to fetch hourly availability:', error);
-    // Graceful fallback: return all slots as available
-    const fallbackSlots = [
-      '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00',
-      '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
-    ].map(hour => ({ hour, available: true }));
-
+    // Graceful fallback: return empty blocks (all available)
     return NextResponse.json(
-      { date, studio_id, slots: fallbackSlots },
+      { date, studio_id, blocks: [] },
       {
         status: 200,
         headers: {

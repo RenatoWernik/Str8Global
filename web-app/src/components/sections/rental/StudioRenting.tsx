@@ -84,10 +84,11 @@ function StudioCard({
     setShowContacts(true); // Automatically show WhatsApp contacts
   };
 
-  // Compute next hour for time range display
-  const getNextHour = (hour: string): string => {
-    const hourNum = parseInt(hour.split(':')[0], 10);
-    return `${String(hourNum + 1).padStart(2, '0')}:00`;
+  // Compute next hour for time range display (add 1 hour instead of strict +1 to string slice because of minutes)
+  const getNextHour = (timeStr: string): string => {
+    if (!timeStr || !timeStr.includes(':')) return '00:00';
+    const [h, m] = timeStr.split(':').map(Number);
+    return `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   };
 
   // WhatsApp message with date AND hour
