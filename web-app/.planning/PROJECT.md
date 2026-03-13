@@ -26,15 +26,15 @@ Owners (Igor & Marta) can manage all rental operations from one dashboard, and c
 
 ### Active
 
-<!-- Current scope: v1.1 Calendar Overhaul -->
+<!-- Current scope: v1.2 Mobile-Native Calendar Experience -->
 
-- [ ] Per-item availability calendar for equipment (days strikethrough)
-- [ ] Per-plan availability calendar for cowork (days strikethrough when full)
-- [ ] Hourly booking calendar for studios (8h-23h, 1h slots, Google Calendar style)
-- [ ] Admin hourly calendar view for studio management
-- [ ] Database schema update for hourly reservations (start_time, end_time)
-- [ ] Hourly availability API for studios
-- [ ] Conflict validation for studio time slots
+- [ ] Full-screen bottom sheet calendar for equipment/cowork (mobile)
+- [ ] Full-screen bottom sheet hourly calendar for studios (mobile)
+- [ ] Swipe gestures for month/day navigation (touch events)
+- [ ] Large touch targets (min 44px) and thumb-zone ergonomics
+- [ ] Mobile-specific animations and transitions (spring physics)
+- [ ] Haptic feedback on date/slot selection (Vibration API)
+- [ ] Desktop calendar code must remain completely unchanged
 
 ### Out of Scope
 
@@ -65,12 +65,14 @@ Owners (Igor & Marta) can manage all rental operations from one dashboard, and c
 | Supabase for DB | Already in use, proven reliable | ✓ Good |
 | Supabase Auth for login | Replaced .env credentials, more secure | ✓ Good |
 | WhatsApp for bookings | No payment integration needed, personal touch | ✓ Good |
-| Per-item calendar (equipment) | Users need to see specific item availability | — Pending |
-| Hourly slots for studios | Studios are priced/booked by hour, not day | — Pending |
+| Per-item calendar (equipment) | Users need to see specific item availability | ✓ Good |
+| Hourly slots for studios | Studios are priced/booked by hour, not day | ✓ Good |
+| Portal rendering for desktop modals | Escapes overflow-hidden + transform parents | ✓ Good |
+| Bottom sheet pattern for mobile calendars | Native mobile feel, thumb-zone ergonomics | — Pending |
 
-## Current Milestone: v1.1 Novas Versões de Calendários
+## Current Milestone: v1.2 Mobile-Native Calendar Experience
 
-**Goal:** Overhaul all calendar experiences — per-item day calendars for equipment/cowork, hourly Google Calendar-style for studios — across public site and admin dashboard, with Supabase schema updates.
+**Goal:** Redesign completo da experiência mobile dos calendários (mensal e horário) com padrões nativos — bottom sheets, gestos swipe, touch targets grandes, animações spring — sem alterar a versão desktop já aprovada.
 
 ---
-*Last updated: 2026-03-10 after milestone v1.1 started*
+*Last updated: 2026-03-13 after milestone v1.2 started*
