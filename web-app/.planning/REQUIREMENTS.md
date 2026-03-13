@@ -74,33 +74,33 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHEET-01 | — | Pending |
-| SHEET-02 | — | Pending |
-| SHEET-03 | — | Pending |
-| SHEET-04 | — | Pending |
-| SHEET-05 | — | Pending |
-| MCAL-01 | — | Pending |
-| MCAL-02 | — | Pending |
-| MCAL-03 | — | Pending |
-| MCAL-04 | — | Pending |
-| MCAL-05 | — | Pending |
-| HCAL-01 | — | Pending |
-| HCAL-02 | — | Pending |
-| HCAL-03 | — | Pending |
-| HCAL-04 | — | Pending |
-| HCAL-05 | — | Pending |
-| TOUCH-01 | — | Pending |
-| TOUCH-02 | — | Pending |
-| TOUCH-03 | — | Pending |
-| PERF-01 | — | Pending |
-| PERF-02 | — | Pending |
-| PERF-03 | — | Pending |
+| SHEET-01 | Phase 5 | Pending |
+| SHEET-02 | Phase 5 | Pending |
+| SHEET-03 | Phase 5 | Pending |
+| SHEET-04 | Phase 5 | Pending |
+| SHEET-05 | Phase 5 | Pending |
+| MCAL-01 | Phase 6 | Pending |
+| MCAL-02 | Phase 6 | Pending |
+| MCAL-03 | Phase 6 | Pending |
+| MCAL-04 | Phase 6 | Pending |
+| MCAL-05 | Phase 6 | Pending |
+| HCAL-01 | Phase 7 | Pending |
+| HCAL-02 | Phase 7 | Pending |
+| HCAL-03 | Phase 7 | Pending |
+| HCAL-04 | Phase 7 | Pending |
+| HCAL-05 | Phase 7 | Pending |
+| TOUCH-01 | Phase 8 | Pending |
+| TOUCH-02 | Phase 8 | Pending |
+| TOUCH-03 | Phase 8 | Pending |
+| PERF-01 | Phase 8 | Pending |
+| PERF-02 | Phase 5 | Pending |
+| PERF-03 | Phase 8 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21 ⚠️
+- Mapped to phases: 21 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after initial definition*
+*Last updated: 2026-03-13 after roadmap mapping*

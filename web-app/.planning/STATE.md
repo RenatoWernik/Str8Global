@@ -3,10 +3,10 @@
 ## Current Position
 
 - **Milestone**: v1.2 — Mobile-Native Calendar Experience
-- **Phase**: Not started (defining requirements)
+- **Phase**: Phase 5 — Bottom Sheet Foundation (next to plan)
 - **Plan**: —
-- **Status**: Defining requirements
-- **Last activity**: 2026-03-13 — Milestone v1.2 started
+- **Status**: Roadmap complete, ready to plan Phase 5
+- **Last activity**: 2026-03-13 — Roadmap v1.2 created (Phases 5-8)
 
 ## Project Reference
 
@@ -28,12 +28,18 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 
 ### Decisions
 
-(None yet for v1.2)
+- vaul (~8kB) for bottom sheets with snap points and spring physics
+- Vibration API (browser native) for haptic feedback with feature detection
+- Extend existing components (not separate files) with mobile branch
+- MobileBottomSheet.tsx as reusable wrapper component
+- Phases 6+7 parallelizable after Phase 5
 
 ### Recent Completions
 
-(v1.1 completions archived — see git history)
+- Research complete: Stack, Features, Architecture, Pitfalls (4 agents)
+- Requirements defined: 21 total across 5 categories
+- Roadmap created: 4 phases (5-8), 21/21 requirements mapped
 
 ### Plans Ready for Execution
 
-(None yet — defining requirements)
+(None yet — next step: `/gsd:plan-phase 5`)
