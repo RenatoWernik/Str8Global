@@ -100,11 +100,11 @@ Plans:
 **Requirements:** SHEET-01, SHEET-02, SHEET-03, SHEET-04, SHEET-05, PERF-02
 **Complexity:** MEDIUM
 **Research:** SKIP (vaul validated, approach defined)
-**Plans:** 2 plans (estimated)
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: MobileBottomSheet component (vaul) com snap points, drag handle, safe areas, Lenis pause
-- [ ] 05-02: Integrar bottom sheet no AvailabilityCalendar e StudioHourlyCalendar (mobile branch)
+- [ ] 05-01-PLAN.md — MobileBottomSheet component reutilizável com vaul (snap points, drag handle, safe areas, body scroll lock)
+- [ ] 05-02-PLAN.md — Integrar bottom sheet nos 2 calendários (mobile branch apenas, desktop Portal inalterado)
 
 **Tasks:**
 1. Instalar vaul (~8kB) como dependência
