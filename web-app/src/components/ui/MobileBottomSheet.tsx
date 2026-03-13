@@ -62,10 +62,10 @@ export function MobileBottomSheet({
             <Drawer.Handle className="w-12 h-1.5 rounded-full bg-white/20" />
           </div>
 
-          {/* Optional header with title and close button */}
-          {title && (
+          {/* Header with title (required by Radix for accessibility) */}
+          {title ? (
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-              <h2 className="text-xl font-bold text-white">{title}</h2>
+              <Drawer.Title className="text-xl font-bold text-white">{title}</Drawer.Title>
               <button
                 onClick={handleClose}
                 className="p-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -74,6 +74,8 @@ export function MobileBottomSheet({
                 <X className="w-5 h-5 text-white/60" />
               </button>
             </div>
+          ) : (
+            <Drawer.Title className="sr-only">Calendário</Drawer.Title>
           )}
 
           {/* Content area with scroll */}
