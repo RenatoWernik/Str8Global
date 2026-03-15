@@ -5,6 +5,12 @@ import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
+/**
+ * ANIMATION LIBRARY: Framer Motion
+ * WHY: Simple viewport reveal with spring physics (entrance animation, not scroll storytelling)
+ * See: src/components/animations/ANIMATION_LIBRARY_GUIDE.md
+ */
+
 interface ScrollFloatProps {
     children: ReactNode;
     className?: string;

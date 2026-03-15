@@ -5,6 +5,12 @@ import { motion, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
+/**
+ * ANIMATION LIBRARY: Framer Motion
+ * WHY: Word-level stagger animations with spring physics (entrance, not scroll-driven)
+ * See: src/components/animations/ANIMATION_LIBRARY_GUIDE.md
+ */
+
 interface TextRevealProps {
     children: string;
     className?: string;
