@@ -197,7 +197,11 @@ Plans:
 **Requirements:** INFRA-01, INFRA-02, INFRA-03, INFRA-04
 **Complexity:** MEDIUM
 **Research:** SKIP (all patterns documented in research/PITFALLS.md)
-**Plans:** 2-3 plans (estimated)
+**Plans:** 2 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — LenisProvider with ScrollTrigger sync + reduced motion support
+- [ ] 09-02-PLAN.md — React 19 null checks + GSAP vs Framer Motion documentation
 
 **Success Criteria:**
 1. LenisProvider calls `ScrollTrigger.update()` on every Lenis scroll frame, preventing position desync after navigation
@@ -400,4 +404,4 @@ Phase 12 (Polish) ───── Desktop enhancements
 ---
 *Roadmap created: 2026-03-10 (v1.1)*
 *Updated: 2026-03-13 (v1.2 phases added)*
-*Updated: 2026-03-15 (v1.2 shipped, v1.3 phases added)*
+*Updated: 2026-03-15 (v1.2 shipped, v1.3 phases added, Phase 9 planned)*
