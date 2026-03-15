@@ -9,6 +9,13 @@ import {
     Target, Camera, Video, Plane, Mic, Palette, BarChart3, Share2
 } from 'lucide-react';
 
+/**
+ * ANIMATION LIBRARY: Framer Motion + requestAnimationFrame
+ * WHY: Entrance reveals (Framer Motion) + continuous rotation (RAF for performance)
+ * GSAP NOT USED: Continuous rotation via RAF is more performant than GSAP ticker
+ * See: src/components/animations/ANIMATION_LIBRARY_GUIDE.md
+ */
+
 interface Capability {
     title: string;
     description: string;
