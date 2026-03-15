@@ -23,18 +23,21 @@ Owners (Igor & Marta) can manage all rental operations from one dashboard, and c
 - ✓ Admin calendar month view — v1.0
 - ✓ Admin analytics and KPIs — v1.0
 - ✓ Supabase Auth for admin login — v1.0
+- ✓ Per-item monthly calendars for equipment/cowork — v1.1
+- ✓ Hourly studio calendars with Google Calendar style — v1.1
+- ✓ Mobile bottom sheet calendars with native UX — v1.2
+- ✓ Haptic feedback and spring animations on mobile — v1.2
 
 ### Active
 
-<!-- Current scope: v1.2 Mobile-Native Calendar Experience -->
+<!-- Current scope: v1.3 Redesign Página Espaço -->
 
-- [ ] Full-screen bottom sheet calendar for equipment/cowork (mobile)
-- [ ] Full-screen bottom sheet hourly calendar for studios (mobile)
-- [ ] Swipe gestures for month/day navigation (touch events)
-- [ ] Large touch targets (min 44px) and thumb-zone ergonomics
-- [ ] Mobile-specific animations and transitions (spring physics)
-- [ ] Haptic feedback on date/slot selection (Vibration API)
-- [ ] Desktop calendar code must remain completely unchanged
+- [ ] Redesign completo das secções pós-Hero da página Espaço
+- [ ] Layouts criativos e fora do padrão para apresentação do espaço
+- [ ] Efeitos e animações interactivas que prendem a atenção
+- [ ] Reutilizar todas as 13 fotos existentes sem adicionar novas
+- [ ] Manter Hero Section 100% intacta
+- [ ] Manter CTA Section actual
 
 ### Out of Scope
 
@@ -46,9 +49,11 @@ Owners (Igor & Marta) can manage all rental operations from one dashboard, and c
 
 - Database: Supabase PostgreSQL (tables: reservations, cowork_reservations, capacity)
 - Current calendar: Single date picker shared across all categories, checks availability for one date at a time
-- Studios currently use day-based reservations but are priced per hour — mismatch that v1.1 fixes
+- Studios now use hourly reservations (8h-23h slots) — fixed in v1.1
+- Mobile calendars use bottom sheet pattern with vaul — completed in v1.2
 - Admin dashboard uses Jarvis/dark theme with cyan accents
 - Public site uses dark theme with magenta (#FF10F0) accent
+- Página Espaço actual: Hero (Globe 3D) + 4 secções de conteúdo + CTA, tudo muito estático e genérico
 
 ## Constraints
 
@@ -68,11 +73,11 @@ Owners (Igor & Marta) can manage all rental operations from one dashboard, and c
 | Per-item calendar (equipment) | Users need to see specific item availability | ✓ Good |
 | Hourly slots for studios | Studios are priced/booked by hour, not day | ✓ Good |
 | Portal rendering for desktop modals | Escapes overflow-hidden + transform parents | ✓ Good |
-| Bottom sheet pattern for mobile calendars | Native mobile feel, thumb-zone ergonomics | — Pending |
+| Bottom sheet pattern for mobile calendars | Native mobile feel, thumb-zone ergonomics | ✓ Good |
 
-## Current Milestone: v1.2 Mobile-Native Calendar Experience
+## Current Milestone: v1.3 Redesign Página Espaço
 
-**Goal:** Redesign completo da experiência mobile dos calendários (mensal e horário) com padrões nativos — bottom sheets, gestos swipe, touch targets grandes, animações spring — sem alterar a versão desktop já aprovada.
+**Goal:** Redesign criativo e imersivo de todas as secções da página "Espaço" (excepto Hero e CTA) — layouts não-convencionais, efeitos interactivos, animações que prendem a atenção, usando apenas as 13 fotos existentes. Inspiração de ReactBits e LightsWind.
 
 ---
-*Last updated: 2026-03-13 after milestone v1.2 started*
+*Last updated: 2026-03-15 after milestone v1.3 started*
