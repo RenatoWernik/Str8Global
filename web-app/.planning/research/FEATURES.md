@@ -1,287 +1,197 @@
-# Feature Research: Mobile-Native Calendar Redesign
+# Feature Landscape: Creative Photography Portfolio Page
 
-**Domain:** Mobile booking calendar experience (web app)
-**Researched:** 2026-03-13
-**Confidence:** MEDIUM (based on training data through January 2025 + established mobile UX patterns)
+**Domain:** Immersive photography agency portfolio/showcase page (Espaço redesign)
+**Researched:** 2026-03-15
 
-## Feature Landscape
+## Table Stakes
 
-### Table Stakes (Users Expect These)
-
-Features users assume exist in mobile booking calendars. Missing these = product feels broken or frustrating.
+Features users expect from a premium photography agency portfolio page. Missing = page feels generic/amateur.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| **Bottom Sheet / Modal Drawer** | iOS/Android native pattern — users expect calendars to slide up from bottom on mobile | MEDIUM | Needs: dismissible by swipe-down gesture, backdrop tap, safe area insets, proper z-index layering. Already have portal logic in existing calendars. |
-| **Swipe to Dismiss** | Standard mobile gesture — pulling down to close feels natural | MEDIUM | Requires: pan gesture detection, threshold velocity/distance, spring animation back if threshold not met. Library: Framer Motion drag constraints. |
-| **Touch-Optimized Tap Targets** | Apple HIG: minimum 44x44pt, Material: 48x48dp — current 320px calendar likely has small targets | LOW | Already have aspect-square grid cells. Need to verify min-height (currently responsive). |
-| **Day-of-Week Headers** | Users need Monday/Tuesday context to avoid booking wrong day | LOW | Already implemented (`WEEKDAYS_PT`). Table stakes to keep. |
-| **Visual Unavailable States** | Users must see what's blocked before tapping (avoid frustration) | LOW | Already have: `line-through` for unavailable dates, `Lock` icon for occupied slots. Table stakes. |
-| **Loading States** | Mobile networks are slow/unreliable — must show fetch progress | LOW | Already have: `loading` flag, `Loader2` spinner. Need to preserve for mobile. |
-| **Today Shortcut** | Users frequently book "today" or "tomorrow" — quick access reduces friction | LOW | Already have "Hoje" button. Common pattern in booking flows. |
-| **Scroll Snappin g (Date Picker)** | When swiping through months/dates horizontally, should snap to full view | MEDIUM | Not yet implemented. Needed for carousel-style date navigation. CSS `scroll-snap-type: x mandatory`. |
-| **Pull-to-Refresh (Optional)** | Mobile pattern to reload availability — less expected in modals, more in full-page views | MEDIUM | May not be table stakes for modal calendars. Evaluate if needed. |
-| **Safe Area Padding** | iOS notch/dynamic island, Android gesture bars — content must not be obscured | LOW | Not yet implemented. Critical for bottom sheets. CSS `env(safe-area-inset-bottom)`. |
+| **Smooth scroll** | Industry standard for creative agencies (Awwwards, FWA). Users expect fluid navigation on dark-theme sites. | LOW | Already have Lenis. No work needed. |
+| **High-quality images** | Core content. Poor image quality = immediate credibility loss. Must be optimized (WebP/AVIF) but crisp. | LOW | Next.js Image handles. Ensure 13 photos optimized. |
+| **Mobile responsive** | 60%+ traffic from mobile. Gallery must adapt to portrait orientation. Touch targets 44px min. | MEDIUM | Existing Tailwind + breakpoints. Test gallery on mobile. |
+| **Fast load time** | Users leave if >3s load. Premium sites paradoxically load faster (shows technical competence). | MEDIUM | Lazy load images, code splitting, optimize fonts. |
+| **Accessible navigation** | Keyboard navigation, screen reader support, focus indicators. Table stakes for professional sites in 2026. | MEDIUM | Existing components have focus styles. Test with keyboard. |
+| **Category filtering** | 5 studios + 5 cowork + 3 amenities need organization. Users want to browse by type. | MEDIUM | Filter buttons + Framer Motion layout animation. |
+| **Image lazy loading** | 13 high-res photos = heavy page. Images below fold must lazy load. | LOW | Next.js Image `loading="lazy"`. Already supported. |
+| **Dark theme optimization** | #000 background already chosen. White text must be readable, images must have contrast. | LOW | Already implemented in design system. Test readability. |
 
-### Differentiators (Competitive Advantage)
+## Differentiators
 
-Features that set mobile booking apart. Not required, but create delight or solve common frustrations.
+Features that set this portfolio page apart from generic templates. Not expected, but create "wow" moments.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| **Horizontal Swipe Date Navigation** | Faster than tap-left/tap-right arrows — native calendar app pattern (iOS Calendar) | MEDIUM | Alternative to current ChevronLeft/ChevronRight buttons. Use `react-swipeable` or Framer Motion `drag` + `onDragEnd`. Snap to full dates. |
-| **Multi-Month Preview (Peek)** | See edges of prev/next month while swiping — reduces cognitive load | MEDIUM-HIGH | Requires: carousel with partial views (show 10-20% of adjacent months). CSS `scroll-padding` or custom carousel. |
-| **Inline Mini Calendar (Collapsed State)** | Full bottom sheet for first interaction, then collapses to mini date strip for quick re-selection | HIGH | Two-state component: full (initial) vs mini (after first selection). Saves vertical space. Seen in Airbnb mobile. |
-| **Haptic Feedback on Selection** | Tactile confirmation when tapping date/time — feels premium | LOW | Web: `navigator.vibrate(50)` (iOS Safari doesn't support, Android Chrome does). Graceful degradation. |
-| **Time Slot Grouping (Already Have)** | Manhã/Tarde/Noite sections reduce overwhelming grid — easier to scan | LOW | Already implemented in `StudioHourlyCalendar`. Differentiator vs flat 8-23h list. Keep and optimize. |
-| **Visual Time Density Heat Map** | Show "busier" hours with color intensity (e.g., more red = fewer slots) | MEDIUM | Helps users pick less-popular times. Requires aggregating availability across time ranges. Not critical for MVP. |
-| **Quick Filters (Morning/Afternoon/Evening)** | Tap to jump to time period — faster than scrolling | LOW-MEDIUM | Add pill buttons above hourly grid: "Manhã" → scroll to 8h, "Tarde" → 12h, "Noite" → 18h. |
-| **Optimistic UI Updates** | Show selection immediately, sync in background — feels instant | MEDIUM | Risk: conflicts if unavailable. Need rollback UX. Consider for post-MVP. |
-| **Persistent Selection Summary Bar** | Sticky footer showing "22 Mar, 14:00" while scrolling time slots — context reminder | MEDIUM | Prevents "wait, what date did I pick?" Useful for hourly calendar with long scroll. |
-| **Gesture-Based Time Scrolling** | Scrub through hours by dragging a slider (like iOS alarm picker) | HIGH | Novel but potentially confusing for first-time users. Probably not worth complexity. |
+| **Text character reveal** | Unexpected animation. Makes headlines feel cinematic. Common on Awwwards sites, rare on local agency sites. | MEDIUM | Splitting.js + GSAP. 1-2 days implementation. |
+| **Magnetic cursor** | Desktop-only but memorable. Cursor pulls towards interactive elements. Signals attention to detail. | MEDIUM | Framer Motion useSpring. 1 day implementation. Custom, no library. |
+| **Image reveal on scroll** | Clip-path animation makes images "appear" dramatically. More engaging than fade-in. | MEDIUM | GSAP ScrollTrigger. 1-2 days for 13 images. |
+| **Parallax layers** | Depth perception. 2-3 image layers scrolling at different speeds. Creates spatial dimension. | LOW-MEDIUM | GSAP ScrollTrigger scrub. Half day per section. |
+| **Bento grid layout** | Varied image sizes (not uniform grid). Looks editorial, not template-based. | MEDIUM | CSS Grid explicit areas. 1-2 days design + implementation. |
+| **Fullscreen lightbox** | Click image → expands to fullscreen with smooth transition. Expected for portfolio work. | MEDIUM | Framer Motion layoutId. 1-2 days. Test on mobile. |
+| **Horizontal scroll section** | Unconventional navigation. Amenities scroll horizontally while pinned. Memorable experience. | HIGH | GSAP ScrollTrigger pin + horizontal. 2-3 days. Accessibility concern. |
+| **Magnetic image hover** | Images subtly follow cursor on hover. More engaging than scale-only hover. | MEDIUM | Framer Motion mouse tracking. 1 day. Desktop-only. |
+| **Balanced typography** | No orphaned words in headlines. Professional typesetting. Most sites ignore this. | LOW | react-wrap-balancer. 1 hour. Instant polish. |
+| **Gradient text animation** | Magenta (#FF10F0) gradient animated through headline. Reinforces brand color. | LOW | CSS background-clip + GSAP. Half day. |
 
-### Anti-Features (Commonly Requested, Often Problematic)
+## Anti-Features
 
-Features that seem good but create problems in mobile booking calendars.
+Features to explicitly NOT build. Common mistakes or over-engineering.
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| **Infinite Scroll Calendar** | "Users should scroll forever through months" | Performance degrades with hundreds of DOM nodes. Also: 90-day booking window is business constraint. | Keep current: ChevronLeft/ChevronRight with disabled state at limits. Or carousel with lazy-loaded months (max 3 rendered). |
-| **Multi-Date Selection (Range)** | "Let users book multiple days at once" | Adds complexity: range validation, partial unavailability, UI for clearing ranges. Your flow is WhatsApp CTA (not direct booking), so range isn't needed. | Single-date selection → user contacts via WhatsApp to discuss multi-day. |
-| **Native Date Picker (`<input type="date">`)** | "Browser's built-in picker is faster to implement" | Ugly, inconsistent across browsers (especially iOS Safari), can't show unavailable dates, can't theme to dark + magenta. | Custom calendar with touch-optimized UI. Already implemented. |
-| **Auto-Advance After Selection** | "Automatically move to next step after picking date" | Disorienting on mobile — users want to confirm their choice first. Also prevents multi-step edits (e.g., "oops, wrong date"). | Explicit "Confirm" or "Continue" button. Or make selection trigger WhatsApp CTA directly (current pattern). |
-| **Pinch-to-Zoom Calendar** | "Let users zoom in to see more detail" | Conflicts with browser's page zoom. Adds gesture complexity. Not useful for calendars (dates are discrete, not continuous like maps). | Ensure adequate font size (already using `text-sm` to `text-xl` responsive). |
-| **Custom Week Start (Sunday vs Monday)** | "Some users prefer Sunday first" | Adds settings complexity. PT-PT convention is Monday-first (ISO 8601). | Keep Monday-first (`WEEKDAYS_PT` already starts Seg). |
-| **Time Zone Selector** | "Users might book from different time zones" | Over-engineering for local Lisboa studio. Adds cognitive load. | Assume Lisboa time (UTC+0/+1). Show "Horário de Lisboa" label if international users expected. |
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| **Auto-playing video backgrounds** | Heavy bandwidth (13 photos already), accessibility issues (motion sickness), distracts from content. | Use video sparingly (1-2 sections max) with play button. CLAUDE.md mentions "separate mobile/desktop versions" for existing videos — follow that pattern. |
+| **Infinite scroll** | Only 13 photos. Infinite scroll for small set feels artificial and prevents users from reaching footer (contact info). | Fixed gallery with "Load More" if adding more photos later, or single-page layout. |
+| **Complex 3D WebGL scenes** | Three.js for complex scenes = 100kB+ bundle, high GPU usage, breaks on older devices. Over-engineered for 13 photos. | Use Three.js sparingly (simple tilt effect on 1-2 images max). Rely on CSS transforms for most effects. |
+| **Music/sound effects** | Unexpected audio is jarring, accessibility issue, most users browse with sound off. | Silence. If absolutely needed, user-initiated with clear mute button. |
+| **Swipe-between-photos carousel (unless validated)** | Adds complexity (embla-carousel 8kB), might not match user mental model (users expect to see all photos at once in portfolio). | Start with static gallery. Add carousel ONLY if UX testing shows users want it. |
+| **Masonry layout (unless design requires)** | react-photo-album 5kB for automatic masonry. For 13 photos, manual CSS Grid gives more design control and smaller bundle. | CSS Grid with explicit grid-template-areas. Bento grid (varied sizes, intentional layout). |
+| **Multiple parallax scroll libraries** | Common mistake: installing locomotive-scroll when Lenis already installed. Double event listeners = janky performance. | Stick to Lenis (already installed). Use GSAP ScrollTrigger for scroll-driven animations. |
+| **Separate image reveal library** | Libraries like react-awesome-reveal (12kB) replicate what GSAP ScrollTrigger does better. | GSAP ScrollTrigger + custom clip-path/opacity animations. |
+| **Typewriter effect on body text** | Slows reading, annoying after first view, accessibility issue (screen readers announce each character). | Use typewriter sparingly (1 headline max) or skip entirely. Character reveal (Splitting.js) is better. |
+| **Cursor trail effects** | Distracting, harms readability on dark backgrounds, feels dated (2010s Flash era). | Magnetic cursor (subtle, functional) instead of trail (visual noise). |
 
 ## Feature Dependencies
 
+**Text animations:**
 ```
-Bottom Sheet Container
-    └──requires──> Swipe to Dismiss Gesture
-    └──requires──> Safe Area Padding
-    └──enhances──> Backdrop Blur + Tap to Close (already have)
-
-Horizontal Swipe Date Navigation
-    └──requires──> Scroll Snapping
-    └──conflicts──> Swipe to Dismiss (different gestures on same axis)
-    └──solution──> Lock swipe-to-dismiss to vertical-only pan
-
-Inline Mini Calendar (Collapsed State)
-    └──requires──> Bottom Sheet Container
-    └──requires──> Animation between expanded/collapsed states
-    └──conflicts──> Current portal-to-body pattern (needs shared state)
-
-Persistent Selection Summary Bar
-    └──requires──> Bottom Sheet Container (sticky positioning context)
-    └──enhances──> Long hourly time grids
-
-Haptic Feedback
-    └──requires──> Feature detection (not supported on iOS)
-    └──enhances──> Touch interaction (any button/selection)
+Splitting.js installation → HeroText component → Character reveal animation
+                                                  ↘ Word scramble effect (optional)
 ```
 
-### Dependency Notes
+**Image effects:**
+```
+GSAP ScrollTrigger (existing) → RevealImage component → Clip-path reveal
+                                                        ↘ Parallax effect
+                                                        ↘ Scale on scroll
 
-- **Bottom Sheet requires Swipe to Dismiss:** Core mobile pattern — users expect to pull down to close. Not having this feels "stuck".
-- **Bottom Sheet requires Safe Area Padding:** Without `env(safe-area-inset-bottom)`, content hides under iOS home indicator or Android gesture bar.
-- **Horizontal Swipe conflicts with Swipe to Dismiss:** Both use pan gestures. Solution: restrict swipe-to-dismiss to vertical (`dragConstraints={{ top: 0, bottom: 300 }}` in Framer Motion), allow horizontal swipe for date navigation.
-- **Scroll Snapping enhances Horizontal Swipe:** Without snap, user might land "between" two dates — confusing. CSS `scroll-snap-type: x mandatory` on container + `scroll-snap-align: center` on date cards.
-- **Inline Mini Calendar conflicts with current portal pattern:** Current `createPortal(document.body)` makes bottom sheet global. Mini calendar needs to live in page flow for collapsed state. May need to rethink portal strategy or have two calendar modes (full-screen modal vs in-flow bottom sheet).
+Framer Motion (existing) → MagneticImage component → Mouse tracking hover
+```
 
-## MVP Definition
+**Gallery:**
+```
+CSS Grid Bento layout → Category filter (Framer Motion layout) → Fullscreen lightbox (Framer layoutId)
+                                                                   ↓
+                                                    Optional: Swipe navigation (embla-carousel)
+```
 
-### Launch With (Phase 1: Mobile Bottom Sheet Foundation)
+**Cursor:**
+```
+Framer Motion useSpring → MagneticCursor component → Magnetic button effects
+                                                     ↘ Image preview cursor (optional)
+```
 
-Minimum viable mobile-native experience — what's needed to make mobile feel "native" instead of "desktop squeezed".
+**Horizontal scroll (amenities section):**
+```
+GSAP ScrollTrigger pin → Horizontal scroll container → Accessibility fallback (keyboard arrows)
+```
 
-- [x] **Bottom Sheet Container** — Slide up from bottom, replaces current desktop modal on mobile
-  - **Why essential:** Current 320px dropdown feels cramped. Bottom sheet is expected mobile pattern.
-  - **Complexity:** MEDIUM (gesture detection, spring animation, safe areas)
+## MVP Recommendation
 
-- [x] **Swipe to Dismiss (Vertical)** — Pull down to close calendar
-  - **Why essential:** Expected mobile gesture. Improves one-handed usability.
-  - **Complexity:** MEDIUM (Framer Motion `drag` + velocity threshold)
+For **Version 1 (4 weeks)**, prioritize table stakes + high-impact differentiators:
 
-- [x] **Safe Area Padding** — Respect iOS notch/home indicator, Android gesture bars
-  - **Why essential:** Content visibility. Without this, buttons are un-tappable.
-  - **Complexity:** LOW (CSS `env()` variables)
+### Must Have (MVP)
+1. **Smooth scroll** (already have Lenis) ✓
+2. **High-quality images** (optimize 13 photos, Next.js Image)
+3. **Mobile responsive gallery** (test touch targets, portrait layout)
+4. **Category filtering** (Studios/Cowork/Amenities buttons)
+5. **Image lazy loading** (Next.js automatic)
+6. **Text character reveal** (Splitting.js — hero section only for MVP)
+7. **Image reveal on scroll** (GSAP clip-path — all 13 photos)
+8. **Bento grid layout** (CSS Grid — showcases design skills)
+9. **Balanced typography** (react-wrap-balancer — quick win)
 
-- [x] **Touch-Optimized Tap Targets** — Minimum 44x44pt for all interactive elements
-  - **Why essential:** Current calendar might be too small on phones. Avoid mis-taps.
-  - **Complexity:** LOW (adjust `min-h-[44px]` on date cells)
+### Should Have (If Time Permits)
+10. **Fullscreen lightbox** (Framer layoutId — expected for portfolios)
+11. **Parallax layers** (GSAP — 2-3 hero images only)
+12. **Magnetic cursor** (Framer Motion — desktop-only, polish)
 
-- [x] **Preserve Existing Features** — All current functionality must work in bottom sheet
-  - Month navigation (ChevronLeft/ChevronRight)
-  - Unavailable date display (line-through, Lock icon)
-  - Loading states (spinner)
-  - Today shortcut ("Hoje" button)
-  - Hourly slot grouping (Manhã/Tarde/Noite)
-  - **Why essential:** Redesign should enhance mobile, not remove working features.
-  - **Complexity:** LOW (refactor, not rebuild)
+### Defer to v2
+- **Horizontal scroll section** (HIGH complexity, accessibility concerns)
+- **Magnetic image hover** (nice-to-have polish)
+- **Gradient text animation** (visual flourish, not critical)
+- **Swipe gallery** (add ONLY if UX testing validates)
+- **3D tilt effects** (requires Three.js verification, heavy bundle)
 
-### Add After Validation (Phase 2: Gesture Enhancements)
+**MVP rationale:**
+- **Week 1:** Text animations (Splitting.js setup, hero reveal, balanced typography)
+- **Week 2:** Image reveal effects (GSAP clip-path for 13 photos, parallax on 2-3 hero images)
+- **Week 3:** Gallery layout (bento grid CSS, category filter, responsive mobile)
+- **Week 4:** Lightbox + polish (Framer layoutId, magnetic cursor, accessibility testing)
 
-Features to add once core bottom sheet is working and validated with users.
+**Scope control:** Defer horizontal scroll and swipe gallery. These are high-complexity features that can be added post-launch if validated.
 
-- [ ] **Horizontal Swipe Date Navigation** — Swipe left/right to change dates (alternative to arrow buttons)
-  - **Trigger for adding:** User testing shows arrow buttons are slow/annoying
-  - **Complexity:** MEDIUM (carousel pattern, scroll snap)
+## Feature Interaction Patterns
 
-- [ ] **Multi-Month Preview (Peek)** — See edges of prev/next month while swiping
-  - **Trigger for adding:** Users report "not knowing what's ahead" when swiping
-  - **Complexity:** MEDIUM-HIGH (carousel with partial views)
+### Desktop Experience (≥768px)
+- **Magnetic cursor** active (pulls towards buttons/images)
+- **Parallax scrolling** active (2-3 layers)
+- **Image hover effects** active (magnetic movement, scale)
+- **Keyboard navigation** full support (arrows, ESC, TAB)
 
-- [ ] **Haptic Feedback on Selection** — Subtle vibration when tapping date/time
-  - **Trigger for adding:** Want to add premium feel after core UX is solid
-  - **Complexity:** LOW (one line: `navigator.vibrate(50)`, with feature detection)
+### Mobile Experience (<768px)
+- **Touch-optimized targets** 44px minimum
+- **Swipe gestures** ONLY if embla-carousel installed (defer to v2)
+- **Reduced motion** simpler animations (respect `prefers-reduced-motion`)
+- **No cursor effects** (cursor events don't exist on touch)
 
-- [ ] **Quick Filters for Time Periods** — "Manhã" / "Tarde" / "Noite" pill buttons to jump
-  - **Trigger for adding:** Analytics show users scroll heavily through hourly grid
-  - **Complexity:** LOW-MEDIUM (scroll-to logic)
+### Accessibility Fallbacks
+- **Reduced motion:** Disable parallax, character reveal, magnetic effects
+- **Keyboard only:** All interactions accessible via TAB, ENTER, ESC, ARROWS
+- **Screen reader:** ARIA labels on gallery images, focus management in lightbox
 
-- [ ] **Persistent Selection Summary Bar** — Sticky footer showing selected date/time while scrolling
-  - **Trigger for adding:** Hourly grid is long, users lose context
-  - **Complexity:** MEDIUM (sticky positioning, state management)
+## User Journey: Gallery Interaction
 
-### Future Consideration (Phase 3+: Advanced UX)
+**Ideal flow:**
+1. **Land on page** → Hero text reveals character-by-character (2s animation)
+2. **Scroll down** → Images reveal via clip-path as they enter viewport
+3. **Category filter** → Click "Studios" → Framer Motion layout animation (other photos fade/slide out)
+4. **Image click** → Fullscreen lightbox opens with smooth Framer layoutId transition
+5. **Navigate lightbox** → Arrow keys (desktop) or swipe (mobile, if implemented)
+6. **Close lightbox** → ESC key or swipe down (drawer pattern)
+7. **Continue scrolling** → Amenities section (horizontal scroll if implemented, or standard vertical)
 
-Features to defer until mobile calendar is validated and showing strong engagement.
+**Critical moments:**
+- **First scroll:** Image reveal must be smooth (60fps). If janky, user loses trust.
+- **Category filter:** Layout animation must feel instant (<300ms). Slow filter = frustrating.
+- **Lightbox open:** Transition must be seamless. Janky animation = feels broken.
 
-- [ ] **Inline Mini Calendar (Collapsed State)** — Two-state bottom sheet (full vs mini)
-  - **Why defer:** High complexity. Need to rethink portal architecture. Not critical if bottom sheet is fast to open/close.
+## Performance Budget
 
-- [ ] **Visual Time Density Heat Map** — Show busier hours with color intensity
-  - **Why defer:** Requires aggregating availability data. Nice-to-have, not blocking.
+For 13 high-quality photos + creative effects:
 
-- [ ] **Optimistic UI Updates** — Show selection immediately, sync in background
-  - **Why defer:** Risk of conflicts. Need robust rollback UX. Current flow (select → WhatsApp) is fast enough.
+| Metric | Target | Current Risk |
+|--------|--------|--------------|
+| **First Contentful Paint** | <1.5s | MEDIUM — 13 images to optimize |
+| **Largest Contentful Paint** | <2.5s | MEDIUM — Hero image size critical |
+| **Total Blocking Time** | <200ms | LOW — Minimal JS with current plan |
+| **Cumulative Layout Shift** | <0.1 | MEDIUM — Gallery filter animation must not shift layout |
+| **Bundle size added** | <10kB | LOW — Only 3.5kB added (Splitting + Balancer) |
 
-- [ ] **Pull-to-Refresh** — Reload availability by pulling down
-  - **Why defer:** Less common in modal contexts. Evaluate if users report stale data issues.
-
-## Feature Prioritization Matrix
-
-| Feature | User Value | Implementation Cost | Priority | Notes |
-|---------|------------|---------------------|----------|-------|
-| Bottom Sheet Container | HIGH | MEDIUM | **P1** | Foundation for all mobile improvements |
-| Swipe to Dismiss | HIGH | MEDIUM | **P1** | Expected mobile gesture |
-| Safe Area Padding | HIGH | LOW | **P1** | Critical for iOS/Android usability |
-| Touch-Optimized Tap Targets | HIGH | LOW | **P1** | Avoid mis-taps |
-| Horizontal Swipe Navigation | MEDIUM | MEDIUM | **P2** | Nice-to-have, not blocking |
-| Haptic Feedback | LOW | LOW | **P2** | Premium feel, easy to add |
-| Quick Time Filters | MEDIUM | LOW-MEDIUM | **P2** | Reduces scrolling friction |
-| Persistent Summary Bar | MEDIUM | MEDIUM | **P2** | Helpful for long grids |
-| Multi-Month Preview | MEDIUM | HIGH | **P3** | Complex, uncertain ROI |
-| Inline Mini Calendar | LOW | HIGH | **P3** | Over-engineering for MVP |
-| Visual Density Heat Map | LOW | MEDIUM | **P3** | Informational, not critical |
-| Optimistic UI | LOW | MEDIUM | **P3** | Current sync is fast enough |
-
-**Priority key:**
-- **P1:** Must have for mobile-native feel — blocks launch
-- **P2:** Should have — add after P1 validation
-- **P3:** Nice to have — future consideration
-
-## Existing Features to Preserve
-
-These are already implemented in `AvailabilityCalendar` and `StudioHourlyCalendar` — must carry forward to mobile redesign.
-
-| Existing Feature | Status | Mobile Consideration |
-|------------------|--------|----------------------|
-| **Portal to body (desktop)** | ✅ Implemented | Keep for desktop. Mobile uses bottom sheet (in-flow or portal with different positioning). |
-| **Month navigation (prev/next)** | ✅ Implemented | Keep. Potentially enhance with swipe gestures (Phase 2). |
-| **Unavailable date display** | ✅ Implemented (`line-through`) | Keep. Visual clarity is table stakes. |
-| **Hourly slot grouping** | ✅ Implemented (Manhã/Tarde/Noite) | Keep. Differentiator vs flat grids. |
-| **Today shortcut** | ✅ Implemented ("Hoje" button) | Keep. Frequently used in booking flows. |
-| **Loading states** | ✅ Implemented (`Loader2`, `loading` flag) | Keep. Mobile networks are slower. |
-| **90-day booking window** | ✅ Implemented (`maxDate = today + 90`) | Keep. Business constraint. |
-| **Click outside to close** | ✅ Implemented | Keep for desktop. Mobile uses swipe-to-dismiss + backdrop tap. |
-| **Escape key to close** | ✅ Implemented | Keep for desktop. Less relevant on mobile (no physical keyboard). |
-| **Portuguese localization** | ✅ Implemented (`MONTHS_PT`, `WEEKDAYS_PT`) | Keep. Non-negotiable for PT-PT market. |
-| **Dark theme + magenta accent** | ✅ Implemented | Keep. Brand identity. |
-| **Framer Motion animations** | ✅ Implemented (spring transitions) | Keep. Enhance with gesture-based animations (drag, swipe). |
-
-## Mobile-Specific Patterns (Industry Standards)
-
-Based on common mobile booking calendar implementations (Airbnb, Booking.com, Google Calendar mobile):
-
-### Pattern 1: Bottom Sheet vs Full-Screen Modal
-
-**Industry consensus:**
-- **Bottom Sheet (half-screen):** Date pickers, simple selections (1-2 taps to complete)
-- **Full-Screen Modal:** Complex calendars with filters, ranges, multi-step flows
-
-**Recommendation for Str8Global:**
-- **Monthly date picker (equipment/cowork):** Bottom sheet (simple: pick 1 date → close)
-- **Hourly slot picker (studios):** Bottom sheet with scroll (more content, but still single-selection)
-- Both are single-step selections leading to WhatsApp CTA — bottom sheet is appropriate
-
-### Pattern 2: Gesture Hierarchy
-
-**Conflict resolution when multiple gestures exist:**
-
-| Gesture | Direction | Priority | Example |
-|---------|-----------|----------|---------|
-| Swipe to Dismiss | Vertical (down) | HIGH | Pull down bottom sheet to close |
-| Scroll Content | Vertical (up/down) | HIGH | Scroll through time slots |
-| Navigate Dates | Horizontal (left/right) | MEDIUM | Swipe between days/months |
-| Pinch to Zoom | Multi-touch | LOW | Usually disabled in calendars |
-
-**Implementation notes:**
-- Use Framer Motion `dragConstraints` to separate vertical (dismiss) from horizontal (navigate)
-- Disable scroll when dragging to dismiss (check `isDragging` flag)
-- Use `overscroll-behavior-y: contain` to prevent pull-to-refresh browser default
-
-### Pattern 3: Selection Feedback Loop
-
-**Expected feedback on tap:**
-
-1. **Visual change** (immediate): Selected date/time highlights with accent color
-2. **Haptic feedback** (optional, 50ms vibration): Tactile confirmation
-3. **UI update** (immediate): Update summary text ("22 de Março, 14:00")
-4. **State persistence** (immediate): Remember selection if user closes/reopens
-5. **Action trigger** (on confirm): Show WhatsApp CTA or auto-advance to next step
-
-**Current implementation:** ✅ Has #1 (magenta highlight), ✅ Has #3 (date string in state), ✅ Has #5 (WhatsApp CTA)
-**Missing:** #2 (haptic, optional), #4 (persistence across modal close/reopen — currently resets)
-
-## Complexity Estimates (For Roadmap Planning)
-
-| Feature Category | Complexity | Est. Dev Time | Dependencies |
-|------------------|------------|---------------|--------------|
-| **Bottom Sheet Foundation** | MEDIUM | 2-3 days | Framer Motion (already installed), safe area CSS |
-| **Swipe to Dismiss** | MEDIUM | 1-2 days | Bottom Sheet foundation |
-| **Safe Area Padding** | LOW | 0.5 day | CSS only |
-| **Touch Target Optimization** | LOW | 0.5 day | CSS only |
-| **Horizontal Swipe Navigation** | MEDIUM | 2-3 days | Carousel logic, scroll snap |
-| **Multi-Month Preview** | MEDIUM-HIGH | 3-4 days | Carousel with partial views |
-| **Haptic Feedback** | LOW | 0.5 day | Feature detection + single API call |
-| **Quick Time Filters** | LOW-MEDIUM | 1-2 days | Scroll-to logic, pill button UI |
-| **Persistent Summary Bar** | MEDIUM | 1-2 days | Sticky positioning, state management |
-| **Inline Mini Calendar** | HIGH | 4-5 days | Rethink portal architecture, two-state animation |
-
-**Total for Phase 1 (MVP):** ~4-6 days
-**Total for Phase 2 (Enhancements):** ~5-8 days
-**Total for Phase 3 (Advanced):** ~5-6 days
+**Optimization checklist:**
+- [ ] All 13 photos converted to AVIF (Next.js automatic)
+- [ ] Hero image preloaded (`<link rel="preload">`)
+- [ ] Below-fold images lazy-loaded
+- [ ] Splitting.js loaded dynamically (not in initial bundle)
+- [ ] GSAP animations use GPU-accelerated properties (transform, opacity)
 
 ## Sources
 
-**Confidence Assessment:**
-- **MEDIUM overall** — Based on training data through January 2025 + established mobile UX patterns from iOS HIG, Material Design, and common web booking flows (Airbnb, Booking.com, Google Calendar).
-- **No web search available** — Could not verify 2026-specific trends or new libraries. Recommendations are based on stable, long-standing patterns (bottom sheets, swipe gestures, touch targets) that are unlikely to have changed.
-- **Code analysis** — HIGH confidence on current implementation (read `AvailabilityCalendar.tsx`, `StudioHourlyCalendar.tsx`, hooks). All feature dependencies verified against existing codebase.
+- **Awwwards Site of the Day winners** (training data) — Text reveal, parallax, magnetic cursor patterns
+- **FWA (Favourite Website Awards)** (training data) — Gallery layouts, image effects
+- **Existing codebase** (package.json, CLAUDE.md) — Current capabilities
+- **Vercel/Next.js best practices** (training data) — Performance budgets, image optimization
 
-**Known gaps:**
-- Latest mobile UX trends (2025-2026) — may exist newer patterns not in training data
-- React/Framer Motion updates post-January 2025 — API changes possible
-- Mobile-specific calendar libraries (e.g., `react-mobile-datepicker`, `react-swipeable-views`) — versions and best practices may have evolved
+**Confidence:**
+- Table stakes features: HIGH (standard expectations)
+- Differentiators: MEDIUM (based on premium agency trends as of Jan 2025)
+- Anti-features: HIGH (common mistakes well-documented)
+- Performance targets: HIGH (Web Vitals standard)
 
-**Verification recommended:**
-- Check Framer Motion docs for latest `drag` / `dragConstraints` API (training data: v10-11)
-- Verify `navigator.vibrate()` browser support in 2026 (training data: supported in Chrome Android, not iOS Safari)
-- Review latest iOS HIG / Material Design for touch target sizes (training data: 44pt / 48dp)
+**Gap:** Could not access ReactBits.dev or LightsWind.com to validate specific effect implementations. User should manually review these sites and cross-reference with this feature list.
 
 ---
-*Feature research for: Mobile-native calendar redesign (Str8Global)*
-*Researched: 2026-03-13*
-*Confidence: MEDIUM (training data + established patterns, no web search verification)*
+
+*Feature landscape for: Creative Photography Portfolio Page (Espaço redesign)*
+*Researched: 2026-03-15*

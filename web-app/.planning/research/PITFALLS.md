@@ -1,622 +1,731 @@
-# Pitfalls Research
+# Pitfalls Research: Heavy Scroll-Driven Animations
 
-**Domain:** Mobile-Native Calendar UX (Bottom Sheets, Touch Gestures, Haptics)
-**Researched:** 2026-03-13
-**Confidence:** MEDIUM
+**Domain:** Creative page redesign with GSAP ScrollTrigger + Framer Motion + Lenis smooth scroll
+**Researched:** 2026-03-15
+**Confidence:** MEDIUM (based on codebase analysis + training data; WebSearch/WebFetch unavailable)
 
-> **Context:** Adding mobile-native patterns to existing Next.js web app with working desktop modals (createPortal), Framer Motion animations, Lenis smooth scroll, and dark theme with backdrop-blur. Focus on integration pitfalls specific to modifying existing calendar components.
+> **Context:** Adding creative, immersive animations to Espaço page (4 heavily animated sections + Hero Globe 3D + CTA). Focus on scroll-driven animations, parallax effects, image reveal animations, and interactive elements using GSAP ScrollTrigger + Framer Motion + Lenis smooth scroll on Next.js 16 with React 19.
 
 ## Critical Pitfalls
 
-### Pitfall 1: Bottom Sheet Drag Conflicts with Lenis Smooth Scroll
+### Pitfall 1: Lenis-ScrollTrigger Desync on Navigation
 
 **What goes wrong:**
-Bottom sheet drag gestures fight with Lenis smooth scroll. User tries to drag bottom sheet down to dismiss but Lenis intercepts the touch event, causing the page to scroll instead. Bottom sheet becomes stuck or requires multiple attempts to dismiss.
+ScrollTrigger calculations become inaccurate after client-side navigation or DOM mutations. Animations trigger at wrong scroll positions, or don't trigger at all. Most common symptom: animations work on initial page load, break after navigating back to the page.
 
 **Why it happens:**
-Both Lenis and Framer Motion's drag listen to the same touch events (`touchstart`, `touchmove`). Event propagation means Lenis captures the event before Framer Motion's drag handler can prevent default. Developers assume Framer Motion's `drag` will automatically handle conflicts.
+Lenis intercepts scroll events and transforms scroll position. ScrollTrigger must be notified about Lenis's internal scroll position on every frame, but React's component lifecycle doesn't guarantee this connection survives navigation or Suspense boundaries (especially in Next.js 16 with React 19 concurrent rendering).
 
 **How to avoid:**
-1. **Disable Lenis when bottom sheet is open:**
-   ```tsx
-   // In bottom sheet component
-   useEffect(() => {
-     if (!isDesktop && isOpen) {
-       // Get Lenis instance and stop
-       const lenis = (window as any).lenis;
-       if (lenis) lenis.stop();
-       return () => {
-         if (lenis) lenis.start();
-       };
-     }
-   }, [isDesktop, isOpen]);
-   ```
-
-2. **Use `touch-action: none` on drag handle:**
-   ```tsx
-   // On bottom sheet drag handle
-   <div className="touch-none" {...dragHandleProps}>
-   ```
-
-3. **Add pointer event prevention:**
-   ```tsx
-   // In drag handler
-   onDragStart={(e) => {
-     e.stopPropagation();
-     (e.target as HTMLElement).setPointerCapture((e as any).pointerId);
-   }}
-   ```
-
-**Warning signs:**
-- Bottom sheet drags feel "sticky" or "laggy"
-- Page scrolls when user tries to drag bottom sheet
-- Bottom sheet dismiss requires multiple swipe attempts
-- Works in desktop Chrome DevTools mobile view but fails on real device
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Must solve before any mobile calendar UI is built.
-
----
-
-### Pitfall 2: Body Scroll Lock Breaks createPortal Desktop Modals
-
-**What goes wrong:**
-When implementing bottom sheet for mobile, developers add `overflow: hidden` to `<body>` to prevent background scrolling. This breaks existing desktop modals that use `createPortal` because the portal container (body) now has `overflow: hidden`, clipping modal content or making it unscrollable.
-
-**Why it happens:**
-Mobile-first approach applies body scroll lock globally. Desktop modals worked fine before because body was scrollable. Adding `overflow: hidden` to body affects ALL portaled content, not just the new bottom sheet.
-
-**How to avoid:**
-1. **Only lock scroll on mobile:**
-   ```tsx
-   useEffect(() => {
-     if (!isDesktop && isOpen) {
-       const originalOverflow = document.body.style.overflow;
-       document.body.style.overflow = 'hidden';
-       return () => {
-         document.body.style.overflow = originalOverflow;
-       };
-     }
-   }, [isDesktop, isOpen]);
-   ```
-
-2. **Use a dedicated portal root for bottom sheets:**
-   ```tsx
-   // Create portal root that's NOT body
-   const portalRoot = document.getElementById('bottom-sheet-portal') || document.body;
-   ```
-
-3. **Alternative: Use `position: fixed` instead of body scroll lock:**
-   ```tsx
-   // On bottom sheet wrapper (mobile only)
-   className="fixed inset-0 z-50"
-   ```
-
-**Warning signs:**
-- Desktop modal content suddenly cuts off or can't scroll
-- Desktop modal backdrop doesn't cover full viewport
-- Z-index issues that didn't exist before
-- Desktop modal animations break after adding mobile bottom sheet
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Must test desktop modals don't regress.
-
----
-
-### Pitfall 3: Haptic Feedback Not Guarded by Feature Detection
-
-**What goes wrong:**
-Code calls `navigator.vibrate()` directly without checking browser support. Causes console errors in Safari (which doesn't support Vibration API) and fails silently in desktop browsers. Developers test only on Android Chrome and assume it works everywhere.
-
-**Why it happens:**
-Vibration API has poor cross-browser support. Safari (iOS and desktop) doesn't support it. Firefox has partial support. Developers copy-paste haptic patterns from React Native examples that assume native API availability.
-
-**How to avoid:**
-1. **Always feature-detect:**
-   ```tsx
-   // lib/haptics.ts
-   export function hapticFeedback(style: 'light' | 'medium' | 'heavy' = 'light') {
-     if (!('vibrate' in navigator)) return;
-
-     const patterns = {
-       light: [10],
-       medium: [20],
-       heavy: [30],
-     };
-
-     navigator.vibrate(patterns[style]);
-   }
-   ```
-
-2. **Provide no-op fallback:**
-   ```tsx
-   // Don't make haptics critical to UX
-   // User should not notice when haptics fail
-   ```
-
-3. **Test on Safari explicitly:**
-   - Safari iOS (real device)
-   - Safari Desktop (macOS)
-   - Chrome iOS (uses WebKit, not Blink)
-
-**Warning signs:**
-- Console errors in Safari: `navigator.vibrate is not a function`
-- Feature works in Chrome DevTools but not real iOS device
-- Haptics only work on Android, not iOS
-- TypeScript errors about `navigator.vibrate` not existing
-
-**Phase to address:**
-Phase 2 (Haptic Feedback) — Must include feature detection from day one.
-
----
-
-### Pitfall 4: Touch Event Passive Listener Violations
-
-**What goes wrong:**
-Console warnings: `"Unable to preventDefault inside passive event listener"`. Touch scrolling feels broken or janky. Developers add `touchstart`/`touchmove` listeners to prevent scrolling during drag but browser ignores `preventDefault()` because listeners are passive by default (Chrome/Safari performance optimization).
-
-**Why it happens:**
-Browsers made `touchstart` and `touchmove` listeners passive by default for scroll performance. Calling `e.preventDefault()` inside passive listener does nothing. Framer Motion handles this internally for `drag`, but custom touch handlers don't.
-
-**How to avoid:**
-1. **Explicitly set `passive: false` when you need `preventDefault()`:**
-   ```tsx
-   useEffect(() => {
-     const handler = (e: TouchEvent) => {
-       e.preventDefault(); // This only works if passive: false
-     };
-
-     element.addEventListener('touchmove', handler, { passive: false });
-     return () => element.removeEventListener('touchmove', handler);
-   }, []);
-   ```
-
-2. **Use Framer Motion's drag instead of custom touch handlers:**
-   ```tsx
-   // Framer Motion handles passive listeners correctly
-   <motion.div drag="y" dragConstraints={{ top: 0, bottom: 300 }}>
-   ```
-
-3. **Use `touch-action` CSS instead of `preventDefault()`:**
-   ```css
-   /* Prevents scroll without JavaScript */
-   .bottom-sheet-handle {
-     touch-action: none;
-   }
-   ```
-
-**Warning signs:**
-- Console warnings about passive event listeners
-- `preventDefault()` seems to have no effect
-- Touch scrolling works on desktop DevTools but not real device
-- Different behavior between Chrome and Safari mobile
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Any custom touch handlers must be tested.
-
----
-
-### Pitfall 5: `AnimatePresence` Exit Animations Don't Complete on Mobile
-
-**What goes wrong:**
-Bottom sheet dismiss animation skips or doesn't play. Sheet just disappears instantly instead of sliding down smoothly. Works perfectly in desktop Chrome DevTools mobile mode but fails on real devices.
-
-**Why it happens:**
-React's state updates trigger faster than mobile browser can keep up, especially on lower-end devices. `AnimatePresence` relies on component staying mounted until animation completes, but parent component unmounts too quickly. Mobile Safari has additional compositing delays.
-
-**How to avoid:**
-1. **Delay state update until animation completes:**
-   ```tsx
-   const [isClosing, setIsClosing] = useState(false);
-
-   const handleClose = () => {
-     setIsClosing(true);
-     // Wait for animation (match exit transition duration)
-     setTimeout(() => {
-       onClose(); // Actually remove from DOM
-     }, 300);
-   };
-
-   return (
-     <AnimatePresence>
-       {!isClosing && (
-         <motion.div exit={{ opacity: 0, y: '100%' }}>
-   ```
-
-2. **Use `willChange` CSS hint:**
-   ```tsx
-   <motion.div
-     style={{ willChange: 'transform, opacity' }}
-     exit={{ y: '100%', opacity: 0 }}
-   ```
-
-3. **Increase exit transition duration on mobile:**
-   ```tsx
-   exit={{ y: '100%', opacity: 0 }}
-   transition={{
-     duration: isDesktop ? 0.2 : 0.35, // Longer on mobile
-     ease: [0.32, 0.72, 0, 1] // Smooth easing
-   }}
-   ```
-
-**Warning signs:**
-- Exit animations work on desktop but not mobile
-- Bottom sheet flashes then disappears
-- Console warnings about `AnimatePresence` children
-- Animations choppy on older mobile devices
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Test exit animations on real devices.
-
----
-
-### Pitfall 6: Z-Index Issues with Existing `overflow-hidden` Parents
-
-**What goes wrong:**
-Bottom sheet renders but appears behind other content or gets clipped. Previous z-index issues with desktop modals resurface because bottom sheet uses different rendering strategy (inline vs. portal).
-
-**Why it happens:**
-Project context mentions "parent components have overflow-hidden that previously caused z-index issues." Mobile bottom sheet renders inline (no portal) to stay in document flow, but parent's `overflow: hidden` clips it. Existing workaround for desktop (createPortal) doesn't apply to mobile.
-
-**How to avoid:**
-1. **Portal mobile bottom sheet too:**
-   ```tsx
-   // BOTH desktop and mobile portal to body
-   return createPortal(
-     <AnimatePresence>
-       {isDesktop ? desktopModal : mobileBottomSheet}
-     </AnimatePresence>,
-     document.body
-   );
-   ```
-
-2. **Or remove `overflow: hidden` from problematic parents:**
-   ```tsx
-   // Check which parents have overflow-hidden
-   // Replace with overflow-clip or clip-path if needed for visual effect
-   ```
-
-3. **Use fixed positioning with high z-index:**
-   ```tsx
-   <motion.div
-     className="fixed inset-0 z-[999]" // Above everything
-     initial={{ opacity: 0 }}
-   ```
-
-**Warning signs:**
-- Bottom sheet appears but is clipped at edges
-- Bottom sheet is behind backdrop or other UI
-- Scrolling parent causes bottom sheet to move (should be fixed)
-- Same z-index issues that existed with desktop modals
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Must audit existing overflow-hidden in layout components.
-
----
-
-### Pitfall 7: Mobile Safari 100vh Bottom Sheet Height Issues
-
-**What goes wrong:**
-Bottom sheet uses `height: 100vh` but doesn't account for mobile Safari's collapsing URL bar. When URL bar is visible, bottom sheet is too tall and gets clipped. When URL bar collapses, layout shifts and looks broken.
-
-**Why it happens:**
-`100vh` in mobile Safari includes the URL bar height, but available viewport changes as user scrolls. Bottom sheet using fixed `100vh` doesn't adapt to actual visible area.
-
-**How to avoid:**
-1. **Use `100dvh` (dynamic viewport height) instead of `100vh`:**
-   ```tsx
-   // Tailwind v4 supports dvh
-   className="h-dvh" // Dynamic viewport height
-   ```
-
-2. **Or calculate with JavaScript:**
-   ```tsx
-   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-
-   useEffect(() => {
-     const handleResize = () => setViewportHeight(window.visualViewport?.height || window.innerHeight);
-     window.visualViewport?.addEventListener('resize', handleResize);
-     return () => window.visualViewport?.removeEventListener('resize', handleResize);
-   }, []);
-
-   <motion.div style={{ height: viewportHeight }}>
-   ```
-
-3. **Design bottom sheet to not require 100vh:**
-   ```tsx
-   // Use max-height with overflow scroll instead
-   className="max-h-[90vh] overflow-y-auto"
-   ```
-
-**Warning signs:**
-- Bottom sheet height jumps when scrolling on mobile Safari
-- Content clipped at bottom on initial render
-- Different height in Safari vs Chrome mobile
-- Works on desktop DevTools but not real iOS device
-
-**Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Test on real iOS Safari.
-
----
-
-### Pitfall 8: Performance Regression from Too Many Animated Elements
-
-**What goes wrong:**
-Calendar with 90+ day/time slots animates all slots on render. Mobile device frame rate drops to 15-20fps. Scrolling feels janky. Battery drains quickly. Works fine on desktop but unusable on mid-range Android phones.
-
-**Why it happens:**
-Existing calendar uses Framer Motion stagger animation on ALL slots:
 ```tsx
-// From StudioHourlyCalendar.tsx line 254-260
-<motion.div
-  initial="hidden"
-  animate="visible"
-  variants={{
-    visible: { opacity: 1, transition: { staggerChildren: 0.02 } }
-  }}
->
-  {slots.map((slot) => (
-    <motion.button variants={{ /* animate each */ }} />
+// In LenisProvider.tsx or page component
+import { ReactLenis, useLenis } from '@studio-freight/react-lenis';
+import { useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+export function LenisProvider({ children }: { children: ReactNode }) {
+  const lenis = useLenis((lenis) => {
+    // Sync Lenis with ScrollTrigger on EVERY frame
+    ScrollTrigger.update();
+  });
+
+  useEffect(() => {
+    // Force refresh after mount and layout shifts
+    const timeout = setTimeout(() => ScrollTrigger.refresh(), 100);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <ReactLenis root options={{ lerp: 0.12, duration: 1.2 }}>
+      {children}
+    </ReactLenis>
+  );
+}
 ```
 
-90+ slots × stagger animation = 90+ simultaneous animations on mobile GPU.
-
-**How to avoid:**
-1. **Reduce stagger or remove on mobile:**
-   ```tsx
-   variants={{
-     visible: {
-       opacity: 1,
-       transition: {
-         staggerChildren: isDesktop ? 0.02 : 0 // No stagger on mobile
-       }
-     }
-   }}
-   ```
-
-2. **Virtualize long lists:**
-   ```tsx
-   // Only render visible slots + buffer
-   // Use react-window or custom virtualization
-   ```
-
-3. **Use CSS animations for simple effects:**
-   ```tsx
-   // Instead of Framer Motion for simple fades
-   className="animate-fadeIn"
-   ```
-
-4. **Reduce motion for users who prefer it:**
-   ```tsx
-   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-   variants={prefersReducedMotion ? undefined : animationVariants}
-   ```
+**CRITICAL:** Your current `LenisProvider.tsx` does NOT include the `useLenis()` hook callback to sync with ScrollTrigger. This MUST be added before adding heavy scroll animations.
 
 **Warning signs:**
-- Dropped frames on mobile (check Chrome DevTools Performance)
-- Animation stutters on older devices
-- High CPU usage in profiler
-- Battery drains quickly during testing
-- Works on flagship phone but not mid-range
+- Animations trigger too early/late after navigating back to page
+- Console errors: "ScrollTrigger.refresh() was called while a previous refresh() was still active"
+- ScrollTrigger markers (if enabled) don't align with actual trigger points
+- Animations work in production but not after Fast Refresh in dev
 
 **Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Performance audit required before mobile release.
+**Phase 01** (Foundation) — Fix LenisProvider before any new scroll animations are added.
 
 ---
 
-### Pitfall 9: Keyboard Covering Input Fields in Bottom Sheet
+### Pitfall 2: GSAP + Framer Motion Fighting Over Same Properties
 
 **What goes wrong:**
-User taps time slot, bottom sheet opens with confirmation form. When user focuses input field (e.g., name, email), mobile keyboard slides up and COVERS the input field. User can't see what they're typing. Submit button is also hidden behind keyboard.
+When GSAP and Framer Motion both animate the same property (e.g., `opacity`, `y`, `scale`) on the same element, one library overwrites the other unpredictably. Result: janky, stuttering animations or animations that "jump" mid-transition.
 
 **Why it happens:**
-Bottom sheet is fixed positioned. Mobile keyboard reduces visual viewport but doesn't resize the bottom sheet. Input field stays in same position, now hidden behind keyboard.
+GSAP directly mutates inline styles. Framer Motion uses React state + inline styles. When both libraries animate `transform`, they compete for control over the same CSS property, causing render thrashing.
+
+**Example conflict in current code:**
+- `espaco/page.tsx` line 46: Framer Motion animates `y` on Hero background
+- `ScrollReveal.tsx`: GSAP animates `y` on text elements
+- If both are used on the same element, they will conflict
 
 **How to avoid:**
-1. **Scroll input into view when keyboard appears:**
-   ```tsx
-   const inputRef = useRef<HTMLInputElement>(null);
 
-   useEffect(() => {
-     const handleResize = () => {
-       if (document.activeElement === inputRef.current) {
-         inputRef.current?.scrollIntoView({
-           behavior: 'smooth',
-           block: 'center'
-         });
-       }
-     };
+**Rule 1: Library-per-element separation**
+```tsx
+// GOOD: GSAP animates container, Framer Motion animates children
+<div ref={gsapRef} className="container">
+  <motion.div animate={{ opacity: 1 }}>Content</motion.div>
+</div>
 
-     window.visualViewport?.addEventListener('resize', handleResize);
-     return () => window.visualViewport?.removeEventListener('resize', handleResize);
-   }, []);
-   ```
+// BAD: Both animate the same element
+<motion.div ref={gsapRef} animate={{ y: 0 }}>
+  {/* GSAP also animates y on this element = conflict */}
+</motion.div>
+```
 
-2. **Make bottom sheet content scrollable:**
-   ```tsx
-   <motion.div className="fixed inset-0">
-     <div className="h-full overflow-y-auto pb-safe"> {/* Scrollable */}
-       <form>...</form>
-     </div>
-   </motion.div>
-   ```
+**Rule 2: Property partitioning**
+```tsx
+// GOOD: GSAP handles transforms, Framer Motion handles opacity
+gsap.to(element, { x: 100, y: 50, rotation: 45 });
+<motion.div animate={{ opacity: 1, filter: "blur(0px)" }}>
 
-3. **Use `env(safe-area-inset-bottom)` for padding:**
-   ```tsx
-   // Account for iOS safe area + keyboard
-   className="pb-[calc(env(safe-area-inset-bottom)+1rem)]"
-   ```
+// BAD: Both libraries animate y
+gsap.to(element, { y: 50 });
+<motion.div animate={{ y: 0 }}>
+```
+
+**Rule 3: Choose ONE library per animation type**
+- **GSAP:** Scroll-driven animations (ScrollTrigger), complex timelines, SVG morphing
+- **Framer Motion:** Entrance animations (mount/unmount), hover states, gesture-based interactions
+
+**For Espaço page specifically:**
+- Use GSAP ScrollTrigger for: parallax effects, image reveals, section transitions
+- Use Framer Motion for: initial hero entrance, hover effects on cards, viewport-once animations (already implemented correctly in `BlurText.tsx`)
 
 **Warning signs:**
-- Input fields hidden when keyboard opens
-- User has to manually scroll to see what they're typing
-- Submit button unreachable when keyboard is open
-- Works on desktop DevTools but not real mobile device
+- DevTools shows rapid style recalculations (>30 per second)
+- Animations stutter or "snap" instead of smooth transitions
+- `transform` property in DevTools flashes between different values
+- Console warnings: "Style changes too fast" or "Forced reflow"
 
 **Phase to address:**
-Phase 3 (Booking Flow Integration) — When bottom sheet contains forms.
+**Phase 02** (Image Reveals & Parallax) — Audit ALL animations before adding new ones. Document which library controls which elements in code comments.
 
 ---
 
-### Pitfall 10: Touch Target Sizes Below Accessibility Guidelines
+### Pitfall 3: Next.js Image + Reveal Animations = Invisible Images
 
 **What goes wrong:**
-Calendar time slots look good on desktop (40px) but are too small on mobile (translates to ~28px actual tap target). Users with larger fingers miss taps or tap wrong slot. Fails WCAG 2.1 Level AAA (44×44px minimum).
+Images are set to `opacity: 0` for reveal animations, but Next.js Image component lazy-loads by default. If the image hasn't loaded when the scroll animation triggers, the animation completes but the image remains invisible (opacity animates from 0 to 1, but `src` is still loading).
 
 **Why it happens:**
-Developers design for desktop first with mouse precision, then don't adjust for touch. CSS pixels don't account for device pixel ratio. 40px CSS on 3× device = 120 physical pixels seems big, but actual touch target is still 40px logical.
+Timing mismatch:
+1. Scroll animation triggers (user scrolls to section)
+2. GSAP animates `opacity: 0 → 1` over 0.8s
+3. Next.js Image starts loading AFTER intersection (lazy load)
+4. Image arrives 300ms after animation completes
+5. User sees: animation plays, then nothing, then image pops in
 
 **How to avoid:**
-1. **Minimum 44px touch targets on mobile:**
-   ```tsx
-   <button
-     className={`
-       ${isDesktop
-         ? 'py-3 px-4' // Smaller on desktop (mouse precision)
-         : 'py-4 px-5 min-h-[44px] min-w-[44px]' // Touch-friendly
-       }
-     `}
-   ```
 
-2. **Add invisible padding for better tap area:**
-   ```tsx
-   <button className="relative">
-     {/* Visual content */}
-     {/* Expanded tap area */}
-     <span className="absolute inset-0 -m-2" /> {/* 16px extra padding */}
-   </button>
-   ```
+**Solution 1: Priority + eager loading for above-fold images**
+```tsx
+// Hero section images (always visible)
+<Image
+  src="/images/espaco/hero.jpg"
+  priority
+  loading="eager"
+  alt="Hero"
+/>
 
-3. **Test with real fingers, not mouse:**
-   - Use real mobile device
-   - Test with users who have different hand sizes
-   - Use accessibility audit tools
+// Below-fold with reveal animation
+<Image
+  src="/images/espaco/studio.jpg"
+  loading="eager" // Force eager even below fold
+  onLoad={() => setImageLoaded(true)} // Track load state
+  alt="Studio"
+/>
+```
+
+**Solution 2: Coordinate animation with load state**
+```tsx
+const [imageLoaded, setImageLoaded] = useState(false);
+
+useGSAP(() => {
+  if (!imageLoaded) return; // Don't animate until loaded
+
+  gsap.fromTo(imageRef.current,
+    { opacity: 0, scale: 1.1 },
+    {
+      opacity: 1,
+      scale: 1,
+      scrollTrigger: { trigger: imageRef.current }
+    }
+  );
+}, [imageLoaded]);
+
+return (
+  <Image
+    onLoad={() => setImageLoaded(true)}
+    style={{ opacity: imageLoaded ? undefined : 0 }} // Keep hidden until loaded
+  />
+);
+```
+
+**Solution 3: Placeholder blur while loading**
+```tsx
+<Image
+  src={src}
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRg..." // Low-res preview
+  onLoad={() => triggerRevealAnimation()}
+/>
+```
+
+**For Espaço page specifically:**
+- 13 images total
+- 5 studio images (Masonry grid) — MUST eager load
+- 5 cowork images (Spotlight cards) — eager load first 3, lazy load last 2
+- 3 comodidades images — can lazy load (below fold)
 
 **Warning signs:**
-- Users complain about mis-taps
-- Need multiple attempts to select slot
-- Harder to use on smaller phones
-- Accessibility audit failures
+- Images "pop in" after scroll animation completes
+- Network tab shows images loading AFTER ScrollTrigger fires
+- Lighthouse "Largest Contentful Paint" is delayed
+- Users report "seeing empty boxes that fill in later"
 
 **Phase to address:**
-Phase 1 (Bottom Sheet Foundation) — Design mobile UI with proper touch targets from start.
+**Phase 02** (Image Reveals) — Implement before adding reveal animations. Add `loading="eager"` to ALL images that will have scroll reveals.
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 4: Mobile Performance Death Spiral with Multiple ScrollTriggers
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Using `body { overflow: hidden }` without mobile check | Simple scroll lock implementation | Breaks desktop modals, global side effects | Never — always scope to mobile |
-| Skipping haptic feature detection | Faster development | Console errors, silent failures on iOS | Never — 3 lines to add detection |
-| Copy-pasting React Native gesture code | Looks like it works | Passive listener violations, won't work on web | Never — web and native have different APIs |
-| Using `100vh` for mobile full-height | Works on desktop | Layout breaks on mobile Safari URL bar | Only if element is not full-height on mobile |
-| Animating all 90+ calendar slots | Beautiful stagger effect | Janky performance on mobile | Only on desktop (disable on mobile) |
-| Not portaling mobile bottom sheet | Simpler code (inline) | Z-index issues with overflow-hidden parents | Only if no parent has overflow-hidden |
-| Hardcoding `navigator.vibrate()` calls | Saves abstraction | Hard to disable, can't fallback, browser errors | Never — always abstract in utility |
-| Not testing on real iOS device | Chrome DevTools is faster | Miss Safari-specific bugs (vh, touch, portal) | Acceptable during early prototyping, never for production |
+**What goes wrong:**
+Page becomes laggy/unresponsive on mobile. Scroll feels "heavy". Animations skip frames. Battery drains rapidly. In extreme cases, mobile browsers kill the tab.
 
-## Integration Gotchas
+**Why it happens:**
+- Mobile devices have ~1/4 the CPU power of desktop
+- ScrollTrigger recalculates on EVERY scroll event (can be 60+ times per second)
+- With 10+ ScrollTrigger instances, that's 600+ calculations per second
+- Each calculation triggers layout recalculation (expensive on mobile)
+- Lenis smooth scroll adds additional per-frame calculations
+- React 19 concurrent rendering can interfere with scroll-linked animations
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| Lenis + Framer Motion drag | Both listen to touch events, conflict | Disable Lenis when bottom sheet open, use `touch-action: none` |
-| createPortal + body scroll lock | Adding `overflow: hidden` to body clips portaled content | Only lock scroll on mobile, or use `position: fixed` trick |
-| Framer Motion + passive touch listeners | Custom `touchmove` handlers can't `preventDefault()` | Use Framer Motion's `drag` or `{ passive: false }` explicitly |
-| Bottom sheet + existing modals | Modifying shared component breaks desktop | Branch on `isDesktop`, test both paths, consider separate components |
-| AnimatePresence + state updates | Unmounting parent too fast skips exit animation | Delay state update until animation completes (setTimeout) |
-| Backdrop blur + mobile GPU | Too much blur causes performance issues | Reduce blur amount on mobile (`backdrop-blur-sm` instead of `backdrop-blur-xl`) |
+**Your current setup is HIGH RISK:**
+- Lenis is disabled on mobile (good!)
+- But ScrollTrigger is NOT disabled on mobile (bad!)
+- Plan includes 4 sections with heavy animations = 15-20 ScrollTrigger instances
+- 13 images with reveal animations = 13 more ScrollTrigger instances
+- Total: 28-33 ScrollTriggers on a single page
+
+**How to avoid:**
+
+**Strategy 1: Disable ScrollTrigger on mobile, use Framer Motion `whileInView` instead**
+```tsx
+const isMobile = useMediaQuery('(max-width: 768px)');
+
+if (isMobile) {
+  // Lightweight Framer Motion (no scroll calculations)
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10%" }}
+      transition={{ duration: 0.6 }}
+    >
+      {content}
+    </motion.div>
+  );
+}
+
+// Desktop: Heavy GSAP ScrollTrigger
+useGSAP(() => {
+  gsap.to(element, {
+    scrollTrigger: { /* complex config */ },
+    // ...
+  });
+}, []);
+```
+
+**Strategy 2: Batch ScrollTrigger instances**
+```tsx
+// BAD: One ScrollTrigger per image (13 instances)
+images.map(img => (
+  <Image onLoad={() => {
+    gsap.to(imgRef, { scrollTrigger: { trigger: imgRef } });
+  }} />
+));
+
+// GOOD: One ScrollTrigger for entire section (1 instance)
+useGSAP(() => {
+  gsap.to('.image-grid img', {
+    opacity: 1,
+    stagger: 0.1, // Stagger within single ScrollTrigger
+    scrollTrigger: { trigger: '.image-grid' }
+  });
+}, []);
+```
+
+**Strategy 3: `will-change` budgeting**
+```tsx
+// BAD: Every element has will-change (GPU memory exhaustion)
+<div className="will-change-transform">
+  <div className="will-change-opacity">
+    <div className="will-change-transform"> {/* 3 layers deep! */}
+
+// GOOD: Only actively animating elements
+<div
+  className={isAnimating ? "will-change-transform" : ""}
+  onAnimationStart={() => setIsAnimating(true)}
+  onAnimationEnd={() => setIsAnimating(false)}
+>
+```
+
+**Strategy 4: Reduce Lenis refresh rate on lower-end devices**
+```tsx
+// Detect device performance
+const isLowEnd = navigator.hardwareConcurrency <= 4;
+
+<ReactLenis options={{
+  lerp: isLowEnd ? 0.08 : 0.12, // Less smooth but more performant
+  duration: isLowEnd ? 0.8 : 1.2,
+}}>
+```
+
+**For Espaço page specifically:**
+
+**Recommended approach:**
+- **Desktop:** GSAP ScrollTrigger for all animations
+- **Mobile:** Framer Motion `whileInView` for simple reveals, NO parallax, NO complex scroll effects
+- **Tablet:** Conditional — use GSAP only if device has 6+ CPU cores
+
+**Warning signs:**
+- Lighthouse Performance score <50 on mobile
+- "Long tasks" in DevTools Performance profiler >500ms
+- Scroll jank (missed frames in Performance monitor)
+- Browser DevTools shows >30% CPU usage while idle
+- Chrome DevTools "Rendering" tab shows constant "Layout Shift"
+
+**Phase to address:**
+**Phase 03** (Mobile Optimization) — MUST happen before Phase 04 (full implementation). Test on actual devices, not just Chrome DevTools mobile emulation.
+
+---
+
+### Pitfall 5: React 19 Concurrent Rendering + useGSAP = Timing Bugs
+
+**What goes wrong:**
+GSAP animations don't trigger on mount, or trigger multiple times. ScrollTrigger positions are calculated incorrectly. Animations "jump" to end state without transitioning.
+
+**Why it happens:**
+React 19's concurrent rendering can pause/resume component rendering. This means:
+- `useGSAP` might run before DOM elements are fully mounted
+- `ScrollTrigger.refresh()` might be called mid-render
+- `refs` might be `null` when GSAP tries to access them
+- Suspense boundaries can remount components, re-triggering animations
+
+**Example from your codebase:**
+```tsx
+// espaco/page.tsx line 41-46
+const containerRef = useRef<HTMLElement>(null);
+const { scrollYProgress } = useScroll({ target: containerRef });
+
+// RISK: containerRef.current might be null in React 19 concurrent render
+// Framer Motion handles this internally, but mixing with GSAP is risky
+```
+
+**How to avoid:**
+
+**Solution 1: Explicit ref null checks in useGSAP**
+```tsx
+useGSAP(() => {
+  const element = containerRef.current;
+  if (!element) {
+    console.warn('Element not mounted yet'); // Debugging
+    return;
+  }
+
+  const ctx = gsap.context(() => {
+    gsap.to(element, { /* animation */ });
+  }, element); // Pass scope as second arg
+
+  return () => ctx.revert(); // Cleanup
+}, {
+  dependencies: [someState],
+  scope: containerRef // IMPORTANT: scope to ref
+});
+```
+
+**Solution 2: Use `useLayoutEffect` for critical animations**
+```tsx
+// When animation MUST run before paint
+useLayoutEffect(() => {
+  if (!elementRef.current) return;
+
+  gsap.set(elementRef.current, { opacity: 0 }); // Initial state
+
+  return () => {
+    gsap.killTweensOf(elementRef.current);
+  };
+}, []);
+```
+
+**Solution 3: Separate GSAP and Framer Motion scroll progress**
+```tsx
+// BAD: Mixing Framer Motion useScroll with GSAP
+const { scrollYProgress } = useScroll({ target: containerRef });
+useGSAP(() => {
+  gsap.to(element, { scrollTrigger: { /* ... */ } });
+});
+
+// GOOD: Choose ONE library for scroll-driven animations per element
+// Option A: Framer Motion only
+const { scrollYProgress } = useScroll({ target: containerRef });
+const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+<motion.div style={{ y }}>
+
+// Option B: GSAP only
+useGSAP(() => {
+  gsap.to(element, {
+    y: '50%',
+    scrollTrigger: { trigger: containerRef.current }
+  });
+});
+```
+
+**For Espaço page specifically:**
+
+Your current Hero section (lines 41-63) mixes Framer Motion `useScroll` + potential GSAP usage. **This is a timing bomb with React 19.**
+
+**Recommendation:**
+- Keep Framer Motion for Hero parallax (already implemented, working)
+- Use GSAP ONLY for sections below Hero
+- Never mix both libraries on the same scroll-driven element
+
+**Warning signs:**
+- Animations work in dev, break in production build
+- Animations trigger twice on mount
+- Console errors: "Cannot read property 'current' of null"
+- ScrollTrigger markers appear in wrong positions
+- Animations don't trigger on first load, work on second navigation
+- Hydration mismatches in Next.js (Warning: Text content did not match)
+
+**Phase to address:**
+**Phase 01** (Foundation) — Establish clear separation between GSAP and Framer Motion before adding new animations. Document library ownership in code.
+
+---
+
+### Pitfall 6: Framer Motion `whileInView` + Many Images = Memory Leak
+
+**What goes wrong:**
+Browser memory usage grows continuously while scrolling. After 2-3 minutes of scrolling up/down the page, browser becomes sluggish or crashes. DevTools shows 500MB+ memory for a single page.
+
+**Why it happens:**
+Framer Motion's `whileInView` creates IntersectionObserver instances. With `once: true`, these should disconnect after triggering, but:
+- If component unmounts/remounts (React 19 Suspense, Fast Refresh), observers aren't cleaned up
+- With 13+ images each having their own `whileInView`, that's 13+ observers
+- Each observer holds references to DOM nodes, preventing garbage collection
+- Framer Motion's animation registry can retain finished animations in memory
+
+**Current risk in espaco/page.tsx:**
+- Line 113-125: `whileInView` on 5 studio images
+- Line 150-169: `whileInView` on 5 cowork images
+- Line 184-204: `whileInView` on 3 comodidades images
+- **Total: 13 IntersectionObserver instances**
+
+**How to avoid:**
+
+**Solution 1: Single observer for entire section**
+```tsx
+// BAD: One observer per image
+{images.map(img => (
+  <motion.div whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+    <Image src={img} />
+  </motion.div>
+))}
+
+// GOOD: One ref for section, manual stagger
+const sectionRef = useRef(null);
+const isInView = useInView(sectionRef, { once: true, margin: "-10%" });
+
+{images.map((img, i) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={isInView ? { opacity: 1 } : {}}
+    transition={{ delay: i * 0.1 }}
+  >
+    <Image src={img} />
+  </motion.div>
+))}
+```
+
+**Solution 2: Shared viewport config**
+```tsx
+// Create once, reuse
+const viewportConfig = { once: true, margin: "-10%" };
+
+{images.map(img => (
+  <motion.div whileInView={{ opacity: 1 }} viewport={viewportConfig}>
+    <Image src={img} />
+  </motion.div>
+))}
+```
+
+**Solution 3: Explicit cleanup for animations**
+```tsx
+const controls = useAnimation();
+
+useEffect(() => {
+  return () => {
+    controls.stop(); // Stop all animations on unmount
+  };
+}, [controls]);
+```
+
+**For Espaço page specifically:**
+
+**Refactor ALL image grids to use section-level `useInView`:**
+```tsx
+// Section 3: Estúdios
+const estudiosRef = useRef(null);
+const estudiosInView = useInView(estudiosRef, { once: true, margin: "-10%" });
+
+<section ref={estudiosRef}>
+  <Masonry>
+    {estudiosImages.map((src, idx) => (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={estudiosInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: idx * 0.1 }}
+      >
+        <Image src={src} />
+      </motion.div>
+    ))}
+  </Masonry>
+</section>
+```
+
+**Reduces observers from 13 → 3** (one per section).
+
+**Warning signs:**
+- Chrome Task Manager shows high memory usage (>400MB for single page)
+- DevTools Memory profiler shows increasing "Detached DOM nodes"
+- Performance degrades after scrolling up/down multiple times
+- Mobile Safari shows "This webpage is using significant memory"
+- Browser DevTools "Performance Monitor" shows memory not being released after scroll
+
+**Phase to address:**
+**Phase 02** (Image Reveals) — Refactor all `whileInView` to section-level observers BEFORE adding more animations.
+
+---
+
+### Pitfall 7: Missing `prefers-reduced-motion` for Heavy Effects = Accessibility Lawsuit
+
+**What goes wrong:**
+Users with vestibular disorders experience nausea, dizziness, or seizures from parallax/scroll effects. Violates WCAG 2.1 (Level A) and ADA compliance. Can result in legal action (documented cases in 2024-2025).
+
+**Why it happens:**
+Developers add `prefers-reduced-motion` checks to entrance animations but forget about:
+- Parallax effects (continuous motion)
+- Smooth scroll (Lenis)
+- Scroll-driven transforms
+- 3D rotations
+- Auto-playing effects
+
+**Current code status:**
+✅ GOOD: `useReducedMotion` hook exists and is used in `ScrollReveal.tsx`, `TextReveal.tsx`
+❌ BAD: Lenis is NOT disabled for reduced motion users (checked in `LenisProvider.tsx` line 11-19, only checks mobile)
+❌ BAD: Hero Globe parallax (espaco/page.tsx line 54-63) does NOT respect reduced motion
+❌ BAD: Framer Motion parallax (`useTransform` on line 46) does NOT check reduced motion
+
+**How to avoid:**
+
+**Solution 1: Disable Lenis for reduced motion**
+```tsx
+// LenisProvider.tsx
+export function LenisProvider({ children }: LenisProviderProps) {
+  const [shouldUseLenis, setShouldUseLenis] = useState(false);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    setShouldUseLenis(!isMobile && !prefersReducedMotion); // Disable for both
+  }, []);
+
+  if (!shouldUseLenis) return <>{children}</>;
+
+  return <ReactLenis {...props}>{children}</ReactLenis>;
+}
+```
+
+**Solution 2: Conditional parallax**
+```tsx
+const prefersReducedMotion = useReducedMotion();
+const { scrollYProgress } = useScroll({ target: containerRef });
+
+// Only apply parallax if motion is allowed
+const backgroundY = useTransform(
+  scrollYProgress,
+  [0, 1],
+  prefersReducedMotion ? ['0%', '0%'] : ['0%', '30%'] // No movement if reduced motion
+);
+```
+
+**Solution 3: CSS-only fallback**
+```tsx
+<motion.div
+  style={{
+    y: prefersReducedMotion ? 0 : backgroundY
+  }}
+  className={prefersReducedMotion ? "opacity-100" : ""}
+>
+```
+
+**For Espaço page specifically:**
+
+**Required changes:**
+1. Update `LenisProvider` to check `prefers-reduced-motion`
+2. Wrap ALL `useTransform` in reduced motion checks
+3. Disable Globe animation for reduced motion users
+4. Add static fallback states for all scroll effects
+
+**Legal risk:** HIGH. Portuguese accessibility laws (Decreto-Lei n.º 83/2018) require WCAG 2.1 Level AA compliance. Parallax without reduced-motion support is a Level A violation.
+
+**Warning signs:**
+- Accessibility audit tools flag "Animation not disabled for prefers-reduced-motion"
+- User reports of motion sickness in feedback
+- Screen reader users report page is "too busy"
+- Failed WCAG 2.1 automated checks
+
+**Phase to address:**
+**Phase 01** (Foundation) — MUST fix before adding any new scroll effects. Non-negotiable for legal compliance.
+
+---
 
 ## Performance Traps
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Stagger animating 90+ slots | Frame rate drops, janky scroll | Disable stagger on mobile, use CSS animations | >50 animated elements on mid-range device |
-| Re-rendering calendar on every scroll | Scroll lag, high CPU | Memoize slots, debounce scroll handlers | Any scroll interaction |
-| Heavy backdrop blur on mobile | Slow modal open, compositing lag | Reduce blur (`blur-sm`), remove on low-end | Mid-range Android devices |
-| Not virtualizing long day lists | Memory grows, scroll stutters | Virtualize if >30 days visible | 90-day range on low-end device |
-| Multiple Lenis instances | Double scrolling, event conflicts | Only one Lenis instance per app | Immediately on second instance |
-| Animating layout properties | Repaints, layout thrashing | Animate transform/opacity only | Any mobile animation |
+| **Too many `will-change` declarations** | Janky animations, high GPU memory, mobile crashes | Only apply `will-change` to actively animating elements; remove after animation completes | >10 simultaneous `will-change` elements on mobile |
+| **Scroll event flooding** | Browser unresponsive during scroll, CPU spikes to 100% | Use `useGSAP` with ScrollTrigger instead of manual scroll listeners; debounce/throttle if manual listeners required | >3 scroll event listeners without throttling |
+| **Image decoding on main thread** | Long tasks (>500ms) when images enter viewport | Add `decoding="async"` to all Next.js Image components | Images >500KB without async decoding |
+| **Unoptimized blur filters** | Stutter during scroll animations with blur effects | Use `backdrop-filter` instead of `filter` when possible; reduce blur radius on mobile (<5px) | Blur radius >10px on elements >50% viewport size |
+| **ScrollTrigger without `scroller` param when using Lenis** | Incorrect trigger positions, animations fire randomly | Always pass `scroller: window` or Lenis element ref to ScrollTrigger config | Any ScrollTrigger instance when Lenis is active |
+| **Framer Motion layout animations in scroll containers** | Scroll position jumps, layout thrashing | Avoid `layout` prop on elements inside scroll-driven sections; use transform-based animations only | Any `layout` animation inside ScrollTrigger-controlled container |
+| **Globe 3D rendering during scroll** | Dropped frames (5-10 FPS) during scroll on mid-range devices | Pause Three.js render loop during active scroll; resume after scroll stops | Three.js rendering at 60fps + Lenis + ScrollTrigger simultaneously |
+
+## Technical Debt Patterns
+
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| **Using `loading="lazy"` on above-fold images** | Faster initial page load metrics | Images invisible during reveal animations, CLS issues | Never for images with scroll reveals |
+| **One useGSAP per element** | Easy to reason about, isolated animations | 20+ useGSAP instances = performance death, unmount cleanup issues | Only for <5 animated elements per page |
+| **Mixing GSAP and Framer Motion on same element** | Can use "best tool" for each animation type | Fighting libraries, unpredictable behavior, debugging nightmare | Never acceptable |
+| **Disabling Lenis on mobile instead of optimizing** | Quick performance fix | Inconsistent UX between devices, harder to debug mobile-specific issues | Acceptable for MVP, must optimize later |
+| **Setting `once: false` on all `whileInView`** | Animations replay on every scroll | Memory leaks, performance degradation, battery drain | Only for critical UI feedback (e.g., "scroll to see more" indicators) |
+| **Global `will-change: transform`** | Silky smooth animations in dev | GPU memory exhaustion, crashes on low-end devices | Never in production; always conditional |
+
+## Integration Gotchas
+
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| **GSAP + Lenis** | Forgetting `ScrollTrigger.update()` in Lenis callback | Use `useLenis((lenis) => ScrollTrigger.update())` in provider |
+| **Framer Motion + Next.js Image** | Animating Image wrapper before image loads | Track `onLoad` state, defer animation until loaded |
+| **ScrollTrigger + React 19** | Assuming refs are immediately available | Explicit null checks in useGSAP, use `scope` parameter |
+| **Masonry + GSAP** | Animating before Masonry layout calculates | Delay GSAP init until Masonry `onLayoutComplete` (custom event) |
+| **Dynamic imports + ScrollTrigger** | ScrollTrigger fires before component fully rendered | Wrap ScrollTrigger setup in component's `useEffect`, not in dynamic parent |
+| **Framer Motion `whileInView` + GSAP ScrollTrigger** | Both libraries observing same element | Choose ONE: `whileInView` (simple) OR ScrollTrigger (complex); never both |
 
 ## UX Pitfalls
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Bottom sheet with no drag handle affordance | Users don't know it's draggable | Add visual drag indicator (pill/line at top) |
-| Keyboard covering input in bottom sheet | Can't see what they're typing | Scroll input into view on focus, scrollable content |
-| Touch targets <44px | Mis-taps, frustration, accessibility fail | 44×44px minimum on mobile |
-| No haptic feedback on select | Feels unresponsive, lacks native feel | Add haptics on slot select (with feature detection) |
-| Bottom sheet opens to full height immediately | Jarring, feels aggressive | Slide up from bottom with spring animation |
-| No swipe-to-dismiss affordance | Users hit X button instead | Allow swipe down to dismiss (feels native) |
-| Calendar scrolls behind bottom sheet | Disorienting, accidental interactions | Disable scroll when bottom sheet open |
-| No loading state on slot select | Looks broken when API is slow | Show spinner/haptic on tap, disable during load |
+| **Parallax too aggressive (>30% movement)** | Motion sickness, content unreadable during scroll | Limit parallax to 15% movement; use easing functions |
+| **Animations block user interaction** | Can't click buttons until animation completes | Use `pointer-events: auto` on interactive elements during animations |
+| **No loading states for heavy sections** | Blank screen for 2-3s, user thinks page is broken | Skeleton screens or progressive reveal during load |
+| **Scroll hijacking (custom scroll behavior)** | Disorienting, breaks browser back button expectations | Only use Lenis for smoothing, not scroll position control |
+| **Auto-playing animations on page load** | Overwhelming, high bounce rate on mobile | Delay entrance animations by 0.5-1s after mount |
+| **Invisible content until scroll** | Users don't know to scroll, miss content | Always show fold line or scroll indicator for off-screen content |
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Bottom sheet:** Tested on real iOS device (not just Chrome DevTools) — Safari has different vh, touch, and portal behavior
-- [ ] **Touch gestures:** Added `{ passive: false }` to touch listeners that need `preventDefault()` — otherwise warnings and broken behavior
-- [ ] **Haptic feedback:** Feature detection prevents console errors on Safari — `if ('vibrate' in navigator)`
-- [ ] **Scroll lock:** Only applied on mobile, desktop modals still work — test both viewport sizes
-- [ ] **Exit animations:** Delayed unmount until animation completes — otherwise instant disappear on mobile
-- [ ] **Touch targets:** All interactive elements ≥44×44px on mobile — audit with accessibility tool
-- [ ] **Lenis conflict:** Disabled when bottom sheet open — test drag doesn't trigger scroll
-- [ ] **Performance:** Reduced animations on mobile (<30fps = fail) — test on mid-range Android
-- [ ] **Z-index:** Bottom sheet not clipped by parent overflow-hidden — audit parent styles
-- [ ] **Keyboard:** Input fields visible when keyboard opens — test on real device with form
+- [ ] **ScrollTrigger animations:** Tested on actual mobile devices (not just DevTools mobile mode) — emulators don't accurately replicate performance
+- [ ] **Image reveals:** Verified all images have `loading="eager"` or load-state tracking before animation triggers
+- [ ] **Reduced motion:** Checked `prefers-reduced-motion` disables ALL motion (not just entrance animations) — includes Lenis, parallax, transforms
+- [ ] **Memory leaks:** Scrolled up/down page 10 times, checked DevTools Memory profiler for retention — memory should return to baseline
+- [ ] **Lenis sync:** Verified `ScrollTrigger.update()` called in Lenis callback — check ScrollTrigger markers align with visual triggers
+- [ ] **Ref null safety:** All `useGSAP` callbacks check `ref.current !== null` — especially critical in React 19 concurrent mode
+- [ ] **Cleanup:** All animations have cleanup functions in `useEffect` return — prevents animations running after unmount
+- [ ] **GPU memory:** Checked `will-change` only on actively animating elements — remove after animation completes
+- [ ] **Layout shift:** Lighthouse CLS score <0.1 with animations enabled — animations shouldn't cause layout jumps
+- [ ] **Accessibility:** WAVE/axe DevTools shows no motion-related violations — parallax/scroll effects disabled for `prefers-reduced-motion`
 
 ## Recovery Strategies
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Lenis conflict shipped to production | LOW | Add Lenis stop/start in next patch, 10 lines of code |
-| Body scroll lock breaking desktop | LOW | Add isDesktop guard, hot-fix in hours |
-| Haptic errors in Safari | LOW | Add feature detection wrapper, patch release |
-| Stagger performance issues | MEDIUM | Conditional stagger (desktop only), requires re-testing animations |
-| 100vh layout breaks on Safari | MEDIUM | Replace with dvh or JS calc, test across devices |
-| Touch targets too small | MEDIUM | Redesign button sizes, re-test entire calendar UX |
-| Exit animations skipping | MEDIUM | Add animation delay logic, test timing across devices |
-| Z-index issues with overflow-hidden | HIGH | Refactor layout structure or add portal, regression risk |
-| Passive listener violations | LOW | Replace with Framer drag or passive:false, isolated fix |
-| Keyboard covering inputs | MEDIUM | Add scroll-into-view logic, test all form fields |
+| **Lenis-ScrollTrigger desync** | LOW | Add `useLenis` callback, refresh ScrollTrigger; 30min fix |
+| **GSAP + Framer Motion conflicts** | MEDIUM | Audit all animations, partition by library; 2-4 hours refactor |
+| **Image loading timing issues** | LOW | Add `loading="eager"` + `onLoad` tracking; 1 hour |
+| **Mobile performance collapse** | HIGH | Conditional rendering for mobile, reduce animations, batch ScrollTriggers; 1-2 days |
+| **React 19 timing bugs** | MEDIUM | Add ref null checks, use `scope` parameter, explicit cleanup; 3-5 hours |
+| **Memory leaks** | MEDIUM | Refactor to section-level observers, add cleanup; 2-3 hours |
+| **Missing reduced motion** | LOW | Wrap effects in `useReducedMotion` checks; 1-2 hours |
+| **Too many ScrollTriggers** | HIGH | Batch into fewer instances, use stagger; 1 day refactor |
 
 ## Pitfall-to-Phase Mapping
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Lenis + drag conflict | Phase 1 (Bottom Sheet) | Drag bottom sheet while Lenis active, page should NOT scroll |
-| Body scroll lock breaking desktop | Phase 1 (Bottom Sheet) | Open desktop modal after mobile bottom sheet implementation, modal should be scrollable |
-| Haptic feedback errors | Phase 2 (Haptic) | Open console on Safari, no errors when haptics trigger |
-| Touch passive listeners | Phase 1 (Bottom Sheet) | No console warnings about passive listeners, drag works |
-| AnimatePresence exit skips | Phase 1 (Bottom Sheet) | Close bottom sheet on real device, animation should slide down smoothly |
-| Z-index overflow-hidden | Phase 1 (Bottom Sheet) | Bottom sheet fully visible, not clipped by any parent |
-| Mobile Safari 100vh | Phase 1 (Bottom Sheet) | Scroll page on iOS Safari, bottom sheet height should not jump |
-| Performance (90+ animations) | Phase 1 (Bottom Sheet) | Open calendar on mid-range device, should maintain 60fps |
-| Keyboard covering input | Phase 3 (Booking Flow) | Focus input in bottom sheet, input should scroll into view |
-| Touch targets too small | Phase 1 (Bottom Sheet) | Tap time slots on real device with different finger sizes, no mis-taps |
+| Lenis-ScrollTrigger desync | Phase 01 (Foundation) | ScrollTrigger markers align with visual triggers after navigation |
+| GSAP + Framer Motion conflicts | Phase 01 (Foundation) | No stutter in animations, DevTools shows <10 style recalcs/sec |
+| Image loading issues | Phase 02 (Image Reveals) | Images visible when animation completes, no CLS |
+| Mobile performance | Phase 03 (Mobile Optimization) | Lighthouse Performance >80 on mobile, <30% CPU usage |
+| React 19 timing bugs | Phase 01 (Foundation) | Animations trigger consistently across dev/prod, no hydration errors |
+| Memory leaks | Phase 02 (Image Reveals) | Memory returns to baseline after 10 scroll cycles |
+| Missing reduced motion | Phase 01 (Foundation) | WAVE/axe audit passes, all motion disabled with media query |
+| Too many ScrollTriggers | Phase 02-04 (Implementation) | <10 ScrollTrigger instances total on page |
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| **Phase 01: Foundation** | Starting implementation before fixing Lenis sync | MANDATORY: Fix LenisProvider, add reduced motion checks BEFORE any new animations |
+| **Phase 02: Image Reveals** | Animating before images load | Add `loading="eager"` to ALL reveal images, track load state |
+| **Phase 03: Parallax Effects** | Excessive movement causing motion sickness | Limit to 15% movement, add easing, disable for reduced motion |
+| **Phase 04: Interactive Elements** | Hover effects conflicting with scroll animations | Use Framer Motion for hover (event-based), GSAP for scroll only |
+| **Phase 05: Mobile** | Assuming mobile optimization can wait | CRITICAL: Test on real devices in Phase 03, not after completion |
 
 ## Sources
 
-**Based on documented patterns from:**
-- Framer Motion documentation (drag, AnimatePresence, mobile performance)
-- MDN Web Docs (Vibration API, touch events, passive listeners, Visual Viewport API)
-- WebKit Blog (Safari viewport units, touch event handling)
-- React Spectrum (accessibility guidelines for touch targets)
-- Personal experience with Lenis scroll library conflicts
-- Analysis of existing codebase (StudioHourlyCalendar.tsx, AvailabilityCalendar.tsx, LenisProvider.tsx)
+**Primary sources:**
+- Codebase analysis: `LenisProvider.tsx`, `GSAPProvider.tsx`, `espaco/page.tsx`, animation components
+- Package versions: GSAP 3.14.2, Framer Motion 12.33.0, Lenis 1.3.17, Next.js 16.1.6, React 19.2.3
 
-**Confidence notes:**
-- **HIGH confidence:** Lenis conflicts, passive listeners, 100vh Safari, AnimatePresence timing — well-documented web patterns
-- **MEDIUM confidence:** Specific Framer Motion + Lenis interaction — based on training data + codebase analysis
-- **LOW confidence:** Exact performance thresholds (e.g., "breaks at 50 elements") — varies by device, needs testing
+**Knowledge base (January 2025 training cutoff):**
+- GSAP ScrollTrigger documentation and known issues
+- Framer Motion performance patterns
+- Lenis + ScrollTrigger integration requirements
+- React 19 concurrent rendering behavior
+- Next.js Image component lazy loading mechanics
+- WCAG 2.1 motion accessibility requirements
 
-**Could not verify with current tools:**
-- Latest Framer Motion best practices (training data from 2025, library may have updates)
-- Tailwind v4 dvh support (confirmed in training data, but project uses v4 beta)
-- Specific Mobile Safari bugs in 2026 (training data current to Jan 2025)
+**Confidence limitations:**
+- MEDIUM confidence: Based on training data (Jan 2025 cutoff) + codebase analysis
+- WebSearch/WebFetch unavailable — cannot verify 2026 updates to libraries
+- Recommendations based on library versions in package.json (may have updates since Jan 2025)
+- Real-world device testing required to validate mobile performance assumptions
+
+**Recommended verification:**
+- Test on actual iOS/Android devices (not just DevTools emulation)
+- Check official docs for GSAP 3.14.2, Framer Motion 12.33.0, Lenis 1.3.17 for any breaking changes
+- Run Lighthouse CI on actual page with full animation load
+- Accessibility audit with WAVE + axe DevTools + manual screen reader testing
 
 ---
-
-*Pitfalls research for: Mobile-native calendar redesign*
-*Researched: 2026-03-13*
-*Confidence: MEDIUM (no web search access, based on training data + codebase analysis)*
+*Pitfalls research for: Espaço page heavy scroll-driven animations*
+*Researched: 2026-03-15*
+*Researcher: GSD Project Researcher (Phase 6)*

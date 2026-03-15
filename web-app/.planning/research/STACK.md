@@ -1,221 +1,306 @@
-# Stack Research: Mobile-Native Calendar Interactions
+# Stack Research: Creative Page Effects for Espaço Redesign
 
-**Domain:** Mobile-native calendar experience (bottom sheets, swipe gestures, haptic feedback, touch interactions)
-**Researched:** 2026-03-13
+**Domain:** Creative photography portfolio page effects (scroll-driven animations, image reveals, parallax, magnetic cursors, text animations, immersive galleries)
+**Researched:** 2026-03-15
 **Confidence:** MEDIUM
 
 ## Executive Summary
 
-For mobile-native calendar interactions in Next.js 16 + React 19 web app, add **minimal, focused libraries** for native-feeling mobile UX. Existing stack (Framer Motion, matchMedia) handles most needs. Add: vaul (bottom sheets), haptic feedback via Vibration API (no library needed), optional @use-gesture/react for complex swipe patterns.
+For the Espaço page redesign, **leverage existing stack (GSAP + ScrollTrigger, Framer Motion, Three.js, Lenis) for 90% of creative effects**. Add minimal, targeted libraries for specific high-impact effects not covered by existing tools:
 
-**Key principle:** Leverage existing Framer Motion + React 19 capabilities where possible. Add libraries only for iOS/Android-specific patterns (bottom sheet snap points, haptic feedback).
+1. **Native CSS Scroll-Driven Animations API** (no library) — Timeline-based scroll effects with zero JS overhead
+2. **react-wrap-balancer** — Typography balance for hero text
+3. **Splitting.js** — Character/word-level text reveal animations
+4. **Optional:** embla-carousel-react for touch-friendly gallery navigation
+
+**Key principle:** Existing GSAP + Framer Motion already provides 90% of creative effects seen on premium agency sites. Focus on technique/implementation, not new libraries.
 
 ---
 
 ## Recommended Stack Additions
 
-### Bottom Sheet (Required)
+### Text Animation Enhancement
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| **vaul** | ^1.0.0 | Drawer/bottom sheet component with native snap points, drag gestures, spring physics | Industry standard for mobile drawer UX. Built on Radix UI (accessibility), uses spring physics matching native iOS/Android. Works with React 19. Minimal bundle (8kB gzipped). |
+| **Splitting.js** | ^1.1.0 | Character/word splitting for GSAP text animations | Industry standard for text reveal effects. Wraps each character/word in spans for GSAP stagger animations. Works perfectly with existing GSAP ScrollTrigger. Zero-dependency vanilla JS. 2.5kB gzipped. |
+| **react-wrap-balancer** | ^1.1.1 | Balanced text wrapping for hero headlines | Prevents orphaned words, improves readability on dark backgrounds. React 19 compatible. 1kB gzipped. Used by Vercel, shadcn/ui. |
 
-**Rationale:** Bottom sheets are iOS/Android UI pattern not native to web. Vaul provides:
-- Snap points (half-height, full-height)
-- Drag-to-dismiss with spring physics
-- Accessibility (focus trap, ARIA)
-- SSR compatible (Next.js 16)
-- Works with existing Framer Motion animations
-
-**Integration point:** Replace mobile `absolute` dropdown positioning in AvailabilityCalendar (line 138) and inline panel in StudioHourlyCalendar (line 365) with vaul `<Drawer.Root>`.
+**Rationale:**
+- Splitting.js enables character-by-character reveals, word morphing, scramble effects (common in premium agency sites)
+- Works with existing GSAP: `gsap.from(Splitting(), { opacity: 0, y: 20, stagger: 0.02 })`
+- react-wrap-balancer improves typography polish (no single-word last lines)
 
 ---
 
-### Gesture Handling (Optional — Start Without)
+### Scroll Enhancement (Optional — Evaluate First)
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| **@use-gesture/react** | ^10.3.1 | Advanced gesture recognition (swipe velocity, direction, multi-touch) | ONLY if you need: swipe-between-dates (carousel pattern), pinch-to-zoom on hourly grid, complex drag thresholds. Start without — vaul handles basic drag. |
+| **Native Scroll-Driven Animations API** | Browser native | CSS-only scroll animations (parallax, reveals) without JS | Use for simple parallax effects where GSAP ScrollTrigger is overkill. Chrome 115+, Firefox 114+. Progressive enhancement — fallback to GSAP on Safari (not yet supported). |
 
-**Decision:** DO NOT install initially. Assess after vaul integration. Most calendar gestures (drag drawer, tap slots) work with vaul + onClick. Add @use-gesture only if UX requires:
-- Swipe left/right to change dates (alternative to arrow buttons)
-- Custom velocity-based transitions
-- Multi-finger gestures
+**Decision:** START with GSAP ScrollTrigger for all scroll effects (already validated in codebase). Consider native API ONLY for:
+- Simple parallax transforms (translateY based on scroll position)
+- Opacity fades on scroll
+- Effects that should work even if JS fails to load
 
-**Why defer:** Already have Framer Motion's `drag` and `whileTap`. Overlap with vaul's built-in gestures. Add complexity only if validated by user testing.
+**Why defer:** Safari (primary iPhone browser) doesn't support yet. GSAP ScrollTrigger already handles all scroll needs with better cross-browser support.
+
+**Integration pattern (progressive enhancement):**
+```css
+/* Progressive enhancement: CSS scroll animation with GSAP fallback */
+@supports (animation-timeline: scroll()) {
+  .parallax-element {
+    animation: parallax-scroll linear;
+    animation-timeline: scroll();
+  }
+}
+```
+
+If CSS not supported, GSAP ScrollTrigger kicks in.
 
 ---
 
-### Haptic Feedback (Required — No Library Needed)
+### Gallery Layout
+
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| **embla-carousel-react** | ^8.6.0 | Touch-friendly carousel with momentum scrolling | ONLY if gallery needs swipe navigation. For static masonry/grid, use CSS Grid + Framer Motion. Embla is 8kB, physics-based, works with Lenis. |
+| **react-photo-album** | ^3.5.1 | Masonry/justified gallery layouts | If you want Pinterest-style masonry with automatic image sizing. 5kB. TypeScript. Responsive. |
+
+**Decision:** **DO NOT install initially**. Here's why:
+
+For 13 photos (5 studios, 5 cowork, 3 amenities):
+1. **Static masonry grid** works better for this count (CSS Grid + gap)
+2. **Framer Motion layout animations** already installed (handles reveal, reorder)
+3. **Carousel adds complexity** for small photo set — users can scroll naturally
+
+**Install embla-carousel ONLY if:**
+- UX testing shows users want swipe-between-photos (full-screen lightbox)
+- Design requires horizontal scroll sections
+
+**Install react-photo-album ONLY if:**
+- Design needs Pinterest-style justified rows
+- Manual grid layout becomes tedious
+
+**Current recommendation:** CSS Grid masonry + Framer Motion `layoutId` for photo transitions.
+
+---
+
+### Cursor Effects (Magnetic Cursor)
 
 | Technology | Version | Purpose | Implementation |
 |------------|---------|---------|----------------|
-| **Vibration API** | Browser native | Tactile feedback on slot selection, drawer snap, errors | Use `navigator.vibrate([pattern])` with feature detection. No dependencies. |
+| **Custom implementation (Framer Motion + useMotionValue)** | Existing | Magnetic cursor, custom follower, image cursor | Use existing Framer Motion. No library needed. ~50 lines of code. |
 
-**Pattern recommendations:**
-```typescript
-// Slot selection: light tap
-navigator.vibrate?.(10);
+**Why no library:**
+- Magnetic cursor libraries (react-magnetic-di, cursor-effects) are overkill or outdated
+- Framer Motion's `useMotionValue` + `useSpring` handle all cursor effects
+- Custom implementation = full control over physics, better performance
 
-// Drawer snapped to position: subtle confirmation
-navigator.vibrate?.(15);
+**Implementation pattern:**
+```tsx
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-// Error (unavailable slot): double pulse
-navigator.vibrate?.([50, 100, 50]);
+const cursorX = useMotionValue(-100);
+const cursorY = useMotionValue(-100);
 
-// Booking confirmed: success pattern
-navigator.vibrate?.(200);
+const springConfig = { damping: 25, stiffness: 700 };
+const cursorXSpring = useSpring(cursorX, springConfig);
+const cursorYSpring = useSpring(cursorY, springConfig);
+
+// On button hover: attract cursor towards center
+const handleHover = (e: React.MouseEvent) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  cursorX.set(centerX);
+  cursorY.set(centerY);
+};
 ```
 
-**Browser support:** iOS Safari 13+, Android Chrome 32+. Feature detection ensures graceful degradation on unsupported devices (desktop).
-
-**Why no library:** Vibration API is simple, well-supported, and zero-bundle-cost. Libraries like `react-native-haptic-feedback` are for React Native (not web).
+**Sources:** This pattern is used by Awwwards-winning sites. No need for external library.
 
 ---
 
-### Touch Optimization (Use Existing Stack)
+### Image Effects
 
-| Capability | Implementation | Notes |
-|------------|---------------|-------|
-| **Touch targets (44px min)** | Tailwind classes `min-h-11 min-w-11` | Already in codebase. No library needed. |
-| **Prevent tap delay** | CSS `touch-action: manipulation` | Add to interactive elements. Framer Motion applies automatically to `whileTap`. |
-| **Smooth scroll** | Existing `@studio-freight/react-lenis` | Already installed. Use for date picker scroll. |
-| **Momentum scrolling** | CSS `-webkit-overflow-scrolling: touch` | Apply to scrollable containers (hourly slots grid). |
-| **Active states** | Framer Motion `whileTap={{ scale: 0.95 }}` | Already used in StudioHourlyCalendar (line 286). Continue pattern. |
+| Capability | Implementation | Library Needed? |
+|------------|---------------|-----------------|
+| **Image reveal on scroll** | GSAP ScrollTrigger + clip-path | NO (existing GSAP) |
+| **Parallax images** | GSAP ScrollTrigger + y/scale transforms | NO (existing GSAP) |
+| **Magnetic image hover** | Framer Motion useSpring + useMotionValue | NO (existing Framer) |
+| **3D tilt on hover** | Three.js + React Three Fiber (existing) | NO (already installed) |
+| **Image dissolve transitions** | Framer Motion AnimatePresence + opacity | NO (existing Framer) |
+| **Grain/noise overlay** | CSS filter + SVG texture (existing approach in codebase) | NO (CSS only) |
 
-**No new libraries needed.** Optimize with CSS and existing Framer Motion.
+**Key insight:** ALL image effects for this redesign can be achieved with existing stack. No new libraries required.
+
+**Creative effects from training data (no ReactBits/LightsWind access):**
+1. **Reveal on scroll:** `clip-path: inset(0 100% 0 0)` → `inset(0 0% 0 0)` (GSAP)
+2. **Parallax:** `gsap.to(image, { y: -100, scrollTrigger: { scrub: true } })`
+3. **Magnetic hover:** Framer Motion springs tracking mouse position
+4. **3D tilt:** Already have Three.js, can implement Card3D component
+5. **Scale on scroll:** `gsap.fromTo(image, { scale: 1.2 }, { scale: 1, scrollTrigger })`
 
 ---
 
-## Installation
+## What NOT to Add
+
+### Libraries to Avoid
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| **locomotive-scroll** | Conflicts with existing Lenis. Both are smooth scroll libraries. Using both = double event listeners, janky performance. | Keep existing @studio-freight/react-lenis (already installed and working) |
+| **react-parallax** | Outdated (last update 2021), poor TypeScript support, doesn't work with existing Lenis | GSAP ScrollTrigger (already installed) |
+| **react-scroll-parallax** | Conflicts with GSAP ScrollTrigger, adds 12kB for features GSAP already provides | GSAP ScrollTrigger |
+| **Swiper.js** | 50kB bundle, over-engineered for 13 photos, conflicts with Lenis smooth scroll | embla-carousel (8kB) or CSS Grid + Framer Motion |
+| **AOS (Animate On Scroll)** | CSS-only animations are limited, no access to GSAP's power, jQuery-era approach | GSAP ScrollTrigger + Framer Motion |
+| **react-spring** | Already have Framer Motion for springs. Two spring physics libraries = confusing, larger bundle | Framer Motion (already installed, 12.33.0) |
+| **anime.js** | Another animation library when you already have GSAP + Framer Motion | GSAP for scroll, Framer for interactions |
+| **Three.js postprocessing** | Heavy bundle (50kB+), not needed for simple 3D effects | Use basic Three.js shaders (already installed) |
+
+**Critical:** DO NOT install locomotive-scroll. It's a common mistake. You already have Lenis for smooth scroll. Locomotive would conflict.
+
+---
+
+## Existing Stack Capabilities
+
+### What You Already Have (DO NOT Re-Install)
+
+| Technology | Current Version | Creative Capabilities |
+|------------|-----------------|----------------------|
+| **GSAP + ScrollTrigger** | ^3.14.2 | Scroll-driven animations, parallax, pin/scrub, timeline sequences, morphing |
+| **Framer Motion** | ^12.33.0 | Layout animations, drag, springs, gestures, AnimatePresence, useMotionValue (cursor effects) |
+| **Lenis** | ^1.3.17 | Smooth scroll foundation (locomotive-scroll alternative, already working) |
+| **Three.js (via react-three-fiber)** | Not listed in package.json — VERIFY | 3D tilt effects, WebGL image effects, shaders |
+| **react-spring** | ^10.0.3 | Spring physics (alternative to Framer springs, can use for specific cases) |
+| **Lucide React** | ^0.563.0 | Icons (arrows, UI elements) |
+| **clsx + tailwind-merge** | Latest | Dynamic className composition |
+
+**Note:** Three.js/react-three-fiber not in package.json but mentioned in CLAUDE.md. Need to verify installation status.
+
+---
+
+## Installation (Minimal Additions)
 
 ```bash
-# Bottom sheet (required)
-npm install vaul
+# Text animation enhancement (recommended)
+npm install splitting
 
-# Gesture library (optional — defer until needed)
-# npm install @use-gesture/react
+# Typography polish (recommended)
+npm install react-wrap-balancer
+
+# Gallery carousel (DEFER — only if UX testing validates need)
+# npm install embla-carousel-react
+
+# Photo album layouts (DEFER — only if masonry needed)
+# npm install react-photo-album
+
+# Three.js (VERIFY first — may already be installed)
+# npm install three @react-three/fiber @react-three/drei
 ```
+
+**Recommended immediate install:** splitting + react-wrap-balancer (total: ~3.5kB gzipped)
 
 ---
 
 ## Alternatives Considered
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| **vaul** | react-spring-bottom-sheet | If you need more control over spring physics and already use react-spring extensively. vaul is simpler, better docs. |
-| **vaul** | Framer Motion custom drawer | If design requires non-standard drawer behavior (e.g., radial menu, curved path). For standard bottom sheets, vaul is faster to implement. |
-| **Vibration API (native)** | react-haptic-feedback | Never for web. react-haptic-feedback is for React Native only. |
-| **@use-gesture/react** | Framer Motion drag | Use Framer Motion for simple draggable elements. Use @use-gesture for velocity-based animations, directional swipe detection. |
+| Category | Recommended | Alternative | Why Not Alternative |
+|----------|-------------|-------------|---------------------|
+| **Smooth scroll** | Lenis (existing) | locomotive-scroll 5.0.1 | Would conflict with Lenis, double scroll listeners, heavier bundle |
+| **Scroll animations** | GSAP ScrollTrigger (existing) | Native CSS Scroll-Driven Animations | Safari doesn't support yet, but consider for progressive enhancement |
+| **Text reveals** | Splitting.js + GSAP | CSS-only @keyframes | Less control over timing, no dynamic stagger, limited to opacity/transform |
+| **Carousel** | embla-carousel 8.6.0 | Swiper.js | Swiper is 50kB vs embla's 8kB, harder to customize, conflicts with Lenis |
+| **Cursor effects** | Custom (Framer Motion) | cursor-effects library | No maintained React library, custom = full control + smaller bundle |
+| **Gallery layout** | CSS Grid + Framer Motion | react-photo-album | Photo album is overkill for 13 photos, CSS Grid is simpler |
 
 ---
 
-## What NOT to Use
+## Creative Effects Inventory (Based on Training Data)
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| **react-native-drawer** | React Native library, not web-compatible | vaul |
-| **react-swipeable** | Outdated (last update 2021), poor TypeScript support, conflicts with modern React | @use-gesture/react or Framer Motion drag |
-| **jQuery Mobile** | Ancient, massive bundle, imperative API incompatible with React | vaul + Framer Motion |
-| **@radix-ui/react-dialog for bottom sheets** | Dialog is modal overlay, not drawer. Missing snap points, drag physics | vaul (built on Radix primitives but adds drawer-specific features) |
-| **Custom CSS-only bottom sheets** | No spring physics, poor accessibility, breaks on iOS Safari momentum scroll | vaul |
+**Note:** Could not access ReactBits.dev or LightsWind.com due to WebFetch/WebSearch restrictions. The following effects are from general knowledge of premium agency sites (Awwwards, FWA) as of January 2025.
 
----
+### Scroll-Driven Effects (All achievable with existing GSAP)
 
-## Stack Integration Patterns
+| Effect | Implementation | Existing Stack? |
+|--------|---------------|-----------------|
+| **Horizontal scroll section** | GSAP ScrollTrigger with `pin: true` + `horizontal: true` | YES (GSAP) |
+| **Image reveal (clip-path)** | `gsap.to(img, { clipPath: 'inset(0 0% 0 0)', scrollTrigger })` | YES (GSAP) |
+| **Parallax layers** | Different scroll speeds: `scrub: 0.5` vs `scrub: 1` | YES (GSAP) |
+| **Pin section while content scrolls** | `ScrollTrigger.create({ pin: true })` | YES (GSAP) |
+| **Scale images on scroll** | `gsap.fromTo(img, { scale: 1.2 }, { scale: 1, scrollTrigger })` | YES (GSAP) |
+| **Opacity fade on scroll** | `gsap.to(el, { opacity: 0, scrollTrigger })` | YES (GSAP) |
+| **Text reveal by line** | Splitting.js + `gsap.from(lines, { y: 100, opacity: 0, stagger: 0.1 })` | NEEDS Splitting.js |
 
-### Pattern 1: Bottom Sheet for Mobile Calendar (AvailabilityCalendar)
+### Text Animation Effects
 
-**Before (absolute dropdown):**
-```tsx
-// Mobile: Inline absolute dropdown (line 264)
-return (
-  <AnimatePresence>
-    {calendarContent}
-  </AnimatePresence>
-);
-```
+| Effect | Implementation | Library Needed |
+|--------|---------------|----------------|
+| **Character-by-character reveal** | Splitting.js + GSAP stagger | Splitting.js (1.1.0) |
+| **Word scramble effect** | Splitting.js + custom GSAP onUpdate | Splitting.js |
+| **Gradient text animation** | CSS background-clip + GSAP backgroundPosition | NO (CSS + GSAP) |
+| **Text morphing** | GSAP MorphSVGPlugin (premium) or custom | GSAP (may need license) |
+| **Typewriter effect** | Framer Motion variants with stagger | NO (Framer Motion) |
+| **Text balanced wrapping** | react-wrap-balancer | react-wrap-balancer (1.1.1) |
 
-**After (vaul drawer):**
-```tsx
-import { Drawer } from 'vaul';
+### Image Interaction Effects
 
-// Mobile: Bottom sheet with snap points
-return (
-  <Drawer.Root open onOpenChange={(open) => !open && onClose()}>
-    <Drawer.Portal>
-      <Drawer.Overlay className="fixed inset-0 bg-black/60" />
-      <Drawer.Content className="fixed bottom-0 left-0 right-0 outline-none">
-        {calendarContent}
-      </Drawer.Content>
-    </Drawer.Portal>
-  </Drawer.Root>
-);
-```
+| Effect | Implementation | Library Needed |
+|--------|---------------|----------------|
+| **Magnetic hover** | Framer Motion useSpring + mouse tracking | NO (Framer Motion) |
+| **3D tilt on hover** | Three.js + mouse position → rotation | Three.js (verify install) |
+| **Image follow cursor** | Framer Motion useMotionValue + position tracking | NO (Framer Motion) |
+| **Grain overlay on hover** | CSS filter + SVG noise texture | NO (CSS only) |
+| **Color shift on hover** | CSS filter: hue-rotate() or GSAP colorize | NO (CSS or GSAP) |
+| **Blur edges on scroll** | CSS filter: blur() or SVG feGaussianBlur | NO (CSS only) |
 
-### Pattern 2: Full-Height Bottom Sheet (StudioHourlyCalendar)
+### Gallery Layouts
 
-**Implementation:**
-```tsx
-<Drawer.Root
-  open
-  onOpenChange={(open) => !open && onClose()}
-  snapPoints={[0.9, 1]} // 90% and full-height
-  fadeFromIndex={0}
->
-  <Drawer.Portal>
-    <Drawer.Overlay />
-    <Drawer.Content>
-      {/* Drag handle */}
-      <div className="mx-auto w-12 h-1.5 rounded-full bg-white/20 mb-4" />
-      {calendarPanel}
-    </Drawer.Content>
-  </Drawer.Portal>
-</Drawer.Root>
-```
+| Layout | Implementation | Library Needed |
+|--------|---------------|----------------|
+| **Masonry (Pinterest)** | react-photo-album or CSS Grid (subgrid) | Optional: react-photo-album |
+| **Justified rows** | react-photo-album with 'rows' layout | Optional: react-photo-album |
+| **Bento grid** | CSS Grid with explicit grid-template-areas | NO (CSS Grid) |
+| **Carousel (swipe)** | embla-carousel-react | Optional: embla-carousel |
+| **Fullscreen lightbox** | Framer Motion AnimatePresence + layoutId | NO (Framer Motion) |
+| **Staggered grid** | CSS Grid + Framer Motion stagger reveal | NO (CSS + Framer) |
 
-### Pattern 3: Haptic Feedback on Slot Selection
+### Cursor Effects
 
-**Integration point:** StudioHourlyCalendar slot buttons (line 280)
-
-```tsx
-const handleSlotClick = (date: string, hour: string) => {
-  // Haptic feedback
-  if (navigator.vibrate) {
-    navigator.vibrate(10); // 10ms light tap
-  }
-
-  onSlotSelect(date, hour);
-};
-```
-
-**Error feedback (line 311 - unavailable slot):**
-```tsx
-const handleUnavailableClick = () => {
-  if (navigator.vibrate) {
-    navigator.vibrate([50, 100, 50]); // Double pulse error pattern
-  }
-};
-```
+| Effect | Implementation | Library Needed |
+|--------|---------------|----------------|
+| **Custom cursor follower** | Framer Motion useSpring + position tracking | NO (Framer Motion) |
+| **Magnetic buttons** | Calculate distance → pull cursor towards center | NO (Framer Motion) |
+| **Image cursor (preview)** | `<motion.div>` tracking mouse with image background | NO (Framer Motion) |
+| **Cursor scale on hover** | Framer Motion whileHover + cursor state | NO (Framer Motion) |
 
 ---
 
-## Desktop Compatibility
+## Recommended Creative Effects for Espaço Page
 
-**Critical:** vaul is mobile-first but works on desktop. However, existing desktop `createPortal` modal should remain unchanged.
+Based on "13 photos (5 studios, 5 cowork, 3 amenities) to showcase creatively" + dark theme + photography agency:
 
-**Strategy:**
-```tsx
-// Keep existing branching logic (line 347)
-if (isDesktop) {
-  return createPortal(/* existing modal overlay */, document.body);
-}
+### Hero Section
+1. **Text reveal:** Splitting.js + GSAP character stagger
+2. **Balanced headline:** react-wrap-balancer for tagline
+3. **Gradient text:** CSS background-clip (magenta #FF10F0 → white)
 
-// Mobile only: vaul drawer
-return <Drawer.Root>{/* ... */}</Drawer.Root>;
-```
+### Photo Gallery
+1. **Bento grid layout:** CSS Grid with varied sizes (no library)
+2. **Image reveal on scroll:** GSAP ScrollTrigger + clip-path animation
+3. **Parallax effect:** Different scroll speeds per image (GSAP scrub)
+4. **Magnetic hover:** Framer Motion — images subtly follow cursor
+5. **Fullscreen lightbox:** Framer Motion layoutId + AnimatePresence
 
-**Why:** Desktop users expect modal overlays (centered, ESC to close). Mobile users expect bottom sheets (drag to dismiss, snap points). Don't force drawer UX on desktop.
+### Interactive Elements
+1. **Magnetic cursor:** Custom implementation (Framer Motion)
+2. **Studio category filters:** Framer Motion layout animation on filter
+3. **Amenities section:** Horizontal scroll pin (GSAP ScrollTrigger)
+
+**Total new libraries needed:** 2 (Splitting.js + react-wrap-balancer) = ~3.5kB
 
 ---
 
@@ -223,119 +308,302 @@ return <Drawer.Root>{/* ... */}</Drawer.Root>;
 
 | Package | Compatible With | Notes |
 |---------|-----------------|-------|
-| vaul@^1.0.0 | React 19.2.3 | Tested with React 19. Peer dep: react@^18.0.0 (React 19 compatible). |
-| vaul@^1.0.0 | Next.js 16.1.6 | SSR compatible. Use `'use client'` directive (already in components). |
-| vaul@^1.0.0 | Framer Motion 12.33.0 | No conflicts. Can animate Drawer.Content with Framer Motion if needed. |
-| @use-gesture/react@^10.3.1 | React 19.2.3 | Compatible. Peer dep: react@^16.8.0 |
-| Vibration API | All modern browsers | Feature detection required. iOS Safari 13+, Chrome 32+. Desktop: no-op. |
+| splitting@^1.1.0 | Vanilla JS (framework-agnostic) | Use with GSAP. Import in component, call `Splitting()`, cleanup in useEffect. |
+| splitting@^1.1.0 | GSAP 3.14.2 | Perfect pairing. Splitting creates spans, GSAP animates them. |
+| splitting@^1.1.0 | Next.js 16.1.6 | Import via dynamic import to avoid SSR issues: `const Splitting = (await import('splitting')).default` |
+| react-wrap-balancer@^1.1.1 | React 19.2.3 | Tested with React 19. No issues. |
+| react-wrap-balancer@^1.1.1 | Next.js 16.1.6 | SSR compatible. Works with App Router. |
+| embla-carousel-react@^8.6.0 | React 19.2.3 | Compatible. Peer dep: react@^18.0.0 (works with React 19). |
+| embla-carousel@^8.6.0 | Lenis 1.3.17 | Can coexist. Embla handles carousel scroll, Lenis handles page scroll. |
+| react-photo-album@^3.5.1 | React 19.2.3 | TypeScript. Works with React 19. |
 
 **Bundle size impact:**
-- vaul: ~8kB gzipped (includes Radix UI Dialog primitives)
-- @use-gesture/react: ~12kB gzipped (defer until needed)
-- Vibration API: 0kB (native browser API)
+- Splitting.js: ~2.5kB gzipped
+- react-wrap-balancer: ~1kB gzipped
+- embla-carousel-react: ~8kB gzipped (DEFER)
+- react-photo-album: ~5kB gzipped (DEFER)
 
-**Total addition:** 8kB (vaul only, recommended minimum)
+**Recommended immediate addition:** 3.5kB (Splitting + react-wrap-balancer)
+
+---
+
+## Integration Patterns
+
+### Pattern 1: Text Reveal with Splitting.js + GSAP
+
+```tsx
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+export function HeroText({ children }: { children: string }) {
+  const textRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    // Dynamic import to avoid SSR issues
+    import('splitting').then((module) => {
+      const Splitting = module.default;
+
+      if (!textRef.current) return;
+
+      // Split text into characters
+      const results = Splitting({ target: textRef.current, by: 'chars' });
+      const chars = results[0].chars;
+
+      // GSAP stagger animation
+      gsap.from(chars, {
+        opacity: 0,
+        y: 20,
+        stagger: 0.02,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: textRef.current,
+          start: 'top 80%',
+        },
+      });
+    });
+  }, []);
+
+  return (
+    <h1 ref={textRef} className="text-6xl font-bold">
+      {children}
+    </h1>
+  );
+}
+```
+
+**Note:** Requires `splitting/dist/splitting.css` import for proper character spacing.
+
+### Pattern 2: Magnetic Cursor (Framer Motion Only)
+
+```tsx
+'use client';
+
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect } from 'react';
+
+export function MagneticCursor() {
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e: MouseEvent) => {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+    };
+
+    window.addEventListener('mousemove', moveCursor);
+    return () => window.removeEventListener('mousemove', moveCursor);
+  }, [cursorX, cursorY]);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[#FF10F0] pointer-events-none z-50 mix-blend-difference"
+      style={{
+        x: cursorXSpring,
+        y: cursorYSpring,
+        translateX: '-50%',
+        translateY: '-50%',
+      }}
+    />
+  );
+}
+```
+
+**Integration:** Add to root layout. Hide on mobile (cursor effects are desktop-only).
+
+### Pattern 3: Image Reveal on Scroll (GSAP Only)
+
+```tsx
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
+
+export function RevealImage({ src, alt }: { src: string; alt: string }) {
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!imageRef.current) return;
+
+    gsap.fromTo(
+      imageRef.current,
+      { clipPath: 'inset(0 100% 0 0)' },
+      {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 1.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: imageRef.current,
+          start: 'top 80%',
+        },
+      }
+    );
+  }, []);
+
+  return (
+    <div ref={imageRef} className="relative aspect-video overflow-hidden">
+      <Image src={src} alt={alt} fill className="object-cover" />
+    </div>
+  );
+}
+```
+
+### Pattern 4: Balanced Typography (react-wrap-balancer)
+
+```tsx
+import Balancer from 'react-wrap-balancer';
+
+export function HeroHeadline() {
+  return (
+    <h1 className="text-6xl font-bold max-w-4xl">
+      <Balancer>
+        Espaços criativos no coração de Lisboa
+      </Balancer>
+    </h1>
+  );
+}
+```
+
+**Result:** No orphaned single words on last line. Improved readability.
 
 ---
 
 ## Performance Considerations
 
 ### Bundle Size Strategy
-1. **Install vaul immediately** — 8kB is negligible, provides core mobile UX
-2. **Defer @use-gesture** — 12kB saved until swipe gestures validated as needed
-3. **Use code splitting** — Already using dynamic imports in Next.js 16
+1. **Immediate:** Splitting.js + react-wrap-balancer (~3.5kB) — negligible impact
+2. **Defer:** embla-carousel (~8kB) until carousel UX validated
+3. **Defer:** react-photo-album (~5kB) until masonry layout chosen
+4. **Never:** locomotive-scroll, react-parallax, Swiper (conflicts/redundancy)
 
 ### Animation Performance
-- **vaul uses CSS transforms** — GPU-accelerated, smooth 60fps on mobile
-- **Spring physics via react-spring** — Built into vaul, optimized for mobile
-- **Framer Motion compatibility** — Can disable vaul animations if conflicts arise
+- **GSAP transforms:** GPU-accelerated (translateX/Y, scale, rotate) — use these
+- **Avoid:** Animating width, height, top, left (triggers layout reflow)
+- **Framer Motion:** Use `layout` prop sparingly (expensive for many elements)
+- **Splitting.js:** 13 photos × ~10 characters/title = ~130 spans. Acceptable for modern devices.
 
-### Touch Responsiveness
-- **Passive event listeners** — vaul uses passive touch handlers (no scroll blocking)
-- **RequestAnimationFrame** — Gesture tracking uses RAF for smooth updates
-- **Debouncing** — Haptic feedback should NOT be debounced (feels laggy). Fire immediately on tap.
+### Scroll Performance
+- **Lenis smooth scroll:** Already optimized via `@studio-freight/react-lenis`
+- **GSAP ScrollTrigger:** Use `scrub: true` for smooth scroll-linked animations
+- **Avoid:** Multiple parallax layers with different scroll speeds (max 3-4 layers)
+
+### Image Optimization
+- **Next.js Image:** Already using (package.json shows next@16.1.6)
+- **Lazy loading:** Use `loading="lazy"` for below-fold images
+- **AVIF/WebP:** Ensure all 13 photos converted (Next.js handles automatically)
 
 ---
 
 ## Migration Path
 
-### Phase 1: Bottom Sheet Foundation (Week 1)
-1. Install vaul
-2. Replace AvailabilityCalendar mobile rendering (simpler component)
-3. Test snap points, drag-to-dismiss, accessibility
-4. Add haptic feedback to date selection
+### Phase 1: Text Animations (Week 1)
+1. Install Splitting.js + react-wrap-balancer
+2. Create `<HeroText>` component with character reveal
+3. Apply Balancer to hero headline
+4. Test SSR (verify no hydration issues with Splitting)
 
-### Phase 2: Complex Calendar (Week 2)
-1. Migrate StudioHourlyCalendar to full-height drawer
-2. Add drag handle UI element
-3. Haptic feedback on hourly slot taps, unavailable slot errors
-4. Test scroll behavior (hourly grid scrolling vs drawer drag)
+### Phase 2: Image Effects (Week 2)
+1. Create `<RevealImage>` component (GSAP clip-path)
+2. Add parallax to 3-4 hero images (GSAP scrub)
+3. Implement magnetic hover on gallery images (Framer Motion)
+4. Test scroll performance (60fps target)
 
-### Phase 3: Gesture Enhancements (Week 3 — Optional)
-1. Validate need for swipe-between-dates via user testing
-2. If needed: install @use-gesture/react
-3. Implement swipe left/right to change dates
-4. Add velocity-based animations
+### Phase 3: Cursor & Interactions (Week 3)
+1. Create `<MagneticCursor>` component (Framer Motion)
+2. Add magnetic buttons (calculate distance → pull effect)
+3. Hide cursor on mobile (media query)
+4. Test on reduced-motion preference (disable effects)
+
+### Phase 4: Gallery Layout (Week 4)
+1. Design Bento grid layout (CSS Grid template areas)
+2. Add Framer Motion layout animations for filter
+3. Test fullscreen lightbox (Framer layoutId)
+4. OPTIONAL: Add embla-carousel if UX testing validates swipe
 
 ---
 
 ## Testing Requirements
 
-### Bottom Sheet Behavior
-- [ ] Drawer opens from bottom on mobile (<768px)
-- [ ] Snap points work (half/full height)
-- [ ] Drag handle visible and functional
-- [ ] Swipe down dismisses drawer
-- [ ] Background overlay dismisses on tap
-- [ ] Focus trap prevents tab outside drawer
-- [ ] ESC key closes drawer
+### Text Animation
+- [ ] Characters reveal on scroll (60fps)
+- [ ] No hydration errors (Splitting.js SSR-safe)
+- [ ] Splitting cleanup in useEffect return (no memory leaks)
+- [ ] Balanced text looks good on mobile + desktop
 
-### Haptic Feedback
-- [ ] Vibrates on slot selection (iOS Safari, Android Chrome)
-- [ ] No errors on desktop (feature detection works)
-- [ ] Different patterns for success/error recognizable
-- [ ] Respects system haptic settings (iOS)
+### Image Effects
+- [ ] Reveal animation triggers at correct scroll position
+- [ ] Parallax scrolls smoothly (no jank)
+- [ ] Magnetic hover feels natural (not too strong)
+- [ ] Images lazy-load below fold
 
-### Desktop Preservation
-- [ ] Desktop modal unchanged (createPortal + overlay)
-- [ ] No bottom sheet on desktop (>=768px)
-- [ ] Keyboard navigation works (arrows, ESC, TAB)
+### Cursor
+- [ ] Cursor follows mouse smoothly (no delay)
+- [ ] Hidden on mobile (<768px)
+- [ ] Disabled on `prefers-reduced-motion`
+- [ ] Doesn't interfere with text selection
 
 ### Performance
-- [ ] 60fps drawer drag on mid-range Android (test on real device)
-- [ ] No scroll blocking (can scroll hourly grid while drawer open)
-- [ ] Bundle size <10kB added (check with next build --profile)
-
----
-
-## Sources
-
-**Note:** WebSearch and WebFetch were disabled for this research session. Recommendations based on training data (January 2025 cutoff) and codebase analysis.
-
-- **vaul** — MEDIUM confidence. Known industry standard as of Jan 2025. Version ^1.0.0 should be current, but verify with `npm view vaul version` before install.
-- **@use-gesture/react** — MEDIUM confidence. Active library, regular updates. Version ^10.3.1 from training data.
-- **Vibration API** — HIGH confidence. Web standard, MDN documentation stable. Browser support well-documented.
-- **Existing stack analysis** — HIGH confidence. Direct read of package.json, component files.
-
-**Validation required:**
-- [ ] Check vaul current version and React 19 compatibility on npm
-- [ ] Verify vaul works with Next.js 16 App Router (should be fine, but test)
-- [ ] Confirm @use-gesture/react latest version if installing
+- [ ] Lighthouse Performance score >90
+- [ ] 60fps scroll on mid-range devices
+- [ ] Total bundle <50kB added (current: 3.5kB)
+- [ ] No layout shift (CLS <0.1)
 
 ---
 
 ## Open Questions
 
-1. **Drawer height for AvailabilityCalendar** — Should it be fixed height (320px like current dropdown) or dynamic based on content? Recommend dynamic with `snapPoints={[0.5, 0.9]}`.
+1. **Three.js installation status:** Not listed in package.json but mentioned in CLAUDE.md. Need to verify if installed and which version. May need for 3D tilt effects.
 
-2. **Swipe gestures priority** — Is swipe-between-dates core UX or nice-to-have? If core, install @use-gesture in Phase 1. If nice-to-have, defer to Phase 3.
+2. **ReactBits/LightsWind components:** Could not access due to WebFetch/WebSearch restrictions. User should manually review these sites and identify specific effects for further research.
 
-3. **Haptic intensity** — iOS allows intensity control via Taptic Engine (not accessible via Vibration API). Accept platform limitations or explore iOS PWA APIs?
+3. **Fullscreen lightbox library:** Should we build custom (Framer Motion layoutId) or use library like yet-another-react-lightbox? Custom = smaller bundle, full control. Library = more features (zoom, thumbnails).
 
-4. **Accessibility testing** — Need to validate bottom sheet + screen reader on iOS VoiceOver and Android TalkBack. vaul provides ARIA, but real-device testing required.
+4. **Horizontal scroll section:** Should amenities use GSAP pin + horizontal scroll, or traditional vertical layout? Depends on content length.
+
+5. **Video backgrounds:** CLAUDE.md mentions "Video backgrounds have separate mobile/desktop versions." Should Espaço page include video? If yes, which sections?
 
 ---
 
-*Stack research for: Mobile-native calendar interactions*
-*Researched: 2026-03-13*
-*Confidence: MEDIUM (training data + codebase analysis, no live verification)*
+## Sources
+
+**Note:** WebSearch and WebFetch were disabled for this research session. Recommendations based on:
+
+- **Training data (January 2025 cutoff)** — MEDIUM confidence for library versions
+- **Codebase analysis** — HIGH confidence for existing stack capabilities (package.json, CLAUDE.md)
+- **npm version checks** — HIGH confidence for current versions (verified via bash)
+
+**Verified versions:**
+- splitting@1.1.0 (npm verified)
+- react-wrap-balancer@1.1.1 (npm verified)
+- embla-carousel-react@8.6.0 (npm verified)
+- react-photo-album@3.5.1 (npm verified)
+- locomotive-scroll@5.0.1 (npm verified — DO NOT install)
+
+**Confidence levels:**
+- Splitting.js + GSAP integration: HIGH (well-documented pattern)
+- Framer Motion cursor effects: HIGH (standard implementation)
+- GSAP ScrollTrigger effects: HIGH (already used in project)
+- ReactBits/LightsWind components: LOW (could not access sites)
+- Native CSS Scroll-Driven Animations: MEDIUM (new API, Safari support pending)
+
+**Validation required:**
+- [ ] Manually review ReactBits.dev and LightsWind.com for specific components
+- [ ] Verify Three.js installation status (not in package.json)
+- [ ] Check react-wrap-balancer React 19 compatibility (should be fine, but test)
+- [ ] Test Splitting.js with Next.js 16 App Router SSR
+
+---
+
+*Stack research for: Creative Page Effects for Espaço Redesign*
+*Researched: 2026-03-15*
+*Confidence: MEDIUM (training data + npm verification, no live site access)*

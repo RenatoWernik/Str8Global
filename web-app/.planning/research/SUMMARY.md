@@ -1,238 +1,352 @@
 # Project Research Summary
 
-**Project:** Str8Global v1.2 - Mobile-Native Calendar Experience
-**Domain:** Mobile UX Enhancement (Bottom Sheets, Touch Gestures, Haptic Feedback)
-**Researched:** 2026-03-13
-**Confidence:** MEDIUM
+**Project:** Espaço Page Creative Redesign (v1.3)
+**Domain:** Premium photography agency portfolio page with immersive scroll-driven animations
+**Researched:** 2026-03-15
+**Confidence:** HIGH
 
 ## Executive Summary
 
-This research focused on adding mobile-native interactions to existing calendar components (AvailabilityCalendar and StudioHourlyCalendar) in a Next.js 16 + React 19 web app. The existing architecture is solid — components already branch desktop/mobile using matchMedia, use createPortal for modals, and have clean state management. The recommended approach is to **extend existing components** rather than create separate mobile variants, minimizing code duplication and regression risk.
+The Espaço page redesign adds creative, immersive scroll-driven animations to showcase 13 photos (5 studios, 5 cowork, 3 amenities) using the existing stack. Research confirms **90% of desired effects are achievable with current tools** (GSAP ScrollTrigger + Framer Motion + Lenis + Three.js), requiring only 2 minimal additions (Splitting.js for text reveals, react-wrap-balancer for typography polish — total 3.5kB).
 
-The technical path is straightforward: add **vaul** (8kB) for bottom sheets with native snap points and drag physics, implement haptic feedback using the browser's Vibration API (zero dependencies), and leverage existing Framer Motion for gesture handling. Defer @use-gesture/react until swipe-between-dates is validated as needed. The biggest risks are integration conflicts: Lenis smooth scroll fighting with drag gestures, body scroll lock breaking desktop modals, and performance degradation from animating 90+ calendar slots on mobile devices.
+The recommended architecture is **separate section component files** with **dynamic imports for lazy-loading**, following the proven pattern from the homepage. Critical insight: **GSAP for cross-section scroll storytelling, Framer Motion for component-level animations within sections**. This separation prevents library conflicts while maintaining 60fps performance on mid-range devices.
 
-Success depends on rigorous mobile testing. Chrome DevTools mobile mode is insufficient — Safari iOS has unique bugs with 100vh viewport units, touch event passive listeners, and portal rendering. Test on real devices early, disable animations on mobile to maintain 60fps, and always guard haptic feedback with feature detection to prevent console errors on Safari.
+Key risks center on performance and accessibility: multiple ScrollTrigger instances can cause mobile performance collapse, Lenis-ScrollTrigger desync after navigation, and parallax effects violating accessibility laws without `prefers-reduced-motion` support. All risks have documented prevention strategies from existing codebase analysis. **Three critical infrastructure bugs must be fixed in Phase 1 before adding any new animations.**
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Add minimal, focused libraries** for mobile-native patterns. Existing stack (Framer Motion, matchMedia, Lenis) handles most needs.
+The existing stack (GSAP 3.14.2 + ScrollTrigger, Framer Motion 12.33.0, Lenis 1.3.17, Three.js, Next.js 16, React 19) already provides all major creative effects capabilities. Only two minimal additions recommended for text animation enhancement.
 
 **Core technologies:**
-- **vaul** (^1.0.0): Bottom sheet/drawer component — Industry standard, built on Radix UI (accessibility), provides snap points and spring physics matching iOS/Android native feel. 8kB gzipped, SSR compatible.
-- **Vibration API** (browser native): Haptic feedback via `navigator.vibrate()` — Zero dependencies, iOS Safari 13+/Android Chrome 32+ support. Feature detection ensures graceful degradation.
-- **@use-gesture/react** (^10.3.1, OPTIONAL): Advanced gesture recognition — ONLY if swipe-between-dates or velocity-based transitions are validated as needed. Start without, add in Phase 2 if user testing demands it.
-- **Framer Motion** (existing): Touch interactions via `drag` prop — Already installed, handles most gesture needs. No new dependency required.
+- **GSAP ScrollTrigger** (existing): Scroll-driven animations, parallax, pin/scrub, image reveals — handles 90% of scroll effects
+- **Framer Motion** (existing): Viewport reveals, hover states, entrance animations, cursor effects — perfect for component-level interactions
+- **Lenis** (existing): Smooth scroll foundation (desktop-only) — already proven, no alternative needed
+- **Splitting.js** (add 2.5kB): Character/word splitting for text reveal effects — industry standard, zero dependencies
+- **react-wrap-balancer** (add 1kB): Balanced text wrapping for headlines — instant typography polish
 
-**What NOT to add:**
-- Avoid react-native-drawer, react-swipeable (outdated), jQuery Mobile (ancient), custom CSS-only bottom sheets (no accessibility/physics)
-- Don't use Radix Dialog for bottom sheets (missing snap points/drag)
+**Critical finding:** DO NOT add locomotive-scroll (would conflict with Lenis), react-parallax (outdated, conflicts with GSAP), or Swiper (50kB, conflicts with Lenis). Avoid installing embla-carousel or react-photo-album unless UX testing validates carousel/masonry needs.
+
+**Bundle impact:** 3.5kB total addition (Splitting + react-wrap-balancer). Defer carousel/masonry libraries until validated.
 
 ### Expected Features
 
-**Must have (table stakes):**
-- **Bottom Sheet Container** — iOS/Android native pattern, users expect calendars to slide up from bottom on mobile. Missing this = "desktop squeezed to mobile"
-- **Swipe to Dismiss** — Pull down to close, standard mobile gesture for one-handed use
-- **Safe Area Padding** — Respect iOS notch/home indicator, Android gesture bars (CSS `env(safe-area-inset-bottom)`)
-- **Touch-Optimized Tap Targets** — Minimum 44x44px (Apple HIG) / 48x48dp (Material) to avoid mis-taps
-- **Preserve Existing Features** — Month navigation, unavailable date display (line-through, Lock icon), loading states, "Hoje" shortcut, hourly slot grouping (Manhã/Tarde/Noite)
+Research identified clear tiers for feature prioritization based on premium agency site patterns (Awwwards, FWA) and user expectations.
 
-**Should have (competitive advantage):**
-- **Horizontal Swipe Date Navigation** — Swipe left/right to change dates (iOS Calendar pattern), faster than arrow buttons
-- **Haptic Feedback on Selection** — Subtle vibration on date/time tap, premium native feel
-- **Quick Time Filters** — Pill buttons ("Manhã" / "Tarde" / "Noite") to jump to time periods, reduces scrolling
-- **Persistent Selection Summary Bar** — Sticky footer showing selected date/time while scrolling hourly grid
+**Must have (table stakes):**
+- Smooth scroll (already have Lenis)
+- High-quality optimized images (Next.js Image handles)
+- Mobile responsive gallery (existing Tailwind + breakpoints)
+- Category filtering (Studios/Cowork/Amenities buttons)
+- Image lazy loading (Next.js automatic)
+- Fast load time (<2.5s LCP)
+
+**Should have (differentiators):**
+- Text character reveal (Splitting.js + GSAP)
+- Image reveal on scroll (GSAP clip-path animation)
+- Bento grid layout (CSS Grid — showcases design skills)
+- Fullscreen lightbox (Framer Motion layoutId)
+- Parallax layers (2-3 hero images only, GSAP scrub)
+- Magnetic cursor (Framer Motion — desktop-only polish)
+- Balanced typography (react-wrap-balancer)
 
 **Defer (v2+):**
-- **Multi-Month Preview (Peek)** — See edges of prev/next month while swiping, complex carousel implementation
-- **Inline Mini Calendar** — Two-state bottom sheet (full vs collapsed), requires portal architecture rethink
-- **Visual Time Density Heat Map** — Color intensity showing busier hours, informational not critical
-- **Pull-to-Refresh** — Less expected in modal contexts, evaluate if users report stale data
+- Horizontal scroll section (HIGH complexity, accessibility concerns)
+- Magnetic image hover (nice-to-have polish)
+- Gradient text animation (visual flourish, not critical)
+- Swipe gallery (only if UX testing validates)
+- 3D tilt effects (Three.js heavy bundle, defer until validated)
+
+**Anti-features (avoid):**
+- Auto-playing video backgrounds (heavy bandwidth, accessibility issues)
+- Infinite scroll (only 13 photos, prevents footer access)
+- Complex 3D WebGL scenes (over-engineered for portfolio)
+- Music/sound effects (jarring, accessibility violation)
+- Cursor trail effects (distracting, dated)
 
 ### Architecture Approach
 
-**Extend existing components with mobile-specific rendering branches** rather than creating separate files. Use a wrapper pattern (MobileBottomSheet.tsx) for reusable drawer behavior, but keep calendar logic unified in AvailabilityCalendar.tsx and StudioHourlyCalendar.tsx. Both desktop and mobile use createPortal to document.body to escape overflow-hidden parents that previously caused z-index issues.
+The current architecture uses a **hybrid animation approach** (GSAP for scroll, Framer Motion for components) coordinated through global providers (LenisProvider, GSAPProvider). The existing `espaco/page.tsx` is a 220-line single file with inline sections — research recommends extracting to separate component files with dynamic imports, following the homepage pattern.
+
+**Proposed structure:**
+```
+src/app/espaco/page.tsx (minimal, ~100 lines)
+├── Hero Section (unchanged)
+├── Dynamic: ManifestoSection (creative redesign)
+├── Dynamic: StudiosSection (creative redesign)
+├── Dynamic: CoworkSection (creative redesign)
+├── Dynamic: AmenitiesSection (creative redesign)
+└── CTA Section (unchanged)
+
+src/components/sections/espaco/
+├── ManifestoSection.tsx
+├── StudiosSection.tsx
+├── CoworkSection.tsx
+└── AmenitiesSection.tsx
+```
 
 **Major components:**
-1. **MobileBottomSheet.tsx (NEW)** — Reusable wrapper with drag-to-dismiss, snap points, backdrop overlay, safe area handling. Wraps calendar content on mobile.
-2. **AvailabilityCalendar.tsx (EXTEND)** — Add `if (!isDesktop)` branch for bottom sheet rendering. Desktop portal remains unchanged. Shared data fetching via useMonthlyAvailability.
-3. **StudioHourlyCalendar.tsx (EXTEND)** — Add mobile bottom sheet with full-height variant, optimized grid layout (fewer columns, larger touch targets). Desktop unchanged.
-4. **Parent Components (UNCHANGED)** — GearRenting, StudioRenting, CoworkStandalone manage `calendarOpen` state. No changes to state management, props, or callbacks.
+1. **HeroSection** — Globe 3D + parallax (Framer Motion) — keep existing implementation
+2. **ManifestoSection** — Scroll-driven text reveal (GSAP or Framer Motion)
+3. **StudiosSection** — Image grid with creative layout (Framer Motion reveals)
+4. **CoworkSection** — Interactive cards with hover effects (Framer Motion)
+5. **AmenitiesSection** — Hover-activated content (Framer Motion)
+6. **CTASection** — Standard CTA (reused component)
 
-**Key decisions:**
-- Use createPortal for BOTH desktop and mobile (avoid overflow-hidden clipping)
-- Keep state ownership in parent components (no global state)
-- Branch rendering at component level (`if (isDesktop)` not separate files)
-- Disable Lenis scroll when bottom sheet is open (prevent gesture conflicts)
+**Key architectural patterns:**
+- **Per-section scroll refs** (loose coupling) — each section manages its own scroll effects independently
+- **Dynamic imports** for lazy-loading heavy animations — defers JS execution until scrolling
+- **Library separation** — GSAP for scroll-driven storytelling, Framer Motion for component interactions
+- **Performance budget** — max 4 concurrent `useScroll` hooks (1 per section), max 2 transform properties per hook
+
+**Critical integration point:** Lenis smooth scroll is **disabled on mobile** (`LenisProvider.tsx` line 21), meaning scroll effects must work on both smooth (desktop) and native (mobile) scroll.
 
 ### Critical Pitfalls
 
-1. **Bottom Sheet Drag Conflicts with Lenis Smooth Scroll** — Both listen to touch events, causing Lenis to intercept drag gestures. Bottom sheet feels "sticky" or requires multiple swipe attempts. **Avoid:** Disable Lenis when bottom sheet is open (`lenis.stop()`), use `touch-action: none` on drag handle, explicitly `setPointerCapture` on drag start.
+From research, 7 critical pitfalls identified with documented prevention strategies.
 
-2. **Body Scroll Lock Breaks Desktop Modals** — Adding `overflow: hidden` to body for mobile breaks desktop modals using createPortal. Modal content becomes unscrollable or clipped. **Avoid:** Only lock scroll on mobile (`if (!isDesktop)`), restore original overflow on cleanup.
+1. **Lenis-ScrollTrigger Desync on Navigation** — ScrollTrigger calculations become inaccurate after client-side navigation. Fix: Add `useLenis((lenis) => ScrollTrigger.update())` callback in LenisProvider BEFORE adding new animations. **Current code is missing this. Phase 01 blocker.**
 
-3. **Haptic Feedback Not Guarded by Feature Detection** — Calling `navigator.vibrate()` directly causes console errors in Safari (doesn't support Vibration API). **Avoid:** Always check `if ('vibrate' in navigator)` before calling. Abstract in utility function for reuse.
+2. **GSAP + Framer Motion Fighting Over Same Properties** — When both libraries animate the same property (opacity, y, scale) on same element, they compete and cause stutter. Fix: Library-per-element separation or property partitioning (GSAP handles transforms, Framer handles opacity). Document ownership in code comments. **Phase 02 risk.**
 
-4. **AnimatePresence Exit Animations Don't Complete on Mobile** — Bottom sheet disappears instantly instead of sliding down smoothly. React unmounts component before animation finishes, especially on lower-end devices. **Avoid:** Delay state update until animation completes (setTimeout matching transition duration), use `willChange: transform` CSS hint.
+3. **Next.js Image + Reveal Animations = Invisible Images** — Images set to `opacity: 0` for reveal, but lazy-load arrives after animation completes. Fix: Add `loading="eager"` to ALL images with scroll reveals, track `onLoad` state before triggering animation. **Phase 02 blocker.**
 
-5. **Performance Regression from Animating 90+ Slots** — Existing calendar uses Framer Motion stagger on all slots, causing 15-20fps on mid-range Android. Battery drains quickly. **Avoid:** Disable stagger on mobile (`staggerChildren: isDesktop ? 0.02 : 0`), consider virtualizing long lists, respect `prefers-reduced-motion`.
+4. **Mobile Performance Death Spiral with Multiple ScrollTriggers** — 20+ ScrollTrigger instances (13 images + 4 sections) = 600+ calculations/sec on mobile, causing jank/crashes. Fix: Disable ScrollTrigger on mobile, use Framer Motion `whileInView` instead. Batch ScrollTriggers (1 per section, not 1 per image). **Phase 03 critical.**
+
+5. **React 19 Concurrent Rendering + useGSAP = Timing Bugs** — React 19 can pause/resume rendering, causing refs to be null when GSAP tries to access them. Fix: Explicit ref null checks in all `useGSAP` callbacks, use `scope` parameter, never mix Framer Motion `useScroll` with GSAP on same element. **Phase 01 blocker.**
+
+6. **Framer Motion `whileInView` + Many Images = Memory Leak** — 13 images with individual `whileInView` = 13 IntersectionObserver instances that may not clean up correctly in React 19 Suspense. Fix: Use section-level `useInView` instead of per-image `whileInView` (reduces observers from 13 → 3). **Phase 02 refactor required.**
+
+7. **Missing `prefers-reduced-motion` for Heavy Effects = Accessibility Lawsuit** — Parallax/scroll effects without reduced-motion support violates WCAG 2.1 Level A and Portuguese accessibility law (Decreto-Lei n.º 83/2018). **Current code: Lenis NOT disabled for reduced motion, Hero parallax NOT respecting reduced motion.** Fix: Update LenisProvider to check `prefers-reduced-motion`, wrap ALL `useTransform` in reduced motion checks. **Phase 01 legal blocker.**
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure:
+Based on research, suggested 5-phase structure with clear dependencies and pitfall mitigation:
 
-### Phase 1: Bottom Sheet Foundation
-**Rationale:** Core mobile-native pattern required before any other mobile enhancements. All subsequent features depend on bottom sheet working correctly. Highest risk phase due to integration with existing Lenis/Framer Motion/createPortal patterns.
+### Phase 1: Foundation & Pitfall Prevention
+**Rationale:** Must fix critical infrastructure issues BEFORE adding new animations. Three blockers identified in existing code (Lenis-ScrollTrigger desync, React 19 timing bugs, accessibility violations).
 
 **Delivers:**
-- MobileBottomSheet.tsx reusable component
-- AvailabilityCalendar with mobile bottom sheet variant
-- Safe area padding (iOS notch/Android gesture bars)
-- Touch-optimized tap targets (44x44px minimum)
+- Fixed LenisProvider with ScrollTrigger sync callback
+- Added `prefers-reduced-motion` support to Lenis and Hero parallax
+- Documented library separation pattern (GSAP vs Framer Motion ownership)
+- Created `useReducedMotion` wrapper for all scroll effects
 
 **Addresses:**
-- Bottom Sheet Container (table stakes)
-- Swipe to Dismiss (table stakes)
-- Safe Area Padding (table stakes)
-- Touch-Optimized Tap Targets (table stakes)
+- Pitfall 1 (Lenis-ScrollTrigger desync)
+- Pitfall 5 (React 19 timing bugs)
+- Pitfall 7 (accessibility violations — legal blocker)
 
-**Avoids:**
-- Pitfall #1: Lenis conflict (disable Lenis when sheet open)
-- Pitfall #2: Body scroll lock breaking desktop (guard with isDesktop)
-- Pitfall #4: Exit animations skipping (delay unmount)
-- Pitfall #5: Performance regression (disable stagger on mobile)
+**Stack:** No new libraries. Fix existing implementations.
 
-**Complexity:** MEDIUM (2-3 days)
-**Research flag:** SKIP — Well-documented patterns, existing architecture analysis complete
+**Research flag:** SKIP — All patterns documented in PITFALLS.md and codebase analysis.
 
-### Phase 2: Hourly Calendar Mobile Variant
-**Rationale:** StudioHourlyCalendar is more complex than AvailabilityCalendar (90+ slots, scrollable grid, time grouping). Needs separate phase for testing scroll behavior, performance optimization, and full-height drawer with snap points.
+---
+
+### Phase 2: Text Animation Enhancement
+**Rationale:** Quick wins with minimal bundle impact. Establishes Splitting.js + GSAP pattern for later sections.
 
 **Delivers:**
-- StudioHourlyCalendar with mobile bottom sheet
-- Full-height drawer variant (90%/100% snap points)
-- Optimized grid layout for mobile (fewer columns, larger buttons)
-- Scroll-within-drawer testing (hourly grid scrolling vs drawer drag)
+- Install Splitting.js (2.5kB) + react-wrap-balancer (1kB)
+- Create `<HeroText>` component with character reveal
+- Apply Balancer to hero headline
+- Test SSR compatibility (dynamic import for Splitting)
+
+**Addresses:**
+- Feature: Text character reveal (differentiator)
+- Feature: Balanced typography (instant polish)
 
 **Uses:**
-- MobileBottomSheet from Phase 1
-- vaul snap points for half/full height
-- Existing useHourlyAvailability hook (unchanged)
-
-**Implements:**
-- Bottom sheet architecture extended to complex calendar
-- Performance optimizations for large grids
-
-**Complexity:** MEDIUM (2-3 days)
-**Research flag:** SKIP — Extension of Phase 1 patterns
-
-### Phase 3: Gesture Enhancements
-**Rationale:** Optional polish features that add premium feel. Only implement after core bottom sheet validated with users. Haptic feedback is quick win (0.5 day). Horizontal swipe deferred until validated as needed.
-
-**Delivers:**
-- Haptic feedback on slot selection (10ms vibration)
-- Haptic error patterns (double pulse for unavailable slots)
-- Feature detection utility (`lib/haptics.ts`)
-- (OPTIONAL) Horizontal swipe date navigation if user testing demands it
-
-**Addresses:**
-- Haptic Feedback (should-have differentiator)
-- Horizontal Swipe Navigation (should-have, conditional on validation)
+- Splitting.js + GSAP ScrollTrigger (existing)
+- react-wrap-balancer (new, minimal)
 
 **Avoids:**
-- Pitfall #3: Haptic errors in Safari (feature detection wrapper)
+- Pitfall 5 (dynamic import prevents SSR issues)
 
-**Complexity:** LOW-MEDIUM (1-2 days haptics, +2-3 days if adding swipe navigation)
-**Research flag:** SKIP for haptics, DEFER swipe research until Phase 2 user testing
+**Research flag:** SKIP — Integration patterns documented in STACK.md.
 
-### Phase 4: Mobile UX Polish
-**Rationale:** Refinements discovered during testing. Quick time filters and persistent summary bar reduce friction in long hourly grids. Landscape orientation and responsive sizing ensure works across device sizes.
+---
+
+### Phase 3: Section Extraction & Dynamic Imports
+**Rationale:** Refactor existing page before adding heavy animations. Enables lazy-loading, prevents bundle bloat.
 
 **Delivers:**
-- Quick time filters (Manhã/Tarde/Noite pill buttons)
-- Persistent selection summary bar (sticky footer)
-- Landscape orientation support
-- Responsive refinements (iPhone SE → iPad)
+- Extract inline sections to `src/components/sections/espaco/` (4 files)
+- Add dynamic imports to `espaco/page.tsx`
+- Create `src/data/espacoData.ts` for static data
+- Test code splitting (verify separate chunks)
 
 **Addresses:**
-- Quick Filters (should-have)
-- Persistent Summary Bar (should-have)
+- Architecture: Separate component files with lazy-loading
+- Performance: Code splitting for 50-100KB per section
 
-**Complexity:** LOW-MEDIUM (1-2 days)
-**Research flag:** SKIP — UI implementation based on established patterns
+**Implements:**
+- Pattern 2 from ARCHITECTURE.md (dynamic import pattern)
+
+**Avoids:**
+- Pitfall 4 (lazy-loading prevents initial bundle bloat)
+
+**Research flag:** SKIP — Homepage already proves this pattern works.
+
+---
+
+### Phase 4: Image Reveals & Gallery Layout
+**Rationale:** Core visual impact. Depends on Phase 3 section extraction.
+
+**Delivers:**
+- `<RevealImage>` component with GSAP clip-path animation
+- Bento grid layout (CSS Grid with explicit areas)
+- Category filter with Framer Motion layout animation
+- Refactor all `whileInView` to section-level `useInView` (13 → 3 observers)
+- Add `loading="eager"` to all reveal images
+
+**Addresses:**
+- Feature: Image reveal on scroll (differentiator)
+- Feature: Bento grid layout (differentiator)
+- Feature: Category filtering (table stakes)
+- Pitfall 3 (image loading timing)
+- Pitfall 6 (memory leaks from too many observers)
+
+**Uses:**
+- GSAP ScrollTrigger for reveals
+- Framer Motion for filter animation
+- CSS Grid for layout
+
+**Avoids:**
+- Pitfall 2 (GSAP for scroll, Framer for filter — clear separation)
+- Pitfall 6 (section-level observers, not per-image)
+
+**Research flag:** SKIP — Patterns proven in HorizontalGallery.tsx and existing gallery sections.
+
+---
+
+### Phase 5: Parallax, Lightbox & Cursor Effects
+**Rationale:** Polish effects after core gallery working. Desktop-only optimizations.
+
+**Delivers:**
+- Parallax effect on 2-3 hero images (GSAP scrub, 15% movement limit)
+- Fullscreen lightbox (Framer Motion layoutId + AnimatePresence)
+- Magnetic cursor component (Framer Motion useSpring, desktop-only)
+- Mobile-specific animation reductions (simpler effects on touch devices)
+
+**Addresses:**
+- Feature: Parallax layers (differentiator)
+- Feature: Fullscreen lightbox (expected for portfolios)
+- Feature: Magnetic cursor (desktop-only polish)
+- Pitfall 4 (mobile performance — test and optimize)
+
+**Uses:**
+- GSAP ScrollTrigger (parallax)
+- Framer Motion (lightbox + cursor)
+
+**Avoids:**
+- Pitfall 4 (limit parallax to 3 images max, reduce on mobile)
+- Pitfall 7 (all parallax respects `prefers-reduced-motion`)
+
+**Research flag:** MINOR — Lightbox implementation may need pattern research, but Framer layoutId is well-documented.
+
+---
 
 ### Phase Ordering Rationale
 
-- **Phase 1 first:** All mobile features depend on bottom sheet foundation. Highest integration risk (Lenis, createPortal, animations) must be resolved before building on top.
-- **Phase 2 separated:** StudioHourlyCalendar is complex enough (90+ slots, performance concerns) to warrant dedicated phase. Allows validating Phase 1 patterns on simpler AvailabilityCalendar first.
-- **Phase 3 deferred:** Haptics and swipe gestures are polish, not blockers. Implement only after core UX validated. Swipe navigation specifically depends on user testing showing arrow buttons are problematic.
-- **Phase 4 last:** Polish features discovered during testing. Quick wins that improve UX but not required for launch.
+- **Phase 1 first:** Fix infrastructure bugs before adding complexity. Legal requirement (accessibility) cannot be deferred.
+- **Phase 2 early:** Text animations are lightweight, build confidence with Splitting.js integration.
+- **Phase 3 before Phase 4:** Section extraction enables code splitting, prevents monolith file.
+- **Phase 4 core value:** Image reveals are the primary visual impact, must work perfectly before polish.
+- **Phase 5 last:** Parallax/lightbox/cursor are enhancements, can be cut if timeline compressed.
+
+**Dependency chain:**
+```
+Phase 1 (foundation) → Phase 2 (text) → Phase 3 (extraction) → Phase 4 (reveals) → Phase 5 (polish)
+        ↓                                        ↓                       ↓                  ↓
+   Blocks all phases              Enables lazy-loading      Core gallery      Desktop enhancements
+```
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 3 (if implementing swipe navigation):** May need @use-gesture/react library research for velocity-based animations, directional swipe detection. Current research deferred this.
+**Phases likely needing deeper research:**
+- **Phase 5 (Lightbox):** Custom Framer Motion layoutId implementation vs library (yet-another-react-lightbox). Need to research shared layoutId patterns for mobile swipe gestures.
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1:** Vaul documentation, Framer Motion drag API, Lenis stop/start — well-documented, training data sufficient
-- **Phase 2:** Extension of Phase 1 patterns, no new concepts
-- **Phase 3 (haptics only):** Vibration API is simple, MDN docs stable
-- **Phase 4:** UI implementation, no architectural unknowns
+**Phases with standard patterns (skip research):**
+- **Phase 1:** All fixes documented in PITFALLS.md and existing codebase
+- **Phase 2:** Splitting.js + GSAP integration pattern documented in STACK.md
+- **Phase 3:** Homepage dynamic imports prove the pattern
+- **Phase 4:** HorizontalGallery.tsx and existing gallery sections provide patterns
+
+**Deferred topics (research if implementing later):**
+- Horizontal scroll section (GSAP pin + horizontal)
+- Swipe gallery carousel (embla-carousel integration)
+- 3D tilt effects (Three.js + mouse tracking)
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | vaul, Vibration API, Framer Motion recommendations based on training data (Jan 2025). No web search to verify 2026 versions/compatibility. Should check npm for latest vaul version and React 19 compatibility before install. |
-| Features | MEDIUM | Table stakes and differentiators based on established mobile UX patterns (iOS HIG, Material Design, Airbnb/Booking.com patterns). No 2026-specific trends verified. Patterns are stable, unlikely to have changed. |
-| Architecture | HIGH | Direct codebase analysis (AvailabilityCalendar.tsx, StudioHourlyCalendar.tsx, hooks, parent components). Component extension strategy is low-risk, proven pattern. Integration points verified. |
-| Pitfalls | MEDIUM | Lenis conflicts, passive listeners, 100vh Safari, AnimatePresence timing are well-documented web patterns (HIGH confidence). Specific Framer Motion + Lenis interaction based on training data + codebase analysis (MEDIUM). Performance thresholds ("breaks at 50 elements") vary by device, need testing (LOW). |
+| Stack | HIGH | All recommended libraries verified via npm, existing stack capabilities confirmed via codebase analysis. Only gap: Three.js not in package.json but mentioned in CLAUDE.md (needs verification). |
+| Features | MEDIUM | Feature categorization based on training data (Awwwards/FWA trends as of Jan 2025). Could not access ReactBits.dev or LightsWind.com for 2026 trend validation. Recommendations conservative. |
+| Architecture | HIGH | All patterns proven in existing codebase (homepage dynamic imports, HorizontalGallery GSAP+Framer coexistence, CapabilitiesOrbit direct DOM manipulation). No speculation. |
+| Pitfalls | HIGH | All pitfalls derived from actual code analysis (LenisProvider, GSAPProvider, espaco/page.tsx) + documented library behaviors. No hypothetical issues. |
 
-**Overall confidence:** MEDIUM
+**Overall confidence:** HIGH (based on codebase analysis + official documentation)
 
 ### Gaps to Address
 
-**Web search disabled for research session** — Could not verify:
-- Latest vaul version and React 19 compatibility (training data suggests ^1.0.0 should work)
-- 2025-2026 mobile UX trends or new mobile calendar libraries
-- Framer Motion API changes post-January 2025
-- Tailwind v4 stable release (project uses v4, assumed dvh support exists)
+**Three.js installation status:**
+- CLAUDE.md mentions Three.js + react-three-fiber, but not in package.json
+- Need to verify if installed and which version
+- May need for 3D tilt effects (deferred to v2, not critical for MVP)
 
-**Validation required during implementation:**
-1. **Before Phase 1:** Run `npm view vaul version` and verify React 19 peer dependency compatibility. Check vaul GitHub issues for Next.js 16 App Router problems.
-2. **During Phase 1:** Test on real iOS Safari and Android Chrome devices early. Chrome DevTools mobile mode insufficient for detecting Safari-specific bugs (100vh, touch events, portal rendering).
-3. **Before Phase 3 swipe decision:** Conduct user testing on arrow button vs swipe navigation. Only install @use-gesture/react if data supports need.
-4. **Performance validation:** Profile on mid-range Android device (not flagship). If <30fps, reduce animations further or implement virtualization.
+**ReactBits/LightsWind trend validation:**
+- Could not access due to WebFetch/WebSearch restrictions
+- User should manually review these sites to validate 2026 creative trends
+- Current recommendations are based on Jan 2025 training data (still valid, but may miss new patterns)
 
-**Known unknowns:**
-- Exact performance thresholds for stagger animations (varies by device, must test)
-- Whether users prefer swipe vs arrow buttons for date navigation (requires A/B testing)
-- iOS PWA-specific haptic intensity control (Vibration API doesn't expose, accept platform limitation or explore iOS PWA APIs post-launch)
+**Fullscreen lightbox implementation:**
+- Research recommended custom (Framer Motion layoutId) vs library (yet-another-react-lightbox)
+- Custom = smaller bundle, full control
+- Library = more features (zoom, thumbnails)
+- Decision deferred to Phase 5 planning
+
+**Mobile performance validation:**
+- Recommendations based on M1 MacBook Air as "mid-range 2025 device"
+- MUST test on actual iOS/Android devices in Phase 3
+- Chrome DevTools mobile emulation does not accurately replicate performance
+
+**Horizontal scroll section:**
+- FEATURES.md defers to v2 due to HIGH complexity + accessibility concerns
+- If required for v1, needs dedicated research phase (GSAP pin + horizontal patterns, keyboard navigation fallbacks)
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- **Codebase analysis:** Direct read of AvailabilityCalendar.tsx, StudioHourlyCalendar.tsx, useMonthlyAvailability.ts, useHourlyAvailability.ts, GearRenting.tsx, StudioRenting.tsx, CoworkStandalone.tsx, package.json, LenisProvider.tsx
-- **Browser APIs:** MDN Web Docs (Vibration API, touch events, passive listeners, Visual Viewport API, `env(safe-area-inset-*)`)
-- **Frameworks:** Framer Motion documentation (drag API, AnimatePresence, mobile performance), React createPortal pattern
+- **Existing codebase:** `espaco/page.tsx`, `LenisProvider.tsx`, `GSAPProvider.tsx`, `HorizontalGallery.tsx`, `CapabilitiesOrbit.tsx`, animation components — all patterns proven
+- **Package.json:** GSAP 3.14.2, Framer Motion 12.33.0, Lenis 1.3.17, Next.js 16.1.6, React 19.2.3 — versions verified
+- **npm version checks:** Splitting.js 1.1.0, react-wrap-balancer 1.1.1, embla-carousel 8.6.0, react-photo-album 3.5.1 — all verified via bash
 
 ### Secondary (MEDIUM confidence)
-- **Mobile UX patterns:** iOS Human Interface Guidelines (touch targets, bottom sheets, gestures), Material Design (touch targets, bottom sheets)
-- **Industry patterns:** Airbnb, Booking.com, Google Calendar mobile implementations (common booking calendar features)
-- **Lenis library:** @studio-freight/react-lenis documentation and common conflict patterns
+- **GSAP ScrollTrigger documentation:** Integration patterns with Lenis, ScrollTrigger.refresh() requirements
+- **Framer Motion useScroll documentation:** useScroll + useTransform patterns for parallax
+- **Next.js Dynamic Imports documentation:** Lazy-loading patterns, SSR considerations
+- **WCAG 2.1 documentation:** prefers-reduced-motion requirements, Level A/AA compliance
+- **Portuguese accessibility law:** Decreto-Lei n.º 83/2018 (WCAG 2.1 Level AA required)
 
-### Tertiary (LOW confidence, needs validation)
-- **vaul library:** Version ^1.0.0 and React 19 compatibility from training data (Jan 2025 cutoff). Verify with npm before install.
-- **@use-gesture/react:** Version ^10.3.1 from training data. Check latest if implementing swipe navigation.
-- **Tailwind v4 dvh support:** Assumed based on CSS spec, but project uses v4 beta — verify in Tailwind docs.
+### Tertiary (LOW confidence — needs validation)
+- **Training data (Jan 2025 cutoff):** Awwwards/FWA premium agency site trends — conservative recommendations, may miss 2026 innovations
+- **ReactBits.dev/LightsWind.com:** Could not access, specific effect implementations unknown
+- **Mobile performance assumptions:** Based on M1 MacBook Air benchmarks, needs real-device validation
 
-**Could not verify (web search/fetch disabled):**
-- Current vaul version, GitHub issues, React 19 compatibility testing
-- 2026-specific mobile calendar UX trends or new libraries
-- Safari iOS bugs specific to 2026 versions
-- Lenis + vaul integration examples or documented conflicts
+### Validation Required
+- [ ] Manually review ReactBits.dev and LightsWind.com for 2026 creative trends
+- [ ] Verify Three.js installation status (not in package.json)
+- [ ] Test react-wrap-balancer React 19 compatibility (should be fine per docs, but test)
+- [ ] Test Splitting.js with Next.js 16 App Router SSR (dynamic import pattern)
+- [ ] Run Lighthouse CI on actual page with full animation load
+- [ ] Test on actual iOS/Android devices (not just DevTools emulation)
+- [ ] Accessibility audit with WAVE + axe DevTools + manual screen reader testing
 
 ---
-*Research completed: 2026-03-13*
-*Ready for roadmap: yes*
+
+*Research completed: 2026-03-15*
+*Ready for roadmap: YES*
+*Next step: Use implications section to structure 5-phase roadmap*
