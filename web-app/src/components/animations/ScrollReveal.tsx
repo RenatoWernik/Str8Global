@@ -34,6 +34,8 @@ export function ScrollReveal({
     const containerRef = useRef<HTMLDivElement>(null);
     const prefersReducedMotion = useReducedMotion();
 
+    // React 19 concurrent safety: Explicit null check + scope parameter
+    // prevents crashes when refs are not yet mounted
     useGSAP(() => {
         if (prefersReducedMotion) return;
 
@@ -72,7 +74,10 @@ export function ScrollReveal({
         });
 
         return () => ctx.revert();
-    }, [scrollContainerRef, enableBlur, baseOpacity, baseRotation, blurStrength, rotationEnd, delay, prefersReducedMotion]);
+    }, {
+        dependencies: [scrollContainerRef, enableBlur, baseOpacity, baseRotation, blurStrength, rotationEnd, delay, prefersReducedMotion],
+        scope: containerRef
+    });
 
     if (prefersReducedMotion) {
         return (
