@@ -3,11 +3,11 @@
 ## Current Position
 
 - **Milestone**: v1.3 — Redesign Página Espaço
-- **Phase**: Phase 9 — Foundation & Pitfall Prevention (Plan 1/1 complete)
-- **Plan**: 09-01 complete
+- **Phase**: Phase 9 — Foundation & Pitfall Prevention (Plan 2/2 complete)
+- **Plan**: 09-02 complete
 - **Status**: Phase 9 complete, ready for Phase 10
 - **Progress**: ███░░░░░░░░░ 25% (milestone: 1/4 phases, project: 9/12 phases shipped)
-- **Last activity**: 2026-03-15 — Phase 9 Plan 01 executed
+- **Last activity**: 2026-03-15 — Phase 9 Plan 02 executed (React 19 safety + library separation)
 
 ## Project Reference
 
@@ -67,17 +67,20 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **SYNC-01 (Phase 9)**: Use useLenis callback for ScrollTrigger synchronization to prevent navigation desync
 - **ACCESS-01 (Phase 9)**: Disable Lenis completely when prefers-reduced-motion active for legal compliance
 - **PARALLAX-01 (Phase 9)**: Zero-movement parallax values (['0%', '0%']) when reduced motion enabled
+- **REACT19-01 (Phase 9)**: All useGSAP must use config object format with `scope: containerRef` parameter for React 19 concurrent safety
+- **LIBRARY-01 (Phase 9)**: Library ownership comments required in all animation components (documents WHY library chosen)
+- **GUIDE-01 (Phase 9)**: ANIMATION_LIBRARY_GUIDE.md is single source of truth for GSAP vs Framer Motion vs RAF decisions
 
 ### Critical Pitfalls (from research)
 
 **Phase 9 fixes (COMPLETED):**
 1. ✅ **Lenis-ScrollTrigger desync** — FIXED: Added `ScrollTrigger.update()` callback in LenisProvider (09-01)
-2. **React 19 timing bugs** — Deferred: useGSAP callbacks need explicit null checks on refs
+2. ✅ **React 19 timing bugs** — FIXED: All useGSAP callbacks use explicit null checks + scope parameter (09-02)
 3. ✅ **Accessibility violations** — FIXED: Lenis and Hero parallax now respect `prefers-reduced-motion` (09-01)
+4. ✅ **GSAP + Framer fighting** — FIXED: Library separation documented in ANIMATION_LIBRARY_GUIDE.md (09-02)
 
 **Later phases must avoid:**
-4. **Mobile performance death** — Limit ScrollTrigger instances, test on real devices
-5. **GSAP + Framer fighting** — Clear library-per-element separation
+5. **Mobile performance death** — Limit ScrollTrigger instances, test on real devices (see guide for budgets)
 6. **Image reveal timing** — Add `loading="eager"` to all scroll-revealed images
 7. **Memory leaks** — Section-level IntersectionObservers, not per-image
 
@@ -101,13 +104,14 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 8 | 08-01 | - | 7 | 2 | 2026-03-15 |
 | 8 | 08-02 | - | 6 | 1 | 2026-03-15 |
 | 9 | 09-01 | 2 min | 2 | 2 | 2026-03-15 |
+| 9 | 09-02 | 3 min | 4 | 5 | 2026-03-15 |
 
 ## Current Todos
 
 - [x] Fix LenisProvider with ScrollTrigger sync callback (INFRA-01) — Complete in 09-01
 - [x] Add `prefers-reduced-motion` support (INFRA-02, legal blocker) — Complete in 09-01
-- [ ] Add null checks to all useGSAP callbacks (INFRA-03) — Deferred to future plan
-- [ ] Document GSAP vs Framer Motion separation pattern (INFRA-04) — Deferred to future plan
+- [x] Add null checks to all useGSAP callbacks (INFRA-03) — Complete in 09-02
+- [x] Document GSAP vs Framer Motion separation pattern (INFRA-04) — Complete in 09-02
 - [ ] Execute Phase 10 (next phase in v1.3 milestone)
 
 ## Active Blockers
@@ -116,16 +120,17 @@ None — Phase 9 complete, ready to proceed to Phase 10.
 
 ## Session Continuity
 
-**Last session:** 2026-03-15 23:04 UTC
-**Stopped at:** Completed Phase 09 Plan 01 (Lenis-ScrollTrigger Sync & Accessibility)
+**Last session:** 2026-03-15 23:08 UTC
+**Stopped at:** Completed Phase 09 Plan 02 (React 19 Safety + Library Separation)
 
 **Next command:** `/gsd:plan-phase 10` or `/gsd:execute-phase 10` (if plan exists)
 
 **What to tell next Claude:**
-"Phase 9 (Foundation & Pitfall Prevention) completo. Fixed critical Lenis-ScrollTrigger desync e added WCAG compliance for prefers-reduced-motion. LenisProvider now syncs ScrollTrigger on every frame, Hero parallax is accessibility-compliant. Ready to proceed to Phase 10. See 09-01-SUMMARY.md for implementation details."
+"Phase 9 (Foundation & Pitfall Prevention) completo. Fixed all 4 critical infrastructure issues: (1) Lenis-ScrollTrigger sync, (2) accessibility compliance, (3) React 19 concurrent safety, (4) GSAP/Framer Motion separation. All useGSAP now use scope parameter + null checks. ANIMATION_LIBRARY_GUIDE.md created (295 lines) documenting library selection patterns. Ready to proceed to Phase 10. See 09-01-SUMMARY.md and 09-02-SUMMARY.md for details."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
 *Updated: 2026-03-13 (v1.2 started)*
 *Updated: 2026-03-15 (v1.2 shipped, v1.3 roadmap created)*
 *Updated: 2026-03-15 23:04 UTC (Phase 9 Plan 01 executed)*
+*Updated: 2026-03-15 23:08 UTC (Phase 9 Plan 02 executed — Phase 9 complete)*
