@@ -1,55 +1,59 @@
 # Requirements: Str8Global
 
-**Defined:** 2026-03-13
+**Defined:** 2026-03-15
 **Core Value:** Owners manage rentals from one dashboard; customers see availability instantly.
 
-## v1.2 Requirements
+## v1.3 Requirements
 
-### Bottom Sheet — Fundação Mobile
+Requirements for Espaço page creative redesign. Each maps to roadmap phases.
 
-- [ ] **SHEET-01**: Ao abrir calendário em mobile (<768px), aparece bottom sheet fullscreen com drag handle no topo
-- [ ] **SHEET-02**: Utilizador pode fechar o bottom sheet com swipe para baixo (velocity-based dismiss)
-- [ ] **SHEET-03**: Bottom sheet respeita safe areas do dispositivo (notch, home indicator)
-- [ ] **SHEET-04**: Bottom sheet tem snap points (meio e fullscreen) para controlo granular
-- [ ] **SHEET-05**: Abertura do bottom sheet pausa Lenis smooth scroll e bloqueia scroll do body
+### Fundação & Acessibilidade
 
-### Calendário Mensal Mobile — Equipamento & Cowork
+- [ ] **INFRA-01**: LenisProvider sincroniza com ScrollTrigger.update() em cada frame
+- [ ] **INFRA-02**: Todas as animações scroll respeitam prefers-reduced-motion (desactivam parallax, reveals simplificados)
+- [ ] **INFRA-03**: useGSAP callbacks têm null checks explícitos nos refs (React 19 concurrent safety)
+- [ ] **INFRA-04**: Separação documentada GSAP vs Framer Motion (GSAP = scroll storytelling, FM = component interactions)
 
-- [ ] **MCAL-01**: Grid de dias do mês dentro do bottom sheet com touch targets mínimos de 44x44px
-- [ ] **MCAL-02**: Swipe horizontal entre meses (esquerda = próximo, direita = anterior)
-- [ ] **MCAL-03**: Estados visuais claros: indisponível (strikethrough), hoje (accent dot), seleccionado (accent fill), passado (dimmed)
-- [ ] **MCAL-04**: Animação de transição spring entre meses ao navegar (swipe ou botões)
-- [ ] **MCAL-05**: Botão "Hoje" acessível na thumb-zone (parte inferior do sheet)
+### Animações de Texto
 
-### Calendário Horário Mobile — Estúdios
+- [ ] **TEXT-01**: Títulos das secções revelam-se character-by-character ao entrar no viewport (Splitting.js + GSAP)
+- [ ] **TEXT-02**: Texto do manifesto usa word-level stagger reveal ao fazer scroll
+- [ ] **TEXT-03**: Headlines usam react-wrap-balancer para tipografia equilibrada
+- [ ] **TEXT-04**: Animações de texto desactivam graciosamente com prefers-reduced-motion
 
-- [ ] **HCAL-01**: Slots horários agrupados por período (Manhã/Tarde/Noite) dentro do bottom sheet fullscreen
-- [ ] **HCAL-02**: Quick time filter pills (Manhã, Tarde, Noite) que fazem scroll automático para o período
-- [ ] **HCAL-03**: Swipe horizontal entre dias (esquerda = próximo dia, direita = dia anterior)
-- [ ] **HCAL-04**: Summary bar persistente no fundo do sheet mostrando data + hora seleccionada + CTA WhatsApp
-- [ ] **HCAL-05**: Touch targets mínimos de 44x44px em cada slot horário
+### Layout & Arquitectura
 
-### Interacção & Feedback
+- [ ] **ARCH-01**: Secções extraídas para componentes separados em src/components/sections/espaco/
+- [ ] **ARCH-02**: Dados estáticos (imagens, títulos) extraídos para src/data/espacoData.ts
+- [ ] **ARCH-03**: Secções carregadas via dynamic import com ssr: false para lazy-loading
+- [ ] **ARCH-04**: Cada secção gere o seu próprio scroll hook independentemente (loose coupling)
 
-- [ ] **TOUCH-01**: Haptic feedback (Vibration API) ao seleccionar data ou slot horário (com feature detection)
-- [ ] **TOUCH-02**: Tap feedback visual imediato (scale + glow) em todos os elementos interactivos
-- [ ] **TOUCH-03**: Animações spring physics em todas as transições mobile (open, close, navigate)
+### Galeria & Efeitos Visuais
 
-### Performance & Compatibilidade
+- [ ] **VFX-01**: Imagens revelam-se com clip-path animation ao entrar no viewport (GSAP ScrollTrigger)
+- [ ] **VFX-02**: Layout bento grid criativo para secção de estúdios (CSS Grid com áreas assimétricas)
+- [ ] **VFX-03**: Layout criativo não-convencional para secção de cowork (diferente do estúdios)
+- [ ] **VFX-04**: Secção de comodidades com layout e efeitos distintos das anteriores
+- [ ] **VFX-05**: Imagens usam loading="eager" quando dentro de scroll reveal effects
+- [ ] **VFX-06**: IntersectionObservers reduzidos de 13 para máximo 4 (1 por secção)
 
-- [ ] **PERF-01**: Sem frame drops visíveis em dispositivos Android mid-range ao animar bottom sheet
-- [ ] **PERF-02**: Desktop calendar code permanece 100% inalterado (zero regressões)
-- [ ] **PERF-03**: Funciona correctamente em Safari iOS e Chrome Android (browsers primários)
+### Polish & Interactividade
+
+- [ ] **POLISH-01**: Parallax em 2-3 imagens hero com GSAP scrub (máximo 15% de movimento)
+- [ ] **POLISH-02**: Lightbox fullscreen ao clicar numa imagem (Framer Motion layoutId + AnimatePresence)
+- [ ] **POLISH-03**: Magnetic cursor em elementos interactivos (desktop-only, Framer Motion useSpring)
+- [ ] **POLISH-04**: Mobile recebe versão simplificada dos efeitos (sem parallax pesado, sem cursor magnético)
+- [ ] **POLISH-05**: Performance mantém 60fps em dispositivo mid-range com CPU throttle 4x
 
 ## v2 Requirements
 
-### Melhorias Futuras Mobile
+### Melhorias Futuras Espaço
 
-- **FUT-01**: Mini calendar colapsado inline (preview sem abrir sheet)
-- **FUT-02**: Visual density heat maps (cores por ocupação)
-- **FUT-03**: Optimistic UI updates na selecção
-- **FUT-04**: Landscape mode optimizado
-- **FUT-05**: @use-gesture/react para gestos avançados (se validado em user testing)
+- **ESP-FUT-01**: Horizontal scroll section para estúdios (GSAP pin + horizontal)
+- **ESP-FUT-02**: Magnetic image hover com distortion effect
+- **ESP-FUT-03**: Gradient text animation nos títulos
+- **ESP-FUT-04**: Swipe gallery carousel (embla-carousel)
+- **ESP-FUT-05**: 3D tilt effects nas imagens (Three.js)
 
 ### Admin Dashboard (diferido de v1.1)
 
@@ -62,45 +66,51 @@
 
 | Feature | Reason |
 |---------|--------|
-| App nativa (iOS/Android) | Projecto é web-first, Next.js |
-| Widgets nativos do smartphone | Impossível em web app |
-| Notificações push ricas | Service Workers demasiado pesado para este caso |
-| Geolocalização | Irrelevante para selecção de datas/horas |
-| Modo offline | APIs de disponibilidade precisam de dados em tempo real |
-| Criação de eventos pelo utilizador | Calendários são só para visualizar disponibilidade + reservar via WhatsApp |
-| Alterações ao desktop | Versão desktop está aprovada e intocável |
+| Novas fotografias | Usar apenas as 13 existentes |
+| Alterações à Hero Section | Permanece 100% intacta (Globe 3D + título) |
+| Alterações ao CTA Section | Permanece actual |
+| Auto-playing video backgrounds | Heavy bandwidth, accessibility issues |
+| Infinite scroll | Só 13 fotos, previne acesso ao footer |
+| 3D WebGL scenes complexas | Over-engineered para portfolio |
+| Music/sound effects | Jarring, accessibility violation |
+| Cursor trail effects | Distracting, dated |
+| locomotive-scroll | Conflita com Lenis existente |
+| react-parallax | Outdated, conflita com GSAP |
+| Swiper | 50kB, conflita com Lenis |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHEET-01 | Phase 5 | Pending |
-| SHEET-02 | Phase 5 | Pending |
-| SHEET-03 | Phase 5 | Pending |
-| SHEET-04 | Phase 5 | Pending |
-| SHEET-05 | Phase 5 | Pending |
-| MCAL-01 | Phase 6 | Pending |
-| MCAL-02 | Phase 6 | Pending |
-| MCAL-03 | Phase 6 | Pending |
-| MCAL-04 | Phase 6 | Pending |
-| MCAL-05 | Phase 6 | Pending |
-| HCAL-01 | Phase 7 | Pending |
-| HCAL-02 | Phase 7 | Pending |
-| HCAL-03 | Phase 7 | Pending |
-| HCAL-04 | Phase 7 | Pending |
-| HCAL-05 | Phase 7 | Pending |
-| TOUCH-01 | Phase 8 | Pending |
-| TOUCH-02 | Phase 8 | Pending |
-| TOUCH-03 | Phase 8 | Pending |
-| PERF-01 | Phase 8 | Pending |
-| PERF-02 | Phase 5 | Pending |
-| PERF-03 | Phase 8 | Pending |
+| INFRA-01 | — | Pending |
+| INFRA-02 | — | Pending |
+| INFRA-03 | — | Pending |
+| INFRA-04 | — | Pending |
+| TEXT-01 | — | Pending |
+| TEXT-02 | — | Pending |
+| TEXT-03 | — | Pending |
+| TEXT-04 | — | Pending |
+| ARCH-01 | — | Pending |
+| ARCH-02 | — | Pending |
+| ARCH-03 | — | Pending |
+| ARCH-04 | — | Pending |
+| VFX-01 | — | Pending |
+| VFX-02 | — | Pending |
+| VFX-03 | — | Pending |
+| VFX-04 | — | Pending |
+| VFX-05 | — | Pending |
+| VFX-06 | — | Pending |
+| POLISH-01 | — | Pending |
+| POLISH-02 | — | Pending |
+| POLISH-03 | — | Pending |
+| POLISH-04 | — | Pending |
+| POLISH-05 | — | Pending |
 
 **Coverage:**
-- v1.2 requirements: 21 total
-- Mapped to phases: 21 ✓
-- Unmapped: 0
+- v1.3 requirements: 23 total
+- Mapped to phases: 0
+- Unmapped: 23 ⚠️
 
 ---
-*Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after roadmap mapping*
+*Requirements defined: 2026-03-15*
+*Last updated: 2026-03-15 after initial definition*
