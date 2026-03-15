@@ -82,35 +82,35 @@ Requirements for Espaço page creative redesign. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| TEXT-01 | — | Pending |
-| TEXT-02 | — | Pending |
-| TEXT-03 | — | Pending |
-| TEXT-04 | — | Pending |
-| ARCH-01 | — | Pending |
-| ARCH-02 | — | Pending |
-| ARCH-03 | — | Pending |
-| ARCH-04 | — | Pending |
-| VFX-01 | — | Pending |
-| VFX-02 | — | Pending |
-| VFX-03 | — | Pending |
-| VFX-04 | — | Pending |
-| VFX-05 | — | Pending |
-| VFX-06 | — | Pending |
-| POLISH-01 | — | Pending |
-| POLISH-02 | — | Pending |
-| POLISH-03 | — | Pending |
-| POLISH-04 | — | Pending |
-| POLISH-05 | — | Pending |
+| INFRA-01 | Phase 9 | Pending |
+| INFRA-02 | Phase 9 | Pending |
+| INFRA-03 | Phase 9 | Pending |
+| INFRA-04 | Phase 9 | Pending |
+| TEXT-01 | Phase 10 | Pending |
+| TEXT-02 | Phase 10 | Pending |
+| TEXT-03 | Phase 10 | Pending |
+| TEXT-04 | Phase 10 | Pending |
+| ARCH-01 | Phase 10 | Pending |
+| ARCH-02 | Phase 10 | Pending |
+| ARCH-03 | Phase 10 | Pending |
+| ARCH-04 | Phase 10 | Pending |
+| VFX-01 | Phase 11 | Pending |
+| VFX-02 | Phase 11 | Pending |
+| VFX-03 | Phase 11 | Pending |
+| VFX-04 | Phase 11 | Pending |
+| VFX-05 | Phase 11 | Pending |
+| VFX-06 | Phase 11 | Pending |
+| POLISH-01 | Phase 12 | Pending |
+| POLISH-02 | Phase 12 | Pending |
+| POLISH-03 | Phase 12 | Pending |
+| POLISH-04 | Phase 12 | Pending |
+| POLISH-05 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23/23 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-15*
-*Last updated: 2026-03-15 after initial definition*
+*Last updated: 2026-03-15 after roadmap creation (traceability updated)*
