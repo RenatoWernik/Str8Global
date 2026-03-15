@@ -82,10 +82,10 @@ Requirements for Espaço page creative redesign. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 9 | Pending |
-| INFRA-02 | Phase 9 | Pending |
-| INFRA-03 | Phase 9 | Pending |
-| INFRA-04 | Phase 9 | Pending |
+| INFRA-01 | Phase 9 | Complete |
+| INFRA-02 | Phase 9 | Complete |
+| INFRA-03 | Phase 9 | Complete |
+| INFRA-04 | Phase 9 | Complete |
 | TEXT-01 | Phase 10 | Pending |
 | TEXT-02 | Phase 10 | Pending |
 | TEXT-03 | Phase 10 | Pending |

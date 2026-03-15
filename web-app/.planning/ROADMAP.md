@@ -182,14 +182,14 @@ Plans:
 **Requirements:** 23 total (INFRA: 4, TEXT: 4, ARCH: 4, VFX: 6, POLISH: 5)
 **Research:** Complete (all patterns documented, skip research for all phases)
 
-- [ ] **Phase 9: Foundation & Pitfall Prevention** — Infrastructure fixes and accessibility (blocks all other phases)
+- [x] **Phase 9: Foundation & Pitfall Prevention** — Infrastructure fixes and accessibility (COMPLETE 2026-03-15)
 - [ ] **Phase 10: Text Animations & Section Extraction** — Character reveals, balanced typography, component architecture
 - [ ] **Phase 11: Visual Redesign & Image Effects** — Creative layouts, clip-path reveals, bento grids
 - [ ] **Phase 12: Polish & Interactivity** — Parallax, lightbox, magnetic cursor
 
 ---
 
-### Phase 9: Foundation & Pitfall Prevention
+### Phase 9: Foundation & Pitfall Prevention (COMPLETE 2026-03-15)
 
 **Goal:** Fix critical infrastructure bugs in the existing animation system before adding new effects. Ensure Lenis-ScrollTrigger sync, React 19 concurrent safety, and legal accessibility compliance.
 
@@ -200,8 +200,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — LenisProvider with ScrollTrigger sync + reduced motion support
-- [ ] 09-02-PLAN.md — React 19 null checks + GSAP vs Framer Motion documentation
+- [x] 09-01-PLAN.md — LenisProvider with ScrollTrigger sync + reduced motion support
+- [x] 09-02-PLAN.md — React 19 null checks + GSAP vs Framer Motion documentation
 
 **Success Criteria:**
 1. LenisProvider calls `ScrollTrigger.update()` on every Lenis scroll frame, preventing position desync after navigation
@@ -396,7 +396,7 @@ Phase 12 (Polish) ───── Desktop enhancements
 | 6. Cal Mensal Mobile | v1.2 | 2/2 | Complete | 2026-03-15 |
 | 7. Cal Horário Mobile | v1.2 | 2/2 | Complete | 2026-03-15 |
 | 8. Feedback & Performance | v1.2 | 2/2 | Complete | 2026-03-15 |
-| 9. Foundation & Pitfall Prevention | v1.3 | 0/2 | Not started | - |
+| 9. Foundation & Pitfall Prevention | v1.3 | 2/2 | Complete | 2026-03-15 |
 | 10. Text & Extraction | v1.3 | 0/3 | Not started | - |
 | 11. Visual Redesign | v1.3 | 0/4 | Not started | - |
 | 12. Polish & Interactivity | v1.3 | 0/3 | Not started | - |
