@@ -3,11 +3,11 @@
 ## Current Position
 
 - **Milestone**: v1.3 — Redesign Página Espaço
-- **Phase**: Phase 9 — Foundation & Pitfall Prevention (Plan 2/2 complete)
-- **Plan**: 09-02 complete
-- **Status**: Phase 9 complete, ready for Phase 10
-- **Progress**: ███░░░░░░░░░ 25% (milestone: 1/4 phases, project: 9/12 phases shipped)
-- **Last activity**: 2026-03-15 — Phase 9 Plan 02 executed (React 19 safety + library separation)
+- **Phase**: Phase 10 — Text Animations & Section Extraction (Plan 1/3 complete)
+- **Plan**: 10-01 complete
+- **Status**: Phase 10 in progress (1/3 plans complete)
+- **Progress**: ████░░░░░░░░ 33% (milestone: 1/4 phases complete, project: 10/12 phases shipped)
+- **Last activity**: 2026-03-16 — Phase 10 Plan 01 executed (animation components + data extraction)
 
 ## Project Reference
 
@@ -51,9 +51,14 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 **Existing components:**
 - `BlurText.tsx` — word-level blur-in animation
 - `RotatingText.tsx` — text rotation effect
+- `CharReveal.tsx` — character-by-character GSAP reveal (v1.3, Phase 10)
+- `BalancedHeadline.tsx` — react-wrap-balancer wrapper (v1.3, Phase 10)
 - `Masonry.tsx` — basic column distribution
 - `SpotlightCard.tsx` — cursor spotlight effect
 - `MobileBottomSheet.tsx` — vaul wrapper with snap points (v1.2)
+
+**Data files:**
+- `espacoData.ts` — all 13 photo paths + section content (v1.3, Phase 10)
 
 ### Decisions
 
@@ -70,6 +75,10 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **REACT19-01 (Phase 9)**: All useGSAP must use config object format with `scope: containerRef` parameter for React 19 concurrent safety
 - **LIBRARY-01 (Phase 9)**: Library ownership comments required in all animation components (documents WHY library chosen)
 - **GUIDE-01 (Phase 9)**: ANIMATION_LIBRARY_GUIDE.md is single source of truth for GSAP vs Framer Motion vs RAF decisions
+- **TEXT-01 (Phase 10)**: CharReveal uses dynamic import of Splitting.js to prevent SSR issues
+- **TEXT-02 (Phase 10)**: GSAP animations use native IntersectionObserver (useInView), not Framer Motion hooks
+- **TEXT-03 (Phase 10)**: DOM manipulation libraries require client-side execution only
+- **TEXT-04 (Phase 10)**: All text animations must show instantly when prefers-reduced-motion is active
 
 ### Critical Pitfalls (from research)
 
@@ -105,6 +114,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 8 | 08-02 | - | 6 | 1 | 2026-03-15 |
 | 9 | 09-01 | 2 min | 2 | 2 | 2026-03-15 |
 | 9 | 09-02 | 3 min | 4 | 5 | 2026-03-15 |
+| 10 | 10-01 | 4 min | 3 | 6 | 2026-03-16 |
 
 ## Current Todos
 
@@ -112,7 +122,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Add `prefers-reduced-motion` support (INFRA-02, legal blocker) — Complete in 09-01
 - [x] Add null checks to all useGSAP callbacks (INFRA-03) — Complete in 09-02
 - [x] Document GSAP vs Framer Motion separation pattern (INFRA-04) — Complete in 09-02
-- [ ] Execute Phase 10 (next phase in v1.3 milestone)
+- [x] Create text animation components + data extraction (TEXT-01) — Complete in 10-01
+- [ ] Extract Manifesto & Estudios sections (10-02)
+- [ ] Extract Cowork & Comodidades sections (10-03)
 
 ## Active Blockers
 
@@ -120,13 +132,13 @@ None — Phase 9 complete, ready to proceed to Phase 10.
 
 ## Session Continuity
 
-**Last session:** 2026-03-15 23:08 UTC
-**Stopped at:** Completed Phase 09 Plan 02 (React 19 Safety + Library Separation)
+**Last session:** 2026-03-16 09:08 UTC
+**Stopped at:** Completed Phase 10 Plan 01 (Text Animation Components & Data Extraction)
 
-**Next command:** `/gsd:plan-phase 10` or `/gsd:execute-phase 10` (if plan exists)
+**Next command:** `/gsd:execute-phase 10` (continue with Plan 02)
 
 **What to tell next Claude:**
-"Phase 9 (Foundation & Pitfall Prevention) completo. Fixed all 4 critical infrastructure issues: (1) Lenis-ScrollTrigger sync, (2) accessibility compliance, (3) React 19 concurrent safety, (4) GSAP/Framer Motion separation. All useGSAP now use scope parameter + null checks. ANIMATION_LIBRARY_GUIDE.md created (295 lines) documenting library selection patterns. Ready to proceed to Phase 10. See 09-01-SUMMARY.md and 09-02-SUMMARY.md for details."
+"Phase 10 Plan 01 completo. Created CharReveal component (GSAP character animation with Splitting.js), BalancedHeadline component (react-wrap-balancer wrapper), and espacoData.ts (all 13 photos + section content). Added TypeScript declarations for splitting library. All components respect prefers-reduced-motion. Ready for Plan 02 (Manifesto & Estudios section extraction). See 10-01-SUMMARY.md for details."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
@@ -134,3 +146,4 @@ None — Phase 9 complete, ready to proceed to Phase 10.
 *Updated: 2026-03-15 (v1.2 shipped, v1.3 roadmap created)*
 *Updated: 2026-03-15 23:04 UTC (Phase 9 Plan 01 executed)*
 *Updated: 2026-03-15 23:08 UTC (Phase 9 Plan 02 executed — Phase 9 complete)*
+*Updated: 2026-03-16 09:08 UTC (Phase 10 Plan 01 executed)*
