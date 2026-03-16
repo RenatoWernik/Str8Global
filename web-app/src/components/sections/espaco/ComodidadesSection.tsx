@@ -1,14 +1,17 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { CharReveal } from '@/components/animations/CharReveal';
 import { BalancedHeadline } from '@/components/animations/BalancedHeadline';
+import { RevealImage } from '@/components/animations/RevealImage';
+import { useSectionInView } from '@/hooks/useSectionInView';
 import { comodidadesImages, espacoContent } from '@/data/espacoData';
 
 export function ComodidadesSection() {
+  const { sectionRef, isInView } = useSectionInView();
+
   return (
-    <section className="relative py-24 px-6 bg-[#050505] z-20 border-t border-white/5">
+    <section ref={sectionRef} className="relative py-24 px-6 bg-[#050505] z-20 border-t border-white/5">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16 text-center">
           <CharReveal
@@ -21,35 +24,36 @@ export function ComodidadesSection() {
           </BalancedHeadline>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {comodidadesImages.map((img, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10%" }}
-              transition={{ duration: 0.6, delay: 0.2 * idx }}
-              className="group relative flex flex-col gap-4"
-            >
-              <div className="relative w-full aspect-square overflow-hidden rounded-2xl border border-white/10 bg-black/50">
-                <Image
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-3 md:gap-4">
+          {comodidadesImages.map((img, idx) => {
+            // Asymmetric column spans: 4-3-3 creates visual interest
+            const colSpan = idx === 0 ? 'md:col-span-4' : 'md:col-span-3';
+
+            // Curtain opening effect: left, up, right
+            const direction = idx === 0 ? 'left' : idx === 1 ? 'up' : 'right';
+
+            return (
+              <div key={idx} className={`group relative overflow-hidden rounded-2xl border border-white/10 ${colSpan}`}>
+                <RevealImage
                   src={img.src}
                   alt={img.title}
-                  fill
-                  className="object-cover transition-all duration-700 opacity-80 group-hover:opacity-100 group-hover:scale-105"
-                  loading="eager"
+                  isInView={isInView}
+                  delay={idx * 0.15}
+                  direction={direction}
+                  className="relative w-full aspect-[3/4]"
+                  imageClassName="transition-all duration-700 opacity-80 group-hover:opacity-100 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6 w-full">
-                  <h3 className="text-2xl font-semibold mb-2 text-white">{img.title}</h3>
+                <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">
+                  <h3 className="text-2xl md:text-3xl font-semibold mb-2 text-white">{img.title}</h3>
                   <div className="w-12 h-1 bg-[var(--color-accent)] transform origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100 mb-3" />
-                  <p className="text-white/70 text-sm leading-relaxed opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                  <p className="text-white/70 text-sm md:text-base leading-relaxed opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
                     {img.desc}
                   </p>
                 </div>
               </div>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
