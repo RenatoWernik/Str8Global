@@ -4,10 +4,10 @@
 
 - **Milestone**: v1.4 — Polish & Interactivity
 - **Phase**: Phase 12 — Polish Interactivity
-- **Plan**: 12-02 complete (12-01 also complete)
-- **Status**: Core polish components created (ParallaxImage + ImageLightbox + MagneticCursor)
-- **Progress**: ████████████ 33% (milestone: 2/6 plans complete)
-- **Last activity**: 2026-03-16 — Phase 12 Plans 01 & 02 executed
+- **Plan**: 12-03 complete (Phase 12 complete)
+- **Status**: Polish integration complete — all Espaço sections enhanced with parallax, lightbox, and magnetic cursor
+- **Progress**: ████████████████████ 50% (milestone: 3/6 plans complete)
+- **Last activity**: 2026-03-16 — Phase 12 Plan 03 executed (Phase 12 complete)
 
 ## Project Reference
 
@@ -103,6 +103,8 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **POLISH-05 (Phase 12)**: Parallax intensity capped at max 15% vertical movement to prevent motion sickness
 - **POLISH-06 (Phase 12)**: ImageLightbox uses Framer Motion layoutId for seamless origin-to-fullscreen morph transitions
 - **POLISH-04 (Phase 12)**: MagneticCursor disabled on mobile (<768px) and when prefers-reduced-motion active (renders children directly)
+- [Phase 12]: POLISH-07: Selective parallax application (2 hero images in Estudios only) prevents motion overload
+- [Phase 12]: POLISH-08: pointer-events-none on overlays prevents click blocking for lightbox triggers
 
 ### Critical Pitfalls (from research)
 
@@ -147,6 +149,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 11 | 11-04 | 2 min | 1 | 1 | 2026-03-16 |
 | 12 | 12-01 | 2 min | 2 | 2 | 2026-03-16 |
 | 12 | 12-02 | 1 min | 1 | 1 | 2026-03-16 |
+| 12 | 12-03 | 4.5 min | 3 | 3 | 2026-03-16 |
 
 ## Current Todos
 
@@ -163,20 +166,21 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Rewrite Comodidades section with creative layout (11-04) — Complete in 11-04
 - [x] Create ParallaxImage and ImageLightbox components (12-01) — Complete in 12-01
 - [x] Create MagneticCursor component with Framer Motion useSpring (12-02) — Complete in 12-02
+- [x] Integrate polish components into all Espaço sections (12-03) — Complete in 12-03
 
 ## Active Blockers
 
-None — Phase 12 Plans 01 & 02 complete! Core polish components ready for integration.
+None — Phase 12 complete! v1.4 Polish & Interactivity milestone ready for testing.
 
 ## Session Continuity
 
-**Last session:** 2026-03-16T13:06:43Z
-**Stopped at:** Completed Phase 12 Plan 01 (Core Polish Components: ParallaxImage + ImageLightbox)
+**Last session:** 2026-03-16T13:16:08.732Z
+**Stopped at:** Completed Phase 12 Plan 03 (Polish Integration) — Phase 12 complete, v1.4 ready for testing
 
-**Next steps:** Phase 12 Plan 03 — Integrate polish components into Espaço sections.
+**Next steps:** Continue with remaining Phase 12 plans (13-14-15) OR move to next milestone phase.
 
 **What to tell next Claude:**
-"Phase 12 Plan 01 completo (2 min, 2 tasks, 2 files). Created ParallaxImage (GSAP ScrollTrigger scrub parallax, max 15% movement, desktop-only) and ImageLightbox (Framer Motion layoutId morph transition with AnimatePresence). Both components respect prefers-reduced-motion (POLISH-04). ParallaxImage supports layoutId integration for seamless lightbox transitions. Components ready for integration into EstudiosSection, CoworkSection, and ComodidadesSection in Plan 12-03. See 12-01-SUMMARY.md for full details. Zero deviations from plan. Note: 12-02 (MagneticCursor) was completed earlier, so both 01 and 02 now complete."
+"Phase 12 completo (7.5 min total, 3 plans, 6 files created/modified). All polish effects integrated into Espaço sections: ParallaxImage on 2 Estudios hero images, ImageLightbox on all 13 images across 3 sections, MagneticCursor wrapping all containers. Selective parallax (hero images only) prevents motion overload. Mobile gets simplified experience (no parallax/magnetic, lightbox works). All effects respect prefers-reduced-motion per WCAG 2.1 Level AA. Build passes, TypeScript clean, IntersectionObserver count unchanged (3 total). See 12-03-SUMMARY.md for integration details. Zero deviations from plan. POLISH-07: Selective parallax application. POLISH-08: pointer-events-none on overlays for lightbox triggers. v1.4 milestone ready for testing."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
