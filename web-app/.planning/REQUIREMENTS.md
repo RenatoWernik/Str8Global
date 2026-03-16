@@ -100,11 +100,11 @@ Requirements for Espaço page creative redesign. Each maps to roadmap phases.
 | VFX-04 | Phase 11 | Complete |
 | VFX-05 | Phase 11 | Complete |
 | VFX-06 | Phase 11 | Complete |
-| POLISH-01 | Phase 12 | Pending |
-| POLISH-02 | Phase 12 | Pending |
-| POLISH-03 | Phase 12 | Pending |
-| POLISH-04 | Phase 12 | Pending |
-| POLISH-05 | Phase 12 | Pending |
+| POLISH-01 | Phase 12 | Complete |
+| POLISH-02 | Phase 12 | Complete |
+| POLISH-03 | Phase 12 | Complete |
+| POLISH-04 | Phase 12 | Complete |
+| POLISH-05 | Phase 12 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 23 total
@@ -113,4 +113,4 @@ Requirements for Espaço page creative redesign. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-03-15*
-*Last updated: 2026-03-15 after roadmap creation (traceability updated)*
+*Last updated: 2026-03-16 — v1.3 milestone complete (all 23 requirements satisfied)*

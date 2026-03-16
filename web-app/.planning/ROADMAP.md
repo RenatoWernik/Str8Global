@@ -4,7 +4,7 @@
 
 - v1.1 Calendários Públicos — Phases 1-4 (shipped 2026-03-10, Phase 4 deferred)
 - v1.2 Mobile-Native Calendar Experience — Phases 5-8 (shipped 2026-03-15)
-- v1.3 Redesign Página Espaço — Phases 9-12 (active)
+- v1.3 Redesign Página Espaço — Phases 9-12 (shipped 2026-03-16)
 
 ## Phases
 
@@ -185,7 +185,7 @@ Plans:
 - [x] **Phase 9: Foundation & Pitfall Prevention** — Infrastructure fixes and accessibility (COMPLETE 2026-03-15)
 - [x] **Phase 10: Text Animations & Section Extraction** — Character reveals, balanced typography, component architecture (COMPLETE 2026-03-16)
 - [x] **Phase 11: Visual Redesign & Image Effects** — Creative layouts, clip-path reveals, bento grids (COMPLETE 2026-03-16)
-- [ ] **Phase 12: Polish & Interactivity** — Parallax, lightbox, magnetic cursor
+- [x] **Phase 12: Polish & Interactivity** — Parallax, lightbox, magnetic cursor (COMPLETE 2026-03-16)
 
 ---
 
@@ -277,7 +277,7 @@ Plans:
 
 ---
 
-### Phase 12: Polish & Interactivity
+### Phase 12: Polish & Interactivity (COMPLETE 2026-03-16)
 
 **Goal:** Add desktop-only polish effects (parallax, fullscreen lightbox, magnetic cursor) with mobile-optimized alternatives. Validate 60fps performance on mid-range devices.
 
@@ -288,9 +288,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — ParallaxImage (GSAP scrub) + ImageLightbox (Framer AnimatePresence)
-- [ ] 12-02-PLAN.md — MagneticCursor component (Framer useSpring, desktop-only)
-- [ ] 12-03-PLAN.md — Integrate effects into 3 sections + mobile safety + build verification
+- [x] 12-01-PLAN.md — ParallaxImage (GSAP scrub) + ImageLightbox (Framer AnimatePresence)
+- [x] 12-02-PLAN.md — MagneticCursor component (Framer useSpring, desktop-only)
+- [x] 12-03-PLAN.md — Integrate effects into 3 sections + mobile safety + build verification
 
 **Success Criteria:**
 1. 2-3 hero images têm parallax subtil (máximo 15% movimento) em desktop, effect disabled em mobile
@@ -361,33 +361,33 @@ Phase 12 (Polish) ───── Desktop enhancements
 
 **v1.2 Coverage:** 21/21 requirements mapped ✓
 
-### v1.3 Requirements (ACTIVE)
+### v1.3 Requirements (COMPLETE)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 9 | Pending |
-| INFRA-02 | Phase 9 | Pending |
-| INFRA-03 | Phase 9 | Pending |
-| INFRA-04 | Phase 9 | Pending |
-| TEXT-01 | Phase 10 | Pending |
-| TEXT-02 | Phase 10 | Pending |
-| TEXT-03 | Phase 10 | Pending |
-| TEXT-04 | Phase 10 | Pending |
-| ARCH-01 | Phase 10 | Pending |
-| ARCH-02 | Phase 10 | Pending |
-| ARCH-03 | Phase 10 | Pending |
-| ARCH-04 | Phase 10 | Pending |
-| VFX-01 | Phase 11 | Pending |
-| VFX-02 | Phase 11 | Pending |
-| VFX-03 | Phase 11 | Pending |
-| VFX-04 | Phase 11 | Pending |
-| VFX-05 | Phase 11 | Pending |
-| VFX-06 | Phase 11 | Pending |
-| POLISH-01 | Phase 12 | Pending |
-| POLISH-02 | Phase 12 | Pending |
-| POLISH-03 | Phase 12 | Pending |
-| POLISH-04 | Phase 12 | Pending |
-| POLISH-05 | Phase 12 | Pending |
+| INFRA-01 | Phase 9 | Complete |
+| INFRA-02 | Phase 9 | Complete |
+| INFRA-03 | Phase 9 | Complete |
+| INFRA-04 | Phase 9 | Complete |
+| TEXT-01 | Phase 10 | Complete |
+| TEXT-02 | Phase 10 | Complete |
+| TEXT-03 | Phase 10 | Complete |
+| TEXT-04 | Phase 10 | Complete |
+| ARCH-01 | Phase 10 | Complete |
+| ARCH-02 | Phase 10 | Complete |
+| ARCH-03 | Phase 10 | Complete |
+| ARCH-04 | Phase 10 | Complete |
+| VFX-01 | Phase 11 | Complete |
+| VFX-02 | Phase 11 | Complete |
+| VFX-03 | Phase 11 | Complete |
+| VFX-04 | Phase 11 | Complete |
+| VFX-05 | Phase 11 | Complete |
+| VFX-06 | Phase 11 | Complete |
+| POLISH-01 | Phase 12 | Complete |
+| POLISH-02 | Phase 12 | Complete |
+| POLISH-03 | Phase 12 | Complete |
+| POLISH-04 | Phase 12 | Complete |
+| POLISH-05 | Phase 12 | Complete |
 
 **v1.3 Coverage:** 23/23 requirements mapped ✓
 
@@ -410,7 +410,7 @@ Phase 12 (Polish) ───── Desktop enhancements
 | 9. Foundation & Pitfall Prevention | v1.3 | 2/2 | Complete | 2026-03-15 |
 | 10. Text & Extraction | v1.3 | 3/3 | Complete | 2026-03-16 |
 | 11. Visual Redesign | v1.3 | 4/4 | Complete | 2026-03-16 |
-| 12. Polish & Interactivity | v1.3 | 0/3 | Planned | - |
+| 12. Polish & Interactivity | v1.3 | 3/3 | Complete | 2026-03-16 |
 
 ---
 *Roadmap created: 2026-03-10 (v1.1)*
