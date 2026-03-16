@@ -1,0 +1,47 @@
+
+> web-app@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.7s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/25) ...
+  Generating static pages using 11 workers (6/25) 
+  Generating static pages using 11 workers (12/25) 
+  Generating static pages using 11 workers (18/25) 
+✓ Generating static pages using 11 workers (25/25) in 386.0ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /aluguel
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/session
+├ ƒ /api/rental/availability
+├ ƒ /api/rental/availability/hourly
+├ ƒ /api/rental/availability/monthly
+├ ƒ /api/restricted/cowork-reservations
+├ ƒ /api/restricted/reservations
+├ ○ /cursos
+├ ○ /espaco
+├ ○ /portfolio
+├ ○ /restricted
+├ ○ /restricted/dashboard
+├ ○ /restricted/dashboard/analytics
+├ ○ /restricted/dashboard/calendario
+├ ○ /restricted/dashboard/clientes
+├ ○ /restricted/dashboard/reservas
+├ ○ /robots.txt
+├ ○ /servicos
+└ ○ /sitemap.xml
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

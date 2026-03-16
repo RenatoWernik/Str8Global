@@ -1,0 +1,263 @@
+
+> web-app@0.1.0 lint
+> eslint
+
+
+C:\Users\renat\Desktop\Str8Global\web-app\.vercel\output\functions\_global-error.rsc.func\___next_launcher.cjs
+  11:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  46:18  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Users\renat\Desktop\Str8Global\web-app\scripts\setup-sheet.ts
+   43:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\aluguel\page.tsx
+  14:20  warning  'isItemAvailable' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\layout.tsx
+  326:9  warning  `rel="preconnect"` is missing from Google Font. See: https://nextjs.org/docs/messages/google-font-preconnect  @next/next/google-font-preconnect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\analytics\page.tsx
+  10:5   warning  'Package' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  11:5   warning  'Video' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  69:21  error    Error: Cannot reassign variable after render completes
+
+Reassigning `cumulativePercent` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\analytics\page.tsx:69:21
+  67 |                     const dash = `${percent} ${100 - percent}`;
+  68 |                     const offset = -cumulativePercent + 25; // start from top
+> 69 |                     cumulativePercent += percent;
+     |                     ^^^^^^^^^^^^^^^^^ Cannot reassign `cumulativePercent` after render completes
+  70 |
+  71 |                     return (
+  72 |                         <motion.circle  react-hooks/immutability
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\calendario\page.tsx
+  73:43  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\calendario\page.tsx:73:43
+  71 |         }
+  72 |         return map;
+> 73 |     }, [reservations, coworkReservations, year, month, daysInMonth]);
+     |                                           ^^^^ This dependency may be modified later
+  74 |
+  75 |     const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  76 |     const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));                      react-hooks/preserve-manual-memoization
+  73:49  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\calendario\page.tsx:73:49
+  71 |         }
+  72 |         return map;
+> 73 |     }, [reservations, coworkReservations, year, month, daysInMonth]);
+     |                                                 ^^^^^ This dependency may be modified later
+  74 |
+  75 |     const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  76 |     const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));               react-hooks/preserve-manual-memoization
+  73:56  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\calendario\page.tsx:73:56
+  71 |         }
+  72 |         return map;
+> 73 |     }, [reservations, coworkReservations, year, month, daysInMonth]);
+     |                                                        ^^^^^^^^^^^ This dependency may be modified later
+  74 |
+  75 |     const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  76 |     const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));  react-hooks/preserve-manual-memoization
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\clientes\page.tsx
+  54:8  warning  React Hook useEffect has missing dependencies: 'fetchData' and 'supabase'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\page.tsx
+  332:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  382:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\app\restricted\dashboard\reservas\page.tsx
+  7:5  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\animations\CharReveal.tsx
+  91:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\animations\TextReveal.tsx
+  34:19  warning  'i' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\animations\TypewriterText.tsx
+  94:35  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\animations\TypewriterText.tsx:94:35
+  92 |             <span
+  93 |                 className="inline-block w-[3px] md:w-[5px] h-[0.9em] bg-[var(--color-accent)] align-middle ml-1 md:ml-2 -mt-1 md:-mt-2 transition-opacity duration-100"
+> 94 |                 style={{ opacity: cursorVisible && stateRef.current.started ? 1 : 0 }}
+     |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  95 |             />
+  96 |         </span>
+  97 |     );  react-hooks/refs
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\CapabilitiesOrbit.tsx
+    3:39  warning  'useCallback' is defined but never used                                                                    @typescript-eslint/no-unused-vars
+  105:8   warning  React Hook useEffect has a missing dependency: 'center'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\Hero.tsx
+  43:5  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\Hero.tsx:43:5
+  41 |     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  42 |     const onCompleteRef = useRef(onComplete);
+> 43 |     onCompleteRef.current = onComplete;
+     |     ^^^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  44 |
+  45 |     useEffect(() => {
+  46 |         const clear = () => {  react-hooks/refs
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\ResultsComparison.tsx
+  37:10  warning  'buildPath' is defined but never used      @typescript-eslint/no-unused-vars
+  41:10  warning  'buildAreaPath' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\portfolio\PortfolioShowcase.tsx
+  15:7   warning  'services' is assigned a value but only used as a type  @typescript-eslint/no-unused-vars
+  60:10  warning  'ServiceCard' is defined but never used                 @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\portfolio\PortfolioSplit.tsx
+  248:20  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\portfolio\PortfolioSplit.tsx:248:20
+  246 |       try {
+  247 |         const seen = localStorage.getItem('portfolio-tutorial-seen');
+> 248 |         if (!seen) setShowTutorial(true);
+      |                    ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  249 |       } catch {
+  250 |         setShowTutorial(true);
+  251 |       }  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\rental\CoworkStandalone.tsx
+  5:32  warning  'Users' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\sections\rental\CoworkStudio.tsx
+  167:3  warning  'loading' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\AvailabilityCalendar.tsx
+  69:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\AvailabilityCalendar.tsx:69:5
+  67 |   useEffect(() => {
+  68 |     const mq = window.matchMedia('(min-width: 768px)');
+> 69 |     setIsDesktop(mq.matches);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  70 |     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+  71 |     mq.addEventListener('change', handler);
+  72 |     return () => mq.removeEventListener('change', handler);  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\CoworkReservationFormModal.tsx
+  174:102  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\StudioHourlyCalendar.tsx
+  92:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\StudioHourlyCalendar.tsx:92:5
+  90 |   useEffect(() => {
+  91 |     const mq = window.matchMedia('(min-width: 768px)');
+> 92 |     setIsDesktop(mq.matches);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  93 |     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+  94 |     mq.addEventListener('change', handler);
+  95 |     return () => mq.removeEventListener('change', handler);  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\components\ui\globe.tsx
+    9:21  error    Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+   42:14  error    Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+   80:17  error    Unexpected any. Specify a different type                                                                                    @typescript-eslint/no-explicit-any
+  151:8   warning  React Hook useEffect has missing dependencies: 'config' and 'onRender'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\data\cursosData.ts
+  1:15  warning  'LucideIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useHourlyAvailability.ts
+  29:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useHourlyAvailability.ts:29:7
+  27 |     // Skip fetch if studioId or date is null
+  28 |     if (!studioId || !date) {
+> 29 |       setBlocks([]);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  30 |       setLoading(false);
+  31 |       setError(null);
+  32 |       return;  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useMonthlyAvailability.ts
+  24:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useMonthlyAvailability.ts:24:7
+  22 |     // If no ID provided, skip fetch and return empty set
+  23 |     if (!id) {
+> 24 |       setUnavailableDates(new Set());
+     |       ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |       setLoading(false);
+  26 |       setError(null);
+  27 |       return;  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useReducedMotion.ts
+  10:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\hooks\useReducedMotion.ts:10:9
+   8 |     useEffect(() => {
+   9 |         const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+> 10 |         setPrefersReducedMotion(mediaQuery.matches);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  11 |
+  12 |         const handleChange = (event: MediaQueryListEvent) => {
+  13 |             setPrefersReducedMotion(event.matches);  react-hooks/set-state-in-effect
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\providers\LenisProvider.tsx
+  74:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\renat\Desktop\Str8Global\web-app\src\types\splitting.d.ts
+  24:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 42 problems (25 errors, 17 warnings)
+
