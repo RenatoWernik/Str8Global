@@ -27,12 +27,23 @@ function isSameDay(a: Date, b: Date): boolean {
     a.getDate() === b.getDate();
 }
 
+function getSpotColor(occupied: number, total: number): string {
+  if (total === 0) return 'text-white/30';
+  const ratio = occupied / total;
+  if (ratio >= 1) return 'text-red-400';
+  if (ratio >= 0.75) return 'text-red-400/80';
+  if (ratio >= 0.5) return 'text-amber-400/80';
+  return 'text-emerald-400/80';
+}
+
 interface AvailabilityCalendarProps {
   itemId: string;                    // The item or plan ID
   itemType: 'item' | 'plan';        // Determines API param (item_id vs plan_id)
   selectedDate: string | null;       // Currently selected date "YYYY-MM-DD"
   onSelect: (date: string) => void;  // Callback when user picks a date
   onClose: () => void;               // Callback to close the calendar
+  showSpots?: boolean;               // Show spots indicator for cowork plans
+  totalSpots?: number;               // Total spots for the plan (used with showSpots)
 }
 
 export function AvailabilityCalendar({
@@ -41,6 +52,8 @@ export function AvailabilityCalendar({
   selectedDate,
   onSelect,
   onClose,
+  showSpots = false,
+  totalSpots,
 }: AvailabilityCalendarProps) {
   const [viewMonth, setViewMonth] = useState(() => {
     if (selectedDate) return new Date(selectedDate + 'T00:00:00');
@@ -61,7 +74,7 @@ export function AvailabilityCalendar({
   const viewMonthStr = `${viewMonth.getFullYear()}-${String(viewMonth.getMonth() + 1).padStart(2, '0')}`;
 
   // Fetch unavailable dates for current view month
-  const { unavailableDates, loading } = useMonthlyAvailability(itemId, itemType, viewMonthStr);
+  const { unavailableDates, spotsByDate, loading } = useMonthlyAvailability(itemId, itemType, viewMonthStr);
 
   // Detect desktop breakpoint (md: 768px)
   useEffect(() => {
@@ -135,10 +148,9 @@ export function AvailabilityCalendar({
       exit={{ opacity: 0, y: isDesktop ? 20 : -10, scale: 0.95 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       className={`
-        p-4 rounded-2xl bg-black/95 border border-white/10 backdrop-blur-xl
         ${isDesktop
-          ? 'w-[400px] p-6 shadow-2xl shadow-black/50'
-          : 'w-full'
+          ? 'w-[400px] p-6 rounded-2xl bg-black/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50'
+          : 'w-full pb-6'
         }
       `}
     >
@@ -153,6 +165,15 @@ export function AvailabilityCalendar({
           >
             <X size={18} />
           </button>
+        </div>
+      )}
+
+      {/* Spots legend (only for cowork plans with showSpots) */}
+      {showSpots && totalSpots && (
+        <div className="flex items-center gap-3 mb-3 px-1 text-[10px] uppercase tracking-wider text-white/30">
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400/80" /> Disponível</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400/80" /> A encher</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400/80" /> Quase cheio</span>
         </div>
       )}
 
@@ -206,13 +227,19 @@ export function AvailabilityCalendar({
           const isSelected = selected && isSameDay(day, selected);
           const isToday = isSameDay(day, today);
 
+          // Spots info for cowork
+          const spotInfo = showSpots ? spotsByDate.get(dateStr) : undefined;
+          const dayTotal = spotInfo?.total ?? totalSpots ?? 0;
+          const dayOccupied = spotInfo?.occupied ?? 0;
+          const hasSpotInfo = showSpots && !isPast && !isTooFar && dayTotal > 0;
+
           return (
             <button
               key={day.toISOString()}
               disabled={isDisabled}
               onClick={() => handleSelect(day)}
               className={`
-                relative w-full aspect-square flex items-center justify-center
+                relative w-full ${hasSpotInfo ? 'aspect-[1/1.15]' : 'aspect-square'} flex flex-col items-center justify-center
                 ${isDesktop ? 'text-base' : 'text-sm'} rounded-lg transition-all duration-200
                 ${isPast
                   ? 'text-white/15 cursor-not-allowed'
@@ -224,9 +251,14 @@ export function AvailabilityCalendar({
                 }
               `}
             >
-              {day.getDate()}
+              <span>{day.getDate()}</span>
+              {hasSpotInfo && !isSelected && (
+                <span className={`text-[8px] leading-none mt-0.5 font-medium ${getSpotColor(dayOccupied, dayTotal)}`}>
+                  {dayTotal - dayOccupied}/{dayTotal}
+                </span>
+              )}
               {isToday && !isSelected && (
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
+                <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
               )}
             </button>
           );

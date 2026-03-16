@@ -15,7 +15,8 @@ import {
 } from '@/data/rentalData';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { HighlightText } from '@/components/ui/HighlightText';
-import { RentalDatePicker } from '@/components/ui/RentalDatePicker';
+import { AvailabilityCalendar } from '@/components/ui/AvailabilityCalendar';
+import { Calendar, X } from 'lucide-react'; // Ensure valid icons using
 
 const MONTHS_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -60,65 +61,57 @@ export function CoworkStudio({ selectedDate, onDateChange, loading, getCoworkSpo
       <div className="hidden md:block absolute bottom-40 left-0 w-72 h-72 bg-purple-600 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Header */}
-        <ScrollReveal baseOpacity={0.3}>
-          <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
-            {rentalCopy.coworkStudio.label}
-          </span>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.1}>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <HighlightText text={rentalCopy.coworkStudio.title} />
-          </h2>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-8">
-            {rentalCopy.coworkStudio.subtitle}
-          </p>
-        </ScrollReveal>
+        {/* Header — z-10 ensures it stacks above Framer Motion animated cards */}
+        <div className="relative z-10">
+          <ScrollReveal baseOpacity={0.3}>
+            <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+              {rentalCopy.coworkStudio.label}
+            </span>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.1}>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+              <HighlightText text={rentalCopy.coworkStudio.title} />
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.2}>
+            <p className="text-white/70 text-lg max-w-xl mb-8">
+              {rentalCopy.coworkStudio.subtitle}
+            </p>
+          </ScrollReveal>
 
-        {/* Date picker */}
-        <div className="mb-12">
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
-            Verificar disponibilidade para:
-          </p>
-          <RentalDatePicker
-            selectedDate={selectedDate}
-            onDateChange={onDateChange}
-            loading={loading}
-          />
+          {/* Date picker removed from header - now inside cards */}
+
+          {/* Period toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex justify-center mb-16"
+          >
+            <div className="inline-flex bg-white/[0.04] border border-white/10 rounded-full p-1">
+              {periods.map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setActivePeriod(period)}
+                  className={`
+                    relative px-6 py-2.5 text-sm font-medium rounded-full transition-colors duration-300
+                    ${activePeriod === period ? 'text-black' : 'text-white/60 hover:text-white/80'}
+                  `}
+                >
+                  {activePeriod === period && (
+                    <motion.div
+                      layoutId="periodToggle"
+                      className="absolute inset-0 bg-[var(--color-accent)] rounded-full"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{periodLabels[period]}</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
         </div>
-
-        {/* Period toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center mb-16"
-        >
-          <div className="inline-flex bg-white/[0.04] border border-white/10 rounded-full p-1">
-            {periods.map((period) => (
-              <button
-                key={period}
-                onClick={() => setActivePeriod(period)}
-                className={`
-                  relative px-6 py-2.5 text-sm font-medium rounded-full transition-colors duration-300
-                  ${activePeriod === period ? 'text-black' : 'text-white/60 hover:text-white/80'}
-                `}
-              >
-                {activePeriod === period && (
-                  <motion.div
-                    layoutId="periodToggle"
-                    className="absolute inset-0 bg-[var(--color-accent)] rounded-full"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10">{periodLabels[period]}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
 
         {/* Plans grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -129,6 +122,7 @@ export function CoworkStudio({ selectedDate, onDateChange, loading, getCoworkSpo
               period={activePeriod}
               index={index}
               selectedDate={selectedDate}
+              onDateChange={onDateChange}
               loading={loading}
               {...(hasData && selectedDate
                 ? { spotsOccupied: getCoworkSpots(planIds[plan.name]).spotsOccupied, apiTotalSpots: getCoworkSpots(planIds[plan.name]).totalSpots }
@@ -169,6 +163,7 @@ function PlanCard({
   period,
   index,
   selectedDate,
+  onDateChange,
   loading,
   spotsOccupied,
   apiTotalSpots,
@@ -177,6 +172,7 @@ function PlanCard({
   period: CoworkStudioPeriod;
   index: number;
   selectedDate: string | null;
+  onDateChange: (date: string) => void;
   loading: boolean;
   spotsOccupied: number;
   apiTotalSpots?: number;
@@ -185,6 +181,8 @@ function PlanCard({
   const pricing = plan.pricing[period];
   const isFeatured = plan.featured;
   const totalSpots = apiTotalSpots ?? plan.totalSpots;
+
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const messageBody = selectedDate
     ? `Olá! Tenho interesse no plano Cowork + Estúdio "${plan.name}".\n\n` +
@@ -201,6 +199,7 @@ function PlanCard({
       className="group relative h-full"
     >
       <div
+        style={{ zIndex: calendarOpen ? 20 : 'auto' }}
         className={`
           relative h-full p-6 md:p-8 rounded-2xl overflow-hidden flex flex-col
           bg-gradient-to-br from-white/[0.04] to-transparent
@@ -260,6 +259,43 @@ function PlanCard({
               );
             })()
           )}
+
+          {/* Date selection inside card */}
+          <div className="mb-4 relative z-20">
+            <button
+              onClick={() => setCalendarOpen(!calendarOpen)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all w-full justify-center"
+            >
+              <Calendar size={16} className="text-[var(--color-accent)]" />
+              <span>{selectedDate ? formatDatePT(selectedDate) : 'Escolher data'}</span>
+              {selectedDate && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDateChange(''); // Clear selection by passing empty/null equivalent if handled by hook
+                  }}
+                  className="ml-auto p-1 hover:bg-white/10 rounded transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </button>
+
+            {calendarOpen && (
+              <AvailabilityCalendar
+                itemId={planIds[plan.name]}
+                itemType="plan"
+                selectedDate={selectedDate}
+                onSelect={(date) => {
+                  onDateChange(date);
+                  setCalendarOpen(false);
+                }}
+                onClose={() => setCalendarOpen(false)}
+                showSpots
+                totalSpots={plan.totalSpots}
+              />
+            )}
+          </div>
 
           {/* Plan name */}
           <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>

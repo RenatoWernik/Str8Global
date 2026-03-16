@@ -2,10 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react';
 
+export interface SpotInfo {
+  occupied: number;
+  total: number;
+}
+
 interface MonthlyAvailabilityResult {
   unavailableDates: Set<string>; // Set of "YYYY-MM-DD" strings for O(1) lookup
+  spotsByDate: Map<string, SpotInfo>; // Map of date → occupied/total (cowork plans only)
   loading: boolean;
   error: string | null;
+}
+
+interface ApiResponse {
+  unavailableDates: string[];
+  spotsByDate?: Record<string, { occupied: number; total: number }>;
 }
 
 export function useMonthlyAvailability(
@@ -14,6 +25,7 @@ export function useMonthlyAvailability(
   month: string             // "YYYY-MM" format
 ): MonthlyAvailabilityResult {
   const [unavailableDates, setUnavailableDates] = useState<Set<string>>(new Set());
+  const [spotsByDate, setSpotsByDate] = useState<Map<string, SpotInfo>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -22,6 +34,7 @@ export function useMonthlyAvailability(
     // If no ID provided, skip fetch and return empty set
     if (!id) {
       setUnavailableDates(new Set());
+      setSpotsByDate(new Map());
       setLoading(false);
       setError(null);
       return;
@@ -44,11 +57,22 @@ export function useMonthlyAvailability(
       fetch(url, { signal: controller.signal })
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch monthly availability');
-          return res.json() as Promise<{ unavailableDates: string[] }>;
+          return res.json() as Promise<ApiResponse>;
         })
         .then(json => {
           // Convert array to Set for O(1) lookup
           setUnavailableDates(new Set(json.unavailableDates));
+
+          // Convert spotsByDate object to Map (cowork plans only)
+          if (json.spotsByDate) {
+            const map = new Map<string, SpotInfo>();
+            for (const [date, info] of Object.entries(json.spotsByDate)) {
+              map.set(date, info);
+            }
+            setSpotsByDate(map);
+          } else {
+            setSpotsByDate(new Map());
+          }
         })
         .catch(err => {
           if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -56,6 +80,7 @@ export function useMonthlyAvailability(
           setError('Erro ao verificar disponibilidade mensal');
           // Graceful fallback: return empty set (everything available)
           setUnavailableDates(new Set());
+          setSpotsByDate(new Map());
         })
         .finally(() => {
           if (!controller.signal.aborted) {
@@ -72,6 +97,7 @@ export function useMonthlyAvailability(
 
   return {
     unavailableDates,
+    spotsByDate,
     loading,
     error,
   };

@@ -26,14 +26,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const unavailableDates = await getMonthlyAvailability({
+    const result = await getMonthlyAvailability({
       item_id: item_id || undefined,
       plan_id: plan_id || undefined,
       month,
     });
 
     return NextResponse.json(
-      { unavailableDates },
+      result,
       {
         headers: {
           'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error('Failed to fetch monthly availability:', error);
-    // Graceful fallback: return empty array (everything available)
+    // Graceful fallback: return empty (everything available)
     return NextResponse.json(
       { unavailableDates: [] },
       {

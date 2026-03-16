@@ -183,7 +183,7 @@ export const coworkStudioPlans: CoworkStudioPlan[] = [
   {
     name: 'Prime',
     description: 'Mesa conferência partilhada',
-    totalSpots: 6,
+    totalSpots: 4,
     image: '/images/studio/studio-01.jpg',
     pricing: {
       diaria: { price: 30, studioHours: '1h estúdio' },
@@ -229,7 +229,7 @@ export const coworkPlans: CoworkPlan[] = [
   {
     name: 'Prime',
     deskDescription: 'Mesa de conferência partilhada',
-    totalSpots: 6,
+    totalSpots: 4,
     image: '/images/studio/studio-04.jpg',
     pricing: { diaria: 15, semanal: 60, mensal: 150 },
     featured: true,

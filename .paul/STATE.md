@@ -1,53 +1,40 @@
-# Project State
-
-## Project Reference
-
-See: .paul/PROJECT.md (updated 2026-02-12)
-
-**Core value:** Marcas em Portugal conseguem encontrar e contratar uma agência criativa premium — e o site confirma isso através da qualidade, sofisticação e ser o oposto de genérico.
-**Current focus:** Phase 2 complete — ready for Phase 3
-
 ## Current Position
 
-Milestone: v0.1 Initial Release (v0.1.0)
-Phase: 2 of 7 (Rental Page Polish) — Complete
-Plan: 02-01 complete
-Status: Phase 2 done, ready for Phase 3 (Portfolio Individual)
-Last activity: 2026-02-12 — Rental page polished
+Milestone: v1.4 Lógica de Capacidade Cowork
+Phase: 1 of 1 (Cowork Capacity Logic) — ✅ Complete
+Plan: 01-01 complete
+Status: Milestone complete
+Last activity: 2026-03-16 — Phase 1 complete, transition executed
 
 Progress:
-- Milestone: [██░░░░░░░░] 28%
-- Phase 2: [██████████] 100%
+- Milestone: [██████████] 100%
+- Phase 1: [██████████] 100%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Phase 2 complete — ready for next PLAN]
+  ✓        ✓        ✓     [Loop complete — milestone finished]
 ```
 
 ## Accumulated Context
 
 ### Decisions
-- 7-phase roadmap defined
-- Navbar: Framer Motion layoutId, z-50, h-20
-- Rental sticky tabs: top-20 z-40 (below navbar)
-- All WhatsApp CTAs route to Marta by default
-- Gear images: Next.js Image with fill + responsive sizes
-
-### Deferred Issues
-None.
+- checkCoworkCapacity() returns worst-day info for date ranges
+- API backward-compatible: items get unavailableDates only, plans get spotsByDate too
+- COWORK_CAPACITY map built from rentalData (single source of truth)
 
 ### Blockers/Concerns
-None.
+- No automated tests for capacity validation (future milestone)
+- Capacity check at application level only (no DB constraint)
+
+### Deferred Issues
+None
 
 ## Session Continuity
 
-Last session: 2026-02-12
-Stopped at: Phase 2 complete
-Next action: /paul:plan for Phase 3 (Portfolio Individual)
+Last session: 2026-03-16
+Stopped at: Milestone v1.4 complete
+Next action: Start next milestone or pause
 Resume file: .paul/ROADMAP.md
-
----
-*STATE.md — Updated after every significant action*

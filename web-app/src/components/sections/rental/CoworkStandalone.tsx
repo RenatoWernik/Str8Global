@@ -44,65 +44,67 @@ export function CoworkStandalone() {
       <div className="hidden md:block absolute bottom-20 right-10 w-80 h-80 bg-purple-600 rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Header */}
-        <motion.span
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block"
-        >
-          {rentalCopy.cowork.label}
-        </motion.span>
-        <motion.h2
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
-        >
-          <HighlightText text={rentalCopy.cowork.title} />
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-white/70 text-lg max-w-xl mb-8"
-        >
-          {rentalCopy.cowork.subtitle}
-        </motion.p>
+        {/* Header — z-10 ensures it stacks above Framer Motion animated cards */}
+        <div className="relative z-10">
+          <motion.span
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block"
+          >
+            {rentalCopy.cowork.label}
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4"
+          >
+            <HighlightText text={rentalCopy.cowork.title} />
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-white/70 text-lg max-w-xl mb-8"
+          >
+            {rentalCopy.cowork.subtitle}
+          </motion.p>
 
-        {/* Period toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center mb-16"
-        >
-          <div className="inline-flex bg-white/[0.04] border border-white/10 rounded-full p-1">
-            {periods.map((period) => (
-              <button
-                key={period}
-                onClick={() => setActivePeriod(period)}
-                className={`
-                  relative px-6 py-2.5 text-sm font-medium rounded-full transition-colors duration-300
-                  ${activePeriod === period ? 'text-black' : 'text-white/60 hover:text-white/80'}
-                `}
-              >
-                {activePeriod === period && (
-                  <motion.div
-                    layoutId="coworkPeriodToggle"
-                    className="absolute inset-0 bg-[var(--color-accent)] rounded-full"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10">{periodLabels[period]}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
+          {/* Period toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex justify-center mb-16"
+          >
+            <div className="inline-flex bg-white/[0.04] border border-white/10 rounded-full p-1">
+              {periods.map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setActivePeriod(period)}
+                  className={`
+                    relative px-6 py-2.5 text-sm font-medium rounded-full transition-colors duration-300
+                    ${activePeriod === period ? 'text-black' : 'text-white/60 hover:text-white/80'}
+                  `}
+                >
+                  {activePeriod === period && (
+                    <motion.div
+                      layoutId="coworkPeriodToggle"
+                      className="absolute inset-0 bg-[var(--color-accent)] rounded-full"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{periodLabels[period]}</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
 
         {/* Plans grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -169,7 +171,7 @@ function CoworkCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className={`group relative h-full ${calendarOpen ? 'z-20' : 'z-0'}`}
+      className="group relative h-full"
     >
       <div
         className={`
@@ -262,6 +264,8 @@ function CoworkCard({
                 selectedDate={selectedDate}
                 onSelect={setSelectedDate}
                 onClose={() => setCalendarOpen(false)}
+                showSpots
+                totalSpots={plan.totalSpots}
               />
             )}
           </div>

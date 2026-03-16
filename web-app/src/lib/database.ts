@@ -205,8 +205,92 @@ export async function getCoworkReservations(filters?: {
     return (data || []) as CoworkReservation[];
 }
 
+/**
+ * Check cowork capacity for a date range.
+ * Returns the maximum spots occupied on any single day in the range.
+ */
+async function checkCoworkCapacity(
+    planId: string,
+    startDate: string,
+    endDate: string,
+    spotsRequested: number,
+    excludeReservationId?: string
+): Promise<{ ok: boolean; worstDay: string | null; occupied: number; total: number }> {
+    const supabase = createServerClient();
+
+    const capacity = await getCoworkCapacity();
+    const totalSpots = capacity[planId] || 0;
+
+    if (totalSpots === 0) {
+        return { ok: true, worstDay: null, occupied: 0, total: 0 };
+    }
+
+    let query = supabase
+        .from('cowork_reservations')
+        .select('start_date, end_date, spots')
+        .eq('plan_id', planId)
+        .eq('status', 'active')
+        .lte('start_date', endDate)
+        .gte('end_date', startDate);
+
+    if (excludeReservationId) {
+        query = query.neq('id', excludeReservationId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(`Failed to check cowork capacity: ${error.message}`);
+
+    // Calculate spots per day in the range
+    const spotsByDay: Record<string, number> = {};
+    const rangeStart = new Date(startDate);
+    const rangeEnd = new Date(endDate);
+
+    for (const res of (data || []) as { start_date: string; end_date: string; spots: number }[]) {
+        const resStart = new Date(res.start_date);
+        const resEnd = new Date(res.end_date);
+        const overlapStart = resStart > rangeStart ? resStart : rangeStart;
+        const overlapEnd = resEnd < rangeEnd ? resEnd : rangeEnd;
+
+        for (let d = new Date(overlapStart); d <= overlapEnd; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            spotsByDay[dateStr] = (spotsByDay[dateStr] || 0) + res.spots;
+        }
+    }
+
+    // Find worst day (most occupied)
+    let worstDay: string | null = null;
+    let maxOccupied = 0;
+    for (const [date, occupied] of Object.entries(spotsByDay)) {
+        if (occupied > maxOccupied) {
+            maxOccupied = occupied;
+            worstDay = date;
+        }
+    }
+
+    const ok = (maxOccupied + spotsRequested) <= totalSpots;
+    return { ok, worstDay, occupied: maxOccupied, total: totalSpots };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createCoworkReservation(reservation: Record<string, any>): Promise<CoworkReservation> {
+    // Validate capacity before insert
+    if (reservation.plan_id && reservation.start_date && reservation.end_date) {
+        const spots = reservation.spots || 1;
+        const check = await checkCoworkCapacity(
+            reservation.plan_id,
+            reservation.start_date,
+            reservation.end_date,
+            spots
+        );
+
+        if (!check.ok) {
+            throw new Error(
+                `CAPACITY_EXCEEDED: Sem vagas disponíveis para ${reservation.plan_id} ` +
+                `(${check.occupied}/${check.total} ocupados em ${check.worstDay})`
+            );
+        }
+    }
+
     const supabase = createServerClient();
     const { data, error } = await supabase
         .from('cowork_reservations')
@@ -220,8 +304,34 @@ export async function createCoworkReservation(reservation: Record<string, any>):
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateCoworkReservation(id: string, updates: Record<string, any>): Promise<CoworkReservation> {
-    const supabase = createServerClient();
-    const { data, error } = await supabase
+    // If updating spots, dates, or plan — validate capacity (excluding self)
+    if (updates.plan_id || updates.start_date || updates.end_date || updates.spots) {
+        const supabase = createServerClient();
+        const { data: existing } = await supabase
+            .from('cowork_reservations')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (existing) {
+            const planId = updates.plan_id || existing.plan_id;
+            const startDate = updates.start_date || existing.start_date;
+            const endDate = updates.end_date || existing.end_date;
+            const spots = updates.spots !== undefined ? updates.spots : existing.spots;
+
+            const check = await checkCoworkCapacity(planId, startDate, endDate, spots, id);
+
+            if (!check.ok) {
+                throw new Error(
+                    `CAPACITY_EXCEEDED: Sem vagas disponíveis para ${planId} ` +
+                    `(${check.occupied}/${check.total} ocupados em ${check.worstDay})`
+                );
+            }
+        }
+    }
+
+    const supabase2 = createServerClient();
+    const { data, error } = await supabase2
         .from('cowork_reservations')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
@@ -373,18 +483,20 @@ async function findNextAvailableDate(itemId: string, fromDate: string): Promise<
 // MONTHLY AVAILABILITY
 // ============================================================
 
+export interface MonthlyAvailabilityResult {
+    unavailableDates: string[];
+    spotsByDate?: Record<string, { occupied: number; total: number }>;
+}
+
 /**
- * Get monthly availability - returns unavailable dates for a given item or cowork plan
- * @param params.item_id - Equipment or studio ID
- * @param params.plan_id - Cowork plan ID
- * @param params.month - Month in YYYY-MM format
- * @returns Array of unavailable date strings in YYYY-MM-DD format
+ * Get monthly availability - returns unavailable dates for a given item or cowork plan.
+ * For cowork plans, also returns spotsByDate with occupied/total per day.
  */
 export async function getMonthlyAvailability(params: {
     item_id?: string;
     plan_id?: string;
     month: string;
-}): Promise<string[]> {
+}): Promise<MonthlyAvailabilityResult> {
     const { item_id, plan_id, month } = params;
 
     if (!item_id && !plan_id) {
@@ -437,7 +549,7 @@ export async function getMonthlyAvailability(params: {
             }
         }
 
-        return Array.from(unavailableDates).sort();
+        return { unavailableDates: Array.from(unavailableDates).sort() };
     }
 
     // Handle cowork plan availability
@@ -476,16 +588,22 @@ export async function getMonthlyAvailability(params: {
             }
         }
 
+        // Build spotsByDate with occupied/total info
+        const spotsInfo: Record<string, { occupied: number; total: number }> = {};
+        for (const [date, occupied] of Object.entries(spotsByDate)) {
+            spotsInfo[date] = { occupied, total: totalSpots };
+        }
+
         // Find dates where spots are full
         const unavailableDates = Object.entries(spotsByDate)
             .filter(([, spots]) => spots >= totalSpots)
             .map(([date]) => date)
             .sort();
 
-        return unavailableDates;
+        return { unavailableDates, spotsByDate: spotsInfo };
     }
 
-    return [];
+    return { unavailableDates: [] };
 }
 
 // ============================================================
