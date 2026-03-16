@@ -11,16 +11,16 @@ export const estudiosImages = [
 
 export const coworkImages = [
   { src: '/images/espaco/CoworkGeral.jpg', title: 'Open Space Geral' },
-  { src: '/images/espaco/CoworkGeral2.jpg', title: 'Perspetiva do Espaço' },
+  { src: '/images/espaco/CoworkGeral2.jpg', title: '' },
   { src: '/images/espaco/Cowork-Starter.jpg', title: 'Plano Starter' },
   { src: '/images/espaco/Cowork-Prime.jpg', title: 'Plano Prime' },
   { src: '/images/espaco/Cowork-Premium.jpg', title: 'Lugar Premium' },
 ];
 
 export const comodidadesImages = [
-  { src: '/images/espaco/Sol.jpg', title: 'Pátio & Sol', desc: 'Luz natural e uma área exterior para inspirar as suas pausas e repouso.' },
-  { src: '/images/espaco/Café.jpg', title: 'Coffee Break', desc: 'Networking natural numa zona de descontração planeada para mentes criativas.' },
-  { src: '/images/espaco/Maquiagem.jpg', title: 'Camarim', desc: 'Cuidado ao detalhe antes de qualquer entrada em cena ou gravação intensiva.' },
+  { src: '/images/espaco/Sol.jpg', title: '', desc: '' },
+  { src: '/images/espaco/Café.jpg', title: '', desc: '' },
+  { src: '/images/espaco/Maquiagem.jpg', title: '', desc: '' },
 ];
 
 export const espacoContent = {

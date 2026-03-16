@@ -123,7 +123,7 @@ export function ParallaxImage({
 
   // If layoutId provided, wrap in motion.div for lightbox transition
   if (layoutId) {
-    return <motion.div layoutId={layoutId}>{containerContent}</motion.div>;
+    return <motion.div layoutId={layoutId} className="w-full h-full block">{containerContent}</motion.div>;
   }
 
   return containerContent;

@@ -145,8 +145,8 @@ export function StudioHourlyCalendar({
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       className={`
-        relative w-full flex flex-col overflow-hidden bg-black/95 border border-white/10 backdrop-blur-xl rounded-2xl
-        ${isDesktop ? 'max-w-4xl max-h-[85vh] shadow-2xl shadow-black/50' : ''}
+        relative w-full flex flex-col overflow-hidden rounded-2xl
+        ${isDesktop ? 'max-w-4xl max-h-[85vh] bg-black/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50' : ''}
       `}
     >
       {/* Header (desktop only — MobileBottomSheet provides header on mobile) */}
@@ -299,7 +299,7 @@ export function StudioHourlyCalendar({
                               : 'bg-white/[0.01] border-transparent cursor-not-allowed'}
                         `}
                       >
-                        <span className={`text-base md:text-xl font-bold tracking-tight transition-colors duration-300 ${isClickable ? 'text-white group-hover/slot:text-[var(--color-accent)]' : isOccupied ? 'text-red-400/40 line-through decoration-red-500/30' : 'text-white/20'}`}>
+                        <span className={`text-base md:text-xl font-bold tracking-tight transition-colors duration-300 ${isClickable ? 'text-white group-hover/slot:text-[var(--color-accent)]' : isOccupied ? 'text-red-400/60 line-through decoration-red-500/50' : 'text-white/40'}`}>
                           {timeStr}
                         </span>
 

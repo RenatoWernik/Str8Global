@@ -5,6 +5,7 @@
 import { ReactNode, useRef, useState, useEffect } from 'react';
 import { motion, useSpring } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { cn } from '@/lib/utils';
 
 interface MagneticCursorProps {
   children: ReactNode;
@@ -76,11 +77,10 @@ export function MagneticCursor({
   return (
     <MotionComponent
       ref={ref}
-      className={className}
+      className={cn('inline-block', className)}
       style={{
         x: springX,
         y: springY,
-        display: 'inline-block',
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

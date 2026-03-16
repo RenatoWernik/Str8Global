@@ -23,11 +23,11 @@ export interface ContactInfo {
 
 // Main navigation links
 export const mainNav: NavItem[] = [
-  { id: 'home', label: 'Home', href: '/' },
+  { id: 'home', label: 'Inicio', href: '/' },
   { id: 'portfolio', label: 'Portfólio', href: '/portfolio' },
-  { id: 'cursos', label: 'Cursos', href: '/cursos' },
-  { id: 'espaco', label: 'Espaço', href: '/espaco' },
   { id: 'aluguel', label: 'Aluguer', href: '/aluguel' },
+  { id: 'espaco', label: 'Espaço', href: '/espaco' },
+  { id: 'cursos', label: 'Cursos', href: '/cursos' },
 ];
 
 // Footer navigation (main + contact anchor)

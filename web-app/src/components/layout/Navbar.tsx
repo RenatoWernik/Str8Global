@@ -193,7 +193,7 @@ export function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
-              {mainNav.filter(item => item.id !== 'home').map((item) => (
+              {mainNav.map((item) => (
                 <Link
                   key={item.id}
                   href={item.href}

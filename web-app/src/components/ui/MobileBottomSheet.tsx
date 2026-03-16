@@ -17,7 +17,7 @@ export function MobileBottomSheet({
   open,
   onOpenChange,
   children,
-  snapPoints = [0.5, 1],
+  snapPoints,
   title,
   onClose,
 }: MobileBottomSheetProps) {

@@ -32,22 +32,24 @@ export function StudioRenting() {
       <div className="hidden md:block absolute bottom-20 left-10 w-96 h-96 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Header */}
-        <ScrollReveal baseOpacity={0.3} delay={0}>
-          <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
-            {rentalCopy.studio.label}
-          </span>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.1}>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <HighlightText text={rentalCopy.studio.title} />
-          </h2>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-12">
-            {rentalCopy.studio.subtitle}
-          </p>
-        </ScrollReveal>
+        {/* Header — z-10 ensures it stacks above Framer Motion animated cards */}
+        <div className="relative z-10">
+          <ScrollReveal baseOpacity={0.3} delay={0}>
+            <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+              {rentalCopy.studio.label}
+            </span>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.1}>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+              <HighlightText text={rentalCopy.studio.title} />
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.2}>
+            <p className="text-white/70 text-lg max-w-xl mb-12">
+              {rentalCopy.studio.subtitle}
+            </p>
+          </ScrollReveal>
+        </div>
 
         {/* Studios grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

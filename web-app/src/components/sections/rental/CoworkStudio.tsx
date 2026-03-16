@@ -264,22 +264,25 @@ function PlanCard({
           <div className="mb-4 relative z-20">
             <button
               onClick={() => setCalendarOpen(!calendarOpen)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all w-full justify-center"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-white/[0.04] border border-white/10 hover:border-[var(--color-accent)]/50 text-white/60 hover:text-white transition-all w-full justify-center ${selectedDate ? 'pr-9' : ''}`}
             >
               <Calendar size={16} className="text-[var(--color-accent)]" />
               <span>{selectedDate ? formatDatePT(selectedDate) : 'Escolher data'}</span>
-              {selectedDate && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDateChange(''); // Clear selection by passing empty/null equivalent if handled by hook
-                  }}
-                  className="ml-auto p-1 hover:bg-white/10 rounded transition-colors"
-                >
-                  <X size={14} />
-                </button>
-              )}
             </button>
+            {selectedDate && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDateChange('');
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDateChange(''); } }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded transition-colors cursor-pointer text-white/60 hover:text-white z-10"
+              >
+                <X size={14} />
+              </span>
+            )}
 
             {calendarOpen && (
               <AvailabilityCalendar

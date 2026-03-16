@@ -14,11 +14,20 @@ import {
     Users,
     Check,
     AlertTriangle,
+    CalendarRange,
+    Clock,
+    Download
 } from 'lucide-react';
 import type { Reservation, CoworkReservation } from '@/types/database';
 import { gearItems, studios } from '@/data/rentalData';
+import { AvailabilityCalendar } from '@/components/ui/AvailabilityCalendar';
+import { StudioHourlyCalendar } from '@/components/ui/StudioHourlyCalendar';
+import { SearchInput } from '@/components/ui/SearchInput';
+import { exportToCSV } from '@/lib/export';
+import { ReservationDetailsModal } from '@/components/ui/ReservationDetailsModal';
+import { CoworkReservationFormModal } from '@/components/ui/CoworkReservationFormModal';
 
-type TabType = 'gear-studio' | 'cowork';
+type TabType = 'gear' | 'studio' | 'cowork';
 
 const allItems = [
     ...gearItems.map(g => ({ id: g.id, name: g.name, type: 'gear' as const, price: g.dailyPrice })),
@@ -32,6 +41,19 @@ const allItems = [
 
 function formatDate(d: string) {
     return new Date(d).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+const coworkPlanDisplayNames: Record<string, string> = {
+    'cowork-starter': 'Starter',
+    'cowork-prime': 'Prime',
+    'cowork-premium': 'Premium',
+    'coworkstudio-starter': 'Starter (Cowork+Estúdio)',
+    'coworkstudio-prime': 'Prime (Cowork+Estúdio)',
+    'coworkstudio-premium': 'Premium (Cowork+Estúdio)',
+};
+
+function getCoworkPlanName(planId: string): string {
+    return coworkPlanDisplayNames[planId] || planId.replace(/-/g, ' ');
 }
 
 // ── Delete Confirm Modal ──
@@ -108,6 +130,8 @@ function ReservationFormModal({
         item_type: 'gear' as 'gear' | 'studio',
         start_date: '',
         end_date: '',
+        start_time: '',
+        end_time: '',
         client: '',
         contact: '',
         notes: '',
@@ -116,6 +140,8 @@ function ReservationFormModal({
     });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [showStudioCalendar, setShowStudioCalendar] = useState(false);
+    const [showAvailabilityCalendar, setShowAvailabilityCalendar] = useState(false);
 
     useEffect(() => {
         if (editingReservation) {
@@ -125,6 +151,8 @@ function ReservationFormModal({
                 item_type: editingReservation.item_type as 'gear' | 'studio',
                 start_date: editingReservation.start_date,
                 end_date: editingReservation.end_date,
+                start_time: editingReservation.start_time || '',
+                end_time: editingReservation.end_time || '',
                 client: editingReservation.client,
                 contact: editingReservation.contact || '',
                 notes: editingReservation.notes || '',
@@ -138,6 +166,8 @@ function ReservationFormModal({
                 item_type: 'gear',
                 start_date: new Date().toISOString().split('T')[0],
                 end_date: '',
+                start_time: '',
+                end_time: '',
                 client: '',
                 contact: '',
                 notes: '',
@@ -146,6 +176,8 @@ function ReservationFormModal({
             });
         }
         setError('');
+        setShowStudioCalendar(false);
+        setShowAvailabilityCalendar(false);
     }, [editingReservation, open]);
 
     const handleItemSelect = (itemId: string) => {
@@ -168,6 +200,8 @@ function ReservationFormModal({
                 item_type: form.item_type,
                 start_date: form.start_date,
                 end_date: form.end_date,
+                start_time: form.start_time || null,
+                end_time: form.end_time || null,
                 client: form.client,
                 contact: form.contact || null,
                 notes: form.notes || null,
@@ -240,28 +274,64 @@ function ReservationFormModal({
                         </select>
                     </div>
 
-                    {/* Dates */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-[11px] tracking-[0.15em] uppercase text-white/40 mb-2">Data Início</label>
-                            <input
-                                type="date"
-                                value={form.start_date}
-                                onChange={(e) => setForm(f => ({ ...f, start_date: e.target.value }))}
-                                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
-                                required
-                            />
+                    {/* Schedule */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <label className="block text-[11px] tracking-[0.15em] uppercase text-white/40">Horário</label>
+                            <button
+                                type="button"
+                                onClick={() => form.item_type === 'studio' ? setShowStudioCalendar(true) : setShowAvailabilityCalendar(true)}
+                                disabled={!form.item_id}
+                                className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 disabled:opacity-50 disabled:hover:text-cyan-400 transition"
+                            >
+                                {form.item_type === 'studio' ? <Clock size={14} /> : <CalendarRange size={14} />}
+                                Ver Disponibilidade
+                            </button>
                         </div>
-                        <div>
-                            <label className="block text-[11px] tracking-[0.15em] uppercase text-white/40 mb-2">Data Fim</label>
-                            <input
-                                type="date"
-                                value={form.end_date}
-                                onChange={(e) => setForm(f => ({ ...f, end_date: e.target.value }))}
-                                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
-                                required
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] text-white/30 mb-1">Data Início</label>
+                                <input
+                                    type="date"
+                                    value={form.start_date}
+                                    onChange={(e) => setForm(f => ({ ...f, start_date: e.target.value }))}
+                                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] text-white/30 mb-1">Data Fim</label>
+                                <input
+                                    type="date"
+                                    value={form.end_date}
+                                    onChange={(e) => setForm(f => ({ ...f, end_date: e.target.value }))}
+                                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
+                                    required
+                                />
+                            </div>
                         </div>
+                        {form.item_type === 'studio' && (
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] text-white/30 mb-1">Hora Início</label>
+                                    <input
+                                        type="time"
+                                        value={form.start_time}
+                                        onChange={(e) => setForm(f => ({ ...f, start_time: e.target.value }))}
+                                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] text-white/30 mb-1">Hora Fim</label>
+                                    <input
+                                        type="time"
+                                        value={form.end_time}
+                                        onChange={(e) => setForm(f => ({ ...f, end_time: e.target.value }))}
+                                        className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/40 transition [color-scheme:dark]"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Client + Contact */}
@@ -364,6 +434,42 @@ function ReservationFormModal({
                         </button>
                     </div>
                 </form>
+
+                {/* Modals for Calendars */}
+                {showStudioCalendar && (
+                    <div className="relative z-[60]">
+                        <StudioHourlyCalendar
+                            studioId={form.item_id}
+                            studioName={form.item_name}
+                            onSlotSelect={(date, hour) => {
+                                // Parse hour to add 1 hour for end time
+                                const startH = parseInt(hour.split(':')[0], 10);
+                                const startM = hour.split(':')[1];
+                                const endHStr = String(startH + 1).padStart(2, '0');
+                                const endHour = `${endHStr}:${startM}`;
+                                
+                                setForm(f => ({ ...f, start_date: date, end_date: date, start_time: hour, end_time: endHour }));
+                                setShowStudioCalendar(false);
+                            }}
+                            onClose={() => setShowStudioCalendar(false)}
+                        />
+                    </div>
+                )}
+                
+                {showAvailabilityCalendar && (
+                    <div className="relative z-[60]">
+                        <AvailabilityCalendar
+                            itemId={form.item_id}
+                            itemType={form.item_type as 'item' | 'plan'}
+                            selectedDate={form.start_date || null}
+                            onSelect={(date) => {
+                                setForm(f => ({ ...f, start_date: date, end_date: date }));
+                                setShowAvailabilityCalendar(false);
+                            }}
+                            onClose={() => setShowAvailabilityCalendar(false)}
+                        />
+                    </div>
+                )}
             </motion.div>
         </div>
     );
@@ -374,12 +480,21 @@ export default function ReservasPage() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [coworkReservations, setCoworkReservations] = useState<CoworkReservation[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<TabType>('gear-studio');
+    const [activeTab, setActiveTab] = useState<TabType>('gear');
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [showForm, setShowForm] = useState(false);
-    const [editingRes, setEditingRes] = useState<Reservation | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; type: TabType } | null>(null);
+    
+    // Modals state
+    const [showGearStudioForm, setShowGearStudioForm] = useState(false);
+    const [editingGearStudioRes, setEditingGearStudioRes] = useState<Reservation | null>(null);
+    
+    const [showCoworkForm, setShowCoworkForm] = useState(false);
+    const [editingCoworkRes, setEditingCoworkRes] = useState<CoworkReservation | null>(null);
+    
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedRes, setSelectedRes] = useState<Reservation | CoworkReservation | null>(null);
+    
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; type: 'gear-studio' | 'cowork' } | null>(null);
     const [deleting, setDeleting] = useState(false);
 
     const fetchData = useCallback(async () => {
@@ -416,11 +531,22 @@ export default function ReservasPage() {
         }
     };
 
-    const filteredReservations = reservations.filter(r => {
+    const filteredGear = reservations.filter(r => {
+        if (r.item_type !== 'gear') return false;
         if (statusFilter !== 'all' && r.status !== statusFilter) return false;
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            return r.item_name.toLowerCase().includes(q) || r.client.toLowerCase().includes(q);
+            return r.item_name.toLowerCase().includes(q) || r.client.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
+        }
+        return true;
+    });
+
+    const filteredStudio = reservations.filter(r => {
+        if (r.item_type !== 'studio') return false;
+        if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            return r.item_name.toLowerCase().includes(q) || r.client.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
         }
         return true;
     });
@@ -429,10 +555,17 @@ export default function ReservasPage() {
         if (statusFilter !== 'all' && r.status !== statusFilter) return false;
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            return r.plan_id.toLowerCase().includes(q) || r.client.toLowerCase().includes(q);
+            return r.plan_id.toLowerCase().includes(q) || r.client.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
         }
         return true;
     });
+
+    const handleExportCSV = () => {
+        const dataToExport = activeTab === 'gear' ? filteredGear : 
+                             activeTab === 'studio' ? filteredStudio : 
+                             filteredCowork;
+        exportToCSV(dataToExport, `reservas_${activeTab}`);
+    };
 
     if (loading) {
         return (
@@ -453,95 +586,186 @@ export default function ReservasPage() {
                         Gerir todos os alugueres de equipamento, estúdios e cowork
                     </p>
                 </div>
-                <button
-                    onClick={() => { setEditingRes(null); setShowForm(true); }}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 rounded-lg text-sm font-medium transition-all duration-200 shrink-0"
-                >
-                    <Plus size={16} />
-                    Nova Reserva
-                </button>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-1 bg-white/[0.02] border border-white/[0.06] rounded-lg p-1 w-fit">
-                {([
-                    { id: 'gear-studio' as TabType, label: 'Equipamento & Estúdios', icon: Package },
-                    { id: 'cowork' as TabType, label: 'Cowork', icon: Users },
-                ]).map(tab => (
+                <div className="flex items-center gap-3 shrink-0">
                     <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-all duration-200 ${activeTab === tab.id
-                                ? 'bg-cyan-500/10 text-cyan-400'
-                                : 'text-white/40 hover:text-white/60'
-                            }`}
+                        onClick={handleExportCSV}
+                        className="flex items-center gap-2 px-4 py-2.5 text-white/50 hover:text-white border border-white/10 hover:bg-white/5 rounded-lg text-sm font-medium transition-all duration-200"
                     >
-                        <tab.icon size={14} />
-                        {tab.label}
+                        <Download size={16} />
+                        Exportar CSV
                     </button>
-                ))}
+                    <button
+                        onClick={() => {
+                            if (activeTab === 'cowork') {
+                                setEditingCoworkRes(null);
+                                setShowCoworkForm(true);
+                            } else {
+                                setEditingGearStudioRes(null);
+                                setShowGearStudioForm(true);
+                            }
+                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 rounded-lg text-sm font-medium transition-all duration-200"
+                    >
+                        <Plus size={16} />
+                        Nova Reserva
+                    </button>
+                </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Procurar por item ou cliente..."
-                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/30 transition"
-                    />
+            {/* Tabs & Filters Line */}
+            <div className="flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center bg-white/[0.02] border border-white/[0.06] rounded-xl p-3">
+                {/* Tabs */}
+                <div className="flex flex-wrap gap-1 bg-black/20 rounded-lg p-1 w-full xl:w-auto">
+                    {([
+                        { id: 'gear' as TabType, label: 'Equipamento', icon: Package },
+                        { id: 'studio' as TabType, label: 'Estúdios', icon: Video },
+                        { id: 'cowork' as TabType, label: 'Coworking', icon: Users },
+                    ]).map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex-1 xl:flex-none items-center justify-center gap-2 px-4 py-2 rounded-md text-sm transition-all duration-200 flex ${activeTab === tab.id
+                                    ? 'bg-cyan-500/10 text-cyan-400 font-medium'
+                                    : 'text-white/40 hover:text-white/60'
+                                }`}
+                        >
+                            <tab.icon size={14} />
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
-                <div className="flex items-center gap-2">
-                    <Filter size={14} className="text-white/30" />
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/30 transition appearance-none"
-                    >
-                        <option value="all" className="bg-[#12121a]">Todos os estados</option>
-                        <option value="active" className="bg-[#12121a]">Ativas</option>
-                        <option value="completed" className="bg-[#12121a]">Concluídas</option>
-                        <option value="cancelled" className="bg-[#12121a]">Canceladas</option>
-                    </select>
+
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+                    <div className="w-full sm:w-64">
+                        <SearchInput 
+                            value={searchQuery} 
+                            onChange={setSearchQuery} 
+                            placeholder="Buscar por nome, ref ou telemóvel..." 
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <Filter size={14} className="text-white/30 hidden sm:block" />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="w-full sm:w-auto bg-[#1A1A24] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition appearance-none"
+                        >
+                            <option value="all" className="bg-[#12121a]">Todos os estados</option>
+                            <option value="active" className="bg-[#12121a]">Ativas</option>
+                            <option value="completed" className="bg-[#12121a]">Concluídas</option>
+                            <option value="cancelled" className="bg-[#12121a]">Canceladas</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             {/* Table */}
             <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                    {activeTab === 'gear-studio' ? (
-                        <table className="w-full">
+                <div className="overflow-x-auto min-h-[400px]">
+                    {activeTab === 'gear' || activeTab === 'studio' ? (
+                        <>
+                            {/* Mobile View */}
+                            <div className="md:hidden flex flex-col gap-3 p-3">
+                                {(activeTab === 'gear' ? filteredGear : filteredStudio).length === 0 ? (
+                                    <div className="text-center py-8 text-white/20 text-sm">
+                                        Nenhuma reserva de {activeTab === 'gear' ? 'equipamento' : 'estúdio'} encontrada
+                                    </div>
+                                ) : (
+                                    (activeTab === 'gear' ? filteredGear : filteredStudio).map((r, i) => (
+                                        <motion.div
+                                            key={r.id}
+                                            initial={{ opacity: 0, scale: 0.98 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: i * 0.03 }}
+                                            onClick={() => { setSelectedRes(r); setShowDetailsModal(true); }}
+                                            className="bg-[#12121a] border border-white/[0.06] rounded-xl p-4 flex flex-col gap-3 cursor-pointer active:scale-95 transition-all"
+                                        >
+                                            <div className="flex justify-between items-start gap-3">
+                                                <div className="flex items-center gap-2">
+                                                    {r.item_type === 'gear' ? (
+                                                        <Package size={14} className="text-cyan-400/80 shrink-0" />
+                                                    ) : (
+                                                        <Video size={14} className="text-violet-400/80 shrink-0" />
+                                                    )}
+                                                    <span className="text-sm font-semibold text-white/90 leading-tight">{r.item_name}</span>
+                                                </div>
+                                                <span className={`shrink-0 text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded-full ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                                                        r.status === 'completed' ? 'bg-cyan-500/10 text-cyan-400' :
+                                                            'bg-red-500/10 text-red-400'
+                                                    }`}>
+                                                    {r.status === 'active' ? 'Ativa' : r.status === 'completed' ? 'Concluída' : 'Cancelada'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-white/60">{r.client}</span>
+                                                <span className="text-emerald-400/80 font-medium">
+                                                    {r.total_price ? `${r.total_price.toFixed(2)}€` : '—'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs text-white/40 bg-white/5 rounded-lg px-3 py-2">
+                                                <CalendarRange size={13} />
+                                                <div className="flex flex-col">
+                                                    <span>{formatDate(r.start_date)} {r.start_time && `- ${r.start_time}`}</span>
+                                                    {r.start_date !== r.end_date && <span>{formatDate(r.end_date)} {r.end_time && `- ${r.end_time}`}</span>}
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2 border-t border-white/[0.04]">
+                                                <span className="text-xs font-mono text-white/30">#{r.id.split('-')[0].toUpperCase()}</span>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setEditingGearStudioRes(r); setShowGearStudioForm(true); }}
+                                                        className="p-1.5 text-white/30 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-md transition"
+                                                    >
+                                                        <Edit3 size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: r.id, name: r.item_name, type: 'gear-studio' }); }}
+                                                        className="p-1.5 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-md transition"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Desktop View */}
+                            <table className="w-full text-left whitespace-nowrap hidden md:table">
                             <thead>
-                                <tr className="border-b border-white/[0.06]">
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Item</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Tipo</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Cliente</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Período</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Valor</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Estado</th>
-                                    <th className="text-right text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Ações</th>
+                                <tr className="border-b border-white/[0.06] bg-black/40">
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Ref</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Item</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Cliente</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Datas</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Valor</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Estado</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4 text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredReservations.length === 0 ? (
+                                {(activeTab === 'gear' ? filteredGear : filteredStudio).length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="text-center py-12 text-white/20 text-sm">
-                                            Nenhuma reserva encontrada
+                                            Nenhuma reserva de {activeTab === 'gear' ? 'equipamento' : 'estúdio'} encontrada
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredReservations.map((r, i) => (
+                                    (activeTab === 'gear' ? filteredGear : filteredStudio).map((r, i) => (
                                         <motion.tr
                                             key={r.id}
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: i * 0.03 }}
-                                            className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
+                                            className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                                            onClick={() => { setSelectedRes(r); setShowDetailsModal(true); }}
                                         >
-                                            <td className="px-5 py-3">
+                                            <td className="px-5 py-4 text-xs font-mono text-white/30">
+                                                #{r.id.split('-')[0].toUpperCase()}
+                                            </td>
+                                            <td className="px-5 py-4">
                                                 <div className="flex items-center gap-2">
                                                     {r.item_type === 'gear' ? (
                                                         <Package size={14} className="text-cyan-400/50" />
@@ -551,38 +775,35 @@ export default function ReservasPage() {
                                                     <span className="text-sm text-white/80 font-medium">{r.item_name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-3">
-                                                <span className={`text-xs px-2 py-1 rounded-full ${r.item_type === 'gear' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-violet-500/10 text-violet-400'
-                                                    }`}>
-                                                    {r.item_type === 'gear' ? 'Equip.' : 'Estúdio'}
-                                                </span>
+                                            <td className="px-5 py-4 text-sm text-white/60">{r.client}</td>
+                                            <td className="px-5 py-4 text-xs text-white/40">
+                                                <div>{formatDate(r.start_date)} {r.start_time && `- ${r.start_time}`}</div>
+                                                {r.start_date !== r.end_date && <div>{formatDate(r.end_date)} {r.end_time && `- ${r.end_time}`}</div>}
                                             </td>
-                                            <td className="px-5 py-3 text-sm text-white/60">{r.client}</td>
-                                            <td className="px-5 py-3 text-xs text-white/40">{formatDate(r.start_date)} → {formatDate(r.end_date)}</td>
-                                            <td className="px-5 py-3 text-sm text-white/70 font-medium">
-                                                {r.total_price ? `${r.total_price}€` : '—'}
+                                            <td className="px-5 py-4 text-sm text-emerald-400/80 font-medium">
+                                                {r.total_price ? `${r.total_price.toFixed(2)}€` : '—'}
                                             </td>
-                                            <td className="px-5 py-3">
+                                            <td className="px-5 py-4">
                                                 <span className={`text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded-full ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                        r.status === 'completed' ? 'bg-white/5 text-white/30' :
+                                                        r.status === 'completed' ? 'bg-cyan-500/10 text-cyan-400' :
                                                             'bg-red-500/10 text-red-400'
                                                     }`}>
                                                     {r.status === 'active' ? 'Ativa' : r.status === 'completed' ? 'Concluída' : 'Cancelada'}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-1">
+                                            <td className="px-5 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
-                                                        onClick={() => { setEditingRes(r); setShowForm(true); }}
+                                                        onClick={(e) => { e.stopPropagation(); setEditingGearStudioRes(r); setShowGearStudioForm(true); }}
                                                         className="p-2 text-white/30 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition"
                                                     >
-                                                        <Edit3 size={14} />
+                                                        <Edit3 size={16} />
                                                     </button>
                                                     <button
-                                                        onClick={() => setDeleteTarget({ id: r.id, name: r.item_name, type: 'gear-studio' })}
+                                                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: r.id, name: r.item_name, type: 'gear-studio' }); }}
                                                         className="p-2 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                                                     >
-                                                        <Trash2 size={14} />
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -591,23 +812,96 @@ export default function ReservasPage() {
                                 )}
                             </tbody>
                         </table>
+                        </>
                     ) : (
-                        <table className="w-full">
+                        <>
+                            {/* Mobile View */}
+                            <div className="md:hidden flex flex-col gap-3 p-3">
+                                {filteredCowork.length === 0 ? (
+                                    <div className="text-center py-8 text-white/20 text-sm">
+                                        Nenhuma reserva cowork encontrada
+                                    </div>
+                                ) : (
+                                    filteredCowork.map((r, i) => (
+                                        <motion.div
+                                            key={r.id}
+                                            initial={{ opacity: 0, scale: 0.98 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: i * 0.03 }}
+                                            onClick={() => { setSelectedRes(r); setShowDetailsModal(true); }}
+                                            className="bg-[#12121a] border border-white/[0.06] rounded-xl p-4 flex flex-col gap-3 cursor-pointer active:scale-95 transition-all"
+                                        >
+                                            <div className="flex justify-between items-start gap-3">
+                                                <div className="flex items-center gap-2">
+                                                    <Users size={14} className="text-amber-400/60 shrink-0" />
+                                                    <span className="text-sm font-semibold text-white/90 leading-tight">{getCoworkPlanName(r.plan_id)}</span>
+                                                </div>
+                                                <span className={`shrink-0 text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded-full ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                                                        r.status === 'completed' ? 'bg-cyan-500/10 text-cyan-400' :
+                                                            'bg-red-500/10 text-red-400'
+                                                    }`}>
+                                                    {r.status === 'active' ? 'Ativa' : r.status === 'completed' ? 'Concluída' : 'Cancelada'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-white/60">{r.client}</span>
+                                                <span className="text-emerald-400/80 font-medium">
+                                                    {r.total_price ? `${r.total_price.toFixed(2)}€` : '—'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-4 text-xs text-white/40 bg-white/5 rounded-lg px-3 py-2">
+                                                <div className="flex items-center gap-2">
+                                                    <CalendarRange size={13} />
+                                                    <div className="flex flex-col">
+                                                        <span className="capitalize">{r.period}</span>
+                                                        <span className="text-[10px] opacity-70">{formatDate(r.start_date)} → {formatDate(r.end_date)}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 ml-auto">
+                                                    <Users size={12} className="opacity-50" />
+                                                    <span>{r.spots}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2 border-t border-white/[0.04]">
+                                                <span className="text-xs font-mono text-white/30">#{r.id.split('-')[0].toUpperCase()}</span>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setEditingCoworkRes(r); setShowCoworkForm(true); }}
+                                                        className="p-1.5 text-white/30 hover:text-amber-400 hover:bg-amber-500/10 rounded-md transition"
+                                                    >
+                                                        <Edit3 size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: r.id, name: `Cowork ${getCoworkPlanName(r.plan_id)}`, type: 'cowork' }); }}
+                                                        className="p-1.5 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-md transition"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
+
+                            {/* Desktop View */}
+                            <table className="w-full text-left whitespace-nowrap hidden md:table">
                             <thead>
-                                <tr className="border-b border-white/[0.06]">
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Plano</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Tipo</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Cliente</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Período</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Lugares</th>
-                                    <th className="text-left text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Estado</th>
-                                    <th className="text-right text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-3">Ações</th>
+                                <tr className="border-b border-white/[0.06] bg-black/40">
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Ref</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Plano</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Cliente</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Período</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Lugares</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Valor</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Estado</th>
+                                    <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4 text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredCowork.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-12 text-white/20 text-sm">
+                                        <td colSpan={8} className="text-center py-12 text-white/20 text-sm">
                                             Nenhuma reserva cowork encontrada
                                         </td>
                                     </tr>
@@ -618,53 +912,79 @@ export default function ReservasPage() {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: i * 0.03 }}
-                                            className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
+                                            className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                                            onClick={() => { setSelectedRes(r); setShowDetailsModal(true); }}
                                         >
-                                            <td className="px-5 py-3 text-sm text-white/80 font-medium capitalize">{r.plan_id}</td>
-                                            <td className="px-5 py-3">
-                                                <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-400">
-                                                    {r.plan_type === 'cowork' ? 'Cowork' : 'Cowork+Estúdio'}
-                                                </span>
+                                            <td className="px-5 py-4 text-xs font-mono text-white/30">
+                                                #{r.id.split('-')[0].toUpperCase()}
                                             </td>
-                                            <td className="px-5 py-3 text-sm text-white/60">{r.client}</td>
-                                            <td className="px-5 py-3 text-xs text-white/40">{formatDate(r.start_date)} → {formatDate(r.end_date)}</td>
-                                            <td className="px-5 py-3 text-sm text-white/60">{r.spots}</td>
-                                            <td className="px-5 py-3">
+                                            <td className="px-5 py-4 text-sm text-white/80 font-medium capitalize flex items-center gap-2">
+                                                <Users size={14} className="text-amber-400/60" />
+                                                {getCoworkPlanName(r.plan_id)}
+                                            </td>
+                                            <td className="px-5 py-4 text-sm text-white/60">{r.client}</td>
+                                            <td className="px-5 py-4 text-xs text-white/40">
+                                                <div><span className="capitalize">{r.period}</span></div>
+                                                <div className="opacity-70 mt-0.5">{formatDate(r.start_date)} → {formatDate(r.end_date)}</div>
+                                            </td>
+                                            <td className="px-5 py-4 text-sm text-white/60">{r.spots}</td>
+                                            <td className="px-5 py-4 text-sm text-emerald-400/80 font-medium">
+                                                {r.total_price ? `${r.total_price.toFixed(2)}€` : '—'}
+                                            </td>
+                                            <td className="px-5 py-4">
                                                 <span className={`text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded-full ${r.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                        r.status === 'completed' ? 'bg-white/5 text-white/30' :
+                                                        r.status === 'completed' ? 'bg-cyan-500/10 text-cyan-400' :
                                                             'bg-red-500/10 text-red-400'
                                                     }`}>
                                                     {r.status === 'active' ? 'Ativa' : r.status === 'completed' ? 'Concluída' : 'Cancelada'}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button
-                                                    onClick={() => setDeleteTarget({ id: r.id, name: `Cowork ${r.plan_id}`, type: 'cowork' })}
-                                                    className="p-2 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
+                                            <td className="px-5 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setEditingCoworkRes(r); setShowCoworkForm(true); }}
+                                                        className="p-2 text-white/30 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: r.id, name: `Cowork ${getCoworkPlanName(r.plan_id)}`, type: 'cowork' }); }}
+                                                        className="p-2 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </motion.tr>
                                     ))
                                 )}
                             </tbody>
                         </table>
+                        </>
                     )}
                 </div>
             </div>
 
             {/* Modals */}
-            <AnimatePresence>
-                {showForm && (
-                    <ReservationFormModal
-                        open={showForm}
-                        onClose={() => { setShowForm(false); setEditingRes(null); }}
-                        onSave={fetchData}
-                        editingReservation={editingRes}
-                    />
-                )}
-            </AnimatePresence>
+            <ReservationFormModal
+                open={showGearStudioForm}
+                onClose={() => { setShowGearStudioForm(false); setEditingGearStudioRes(null); }}
+                onSave={fetchData}
+                editingReservation={editingGearStudioRes}
+            />
+
+            <CoworkReservationFormModal
+                open={showCoworkForm}
+                onClose={() => { setShowCoworkForm(false); setEditingCoworkRes(null); }}
+                onSave={fetchData}
+                editingReservation={editingCoworkRes}
+            />
+
+            <ReservationDetailsModal
+                open={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                reservation={selectedRes}
+            />
 
             <AnimatePresence>
                 {deleteTarget && (

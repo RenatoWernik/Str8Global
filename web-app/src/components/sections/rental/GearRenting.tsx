@@ -40,25 +40,26 @@ export function GearRenting() {
       <div className="hidden md:block absolute top-40 right-0 w-80 h-80 bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Header */}
-        <ScrollReveal baseOpacity={0.3} delay={0}>
-          <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
-            {rentalCopy.gear.label}
-          </span>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.1}>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
-            <HighlightText text={rentalCopy.gear.title} />
-          </h2>
-        </ScrollReveal>
-        <ScrollReveal baseOpacity={0.3} delay={0.2}>
-          <p className="text-white/70 text-lg max-w-xl mb-8">
-            {rentalCopy.gear.subtitle}
-          </p>
-        </ScrollReveal>
+        {/* Header — z-10 ensures it stacks above Framer Motion animated cards */}
+        <div className="relative z-10">
+          <ScrollReveal baseOpacity={0.3} delay={0}>
+            <span className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block">
+              {rentalCopy.gear.label}
+            </span>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.1}>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4">
+              <HighlightText text={rentalCopy.gear.title} />
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal baseOpacity={0.3} delay={0.2}>
+            <p className="text-white/70 text-lg max-w-xl mb-8">
+              {rentalCopy.gear.subtitle}
+            </p>
+          </ScrollReveal>
 
-        {/* Category pills */}
-        <div className="flex flex-wrap gap-3 mb-12">
+          {/* Category pills */}
+          <div className="flex flex-wrap gap-3 mb-12">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -75,6 +76,7 @@ export function GearRenting() {
               {gearCategoryLabels[cat]}
             </button>
           ))}
+          </div>
         </div>
 
         {/* Items grid */}

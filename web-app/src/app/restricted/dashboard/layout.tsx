@@ -13,12 +13,14 @@ import {
     Menu,
     X,
     ChevronRight,
+    Users,
 } from 'lucide-react';
 
 const navItems = [
     { href: '/restricted/dashboard', label: 'Visão Geral', icon: LayoutDashboard },
     { href: '/restricted/dashboard/reservas', label: 'Reservas', icon: ClipboardList },
     { href: '/restricted/dashboard/calendario', label: 'Calendário', icon: CalendarDays },
+    { href: '/restricted/dashboard/clientes', label: 'Clientes', icon: Users },
     { href: '/restricted/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
 ];
 

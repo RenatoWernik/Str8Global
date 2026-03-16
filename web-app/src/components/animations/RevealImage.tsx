@@ -19,6 +19,9 @@ interface RevealImageProps {
   isInView: boolean;        // Controlled by parent section (not self-observed)
   delay?: number;           // Stagger delay in seconds, default 0
   direction?: 'up' | 'down' | 'left' | 'right'; // Reveal direction, default 'up'
+  useFill?: boolean;        // If true, uses fill and requires container height. Defaults to true.
+  width?: number;           // Required if useFill is false
+  height?: number;          // Required if useFill is false
 }
 
 export function RevealImage({
@@ -30,6 +33,9 @@ export function RevealImage({
   isInView,
   delay = 0,
   direction = 'up',
+  useFill = true,
+  width = 1200,
+  height = 800,
 }: RevealImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -74,15 +80,26 @@ export function RevealImage({
   return (
     <div
       ref={containerRef}
-      className={`${aspectRatio} relative overflow-hidden ${className}`}
+      className={`${useFill ? aspectRatio : ''} relative overflow-hidden ${className}`}
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className={`object-cover ${imageClassName}`}
-        loading="eager"
-      />
+      {useFill ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className={`object-cover ${imageClassName}`}
+          loading="eager"
+        />
+      ) : (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className={`w-full h-auto object-cover ${imageClassName}`}
+          loading="eager"
+        />
+      )}
     </div>
   );
 }

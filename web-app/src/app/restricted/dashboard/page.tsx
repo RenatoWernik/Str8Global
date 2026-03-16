@@ -14,6 +14,18 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Reservation, CoworkReservation } from '@/types/database';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from 'recharts';
 
 interface DashboardData {
     reservations: Reservation[];
@@ -183,6 +195,46 @@ export default function DashboardOverview() {
     const allRecent = [...allRes, ...allCowork]
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
+    // Analytics Data (Last 30 days)
+    const last30Days = Array.from({ length: 30 }).map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        return {
+            dateStr: d.toISOString().split('T')[0],
+            display: d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }),
+            receita: 0,
+            reservas: 0
+        };
+    });
+
+    let gearRev = 0, studioRev = 0, coworkRev = 0;
+
+    [...allRes, ...allCowork].forEach(r => {
+        if (r.status === 'cancelled') return;
+        
+        // Distribution Data
+        if ('item_type' in r) {
+            if (r.item_type === 'gear') gearRev += (r.total_price || 0);
+            if (r.item_type === 'studio') studioRev += (r.total_price || 0);
+        } else {
+            coworkRev += (r.total_price || 0);
+        }
+
+        // Timeline Data
+        const localDate = new Date(r.created_at).toISOString().split('T')[0];
+        const day = last30Days.find(d => d.dateStr === localDate);
+        if (day) {
+            day.receita += (r.total_price || 0);
+            day.reservas += 1;
+        }
+    });
+
+    const donutData = [
+        { name: 'Equipamentos', value: gearRev, color: '#22d3ee' },
+        { name: 'Estúdios', value: studioRev, color: '#a78bfa' },
+        { name: 'Coworking', value: coworkRev, color: '#fbbf24' },
+    ].filter(d => d.value > 0);
+
     return (
         <div className="space-y-8">
             {/* Page header */}
@@ -240,13 +292,121 @@ export default function DashboardOverview() {
                 />
             </div>
 
+            {/* Charts Grid */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Timeline Chart */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="xl:col-span-2 bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden p-5 flex flex-col gap-4"
+                >
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-sm font-semibold text-white/80">Evolução de Receita (Últimos 30 Dias)</h2>
+                            <p className="text-xs text-white/40">Baseado na data de criação da reserva</p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-[300px] w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={last30Days} margin={{ top: 5, right: 20, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis 
+                                    dataKey="display" 
+                                    stroke="rgba(255,255,255,0.3)" 
+                                    fontSize={10} 
+                                    tickLine={false} 
+                                    axisLine={false} 
+                                    dy={10}
+                                />
+                                <YAxis 
+                                    stroke="rgba(255,255,255,0.3)" 
+                                    fontSize={10} 
+                                    tickLine={false} 
+                                    axisLine={false} 
+                                    tickFormatter={(val) => `${val}€`} 
+                                />
+                                <Tooltip
+                                    cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '3 3' }}
+                                    contentStyle={{ backgroundColor: '#12121a', borderColor: 'rgba(255,255,255,0.06)', borderRadius: '8px', fontSize: '12px' }}
+                                    formatter={(val: any) => [`${Number(val).toFixed(2)}€`, 'Receita']}
+                                    labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="receita" 
+                                    stroke="#22d3ee" 
+                                    strokeWidth={3}
+                                    dot={false}
+                                    activeDot={{ r: 6, fill: "#22d3ee", stroke: "#0c0c14", strokeWidth: 2 }}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </motion.div>
+
+                {/* Donut Chart */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden p-5 flex flex-col gap-4"
+                >
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-sm font-semibold text-white/80">Distribuição de Receita</h2>
+                            <p className="text-xs text-white/40">Todas as reservas concluídas e ativas</p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-[300px] w-full flex flex-col items-center justify-center">
+                        {donutData.length === 0 ? (
+                            <p className="text-sm text-white/30">Sem dados suficientes</p>
+                        ) : (
+                            <>
+                                <ResponsiveContainer width="100%" height={220}>
+                                    <PieChart>
+                                        <Pie
+                                            data={donutData}
+                                            innerRadius={60}
+                                            outerRadius={85}
+                                            paddingAngle={4}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {donutData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{ backgroundColor: '#12121a', borderColor: 'rgba(255,255,255,0.06)', borderRadius: '8px', fontSize: '12px' }}
+                                            formatter={(val: any) => [`${Number(val).toFixed(2)}€`, 'Receita']}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="flex flex-col gap-2 w-full mt-2">
+                                    {donutData.map((entry, index) => (
+                                        <div key={index} className="flex items-center justify-between text-xs">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                                                <span className="text-white/70">{entry.name}</span>
+                                            </div>
+                                            <span className="font-semibold text-white/90">{entry.value.toFixed(2)}€</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+
             {/* Content Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Recent Activity */}
                 <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
                     className="xl:col-span-2 bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden"
                 >
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">

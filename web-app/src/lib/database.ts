@@ -361,6 +361,16 @@ interface CapacityRow {
     total_spots: number;
 }
 
+// Fallback capacity values matching rentalData.ts — used when capacity table is empty/missing entries
+const CAPACITY_FALLBACK: Record<string, number> = {
+    'cowork-starter': 4,
+    'cowork-prime': 4,
+    'cowork-premium': 2,
+    'coworkstudio-starter': 4,
+    'coworkstudio-prime': 4,
+    'coworkstudio-premium': 2,
+};
+
 export async function getCoworkCapacity(): Promise<Record<string, number>> {
     const supabase = createServerClient();
     const { data, error } = await supabase
@@ -369,7 +379,7 @@ export async function getCoworkCapacity(): Promise<Record<string, number>> {
 
     if (error) throw new Error(`Failed to fetch capacity: ${error.message}`);
 
-    const capacity: Record<string, number> = {};
+    const capacity: Record<string, number> = { ...CAPACITY_FALLBACK };
     for (const row of (data || []) as CapacityRow[]) {
         capacity[row.plan_id] = row.total_spots;
     }
