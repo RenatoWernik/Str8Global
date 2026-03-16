@@ -2,12 +2,12 @@
 
 ## Current Position
 
-- **Milestone**: v1.3 — Redesign Página Espaço
-- **Phase**: Phase 11 — Visual Redesign & Image Effects (COMPLETE - 4/4 plans)
-- **Plan**: 11-04 complete
-- **Status**: All three sections rewritten with distinct creative layouts and GSAP reveals
-- **Progress**: ████████████████████████ 100% (milestone: 4/4 phases complete, project: 12/12 phases shipped)
-- **Last activity**: 2026-03-16 — Phase 11 Plan 04 executed (full-bleed showcase Comodidades section)
+- **Milestone**: v1.4 — Polish & Interactivity
+- **Phase**: Phase 12 — Polish Interactivity
+- **Plan**: 12-02 complete
+- **Status**: MagneticCursor component created with Framer Motion useSpring physics
+- **Progress**: ██████ 17% (milestone: 1/6 plans complete)
+- **Last activity**: 2026-03-16 — Phase 12 Plan 02 executed (MagneticCursor component)
 
 ## Project Reference
 
@@ -59,6 +59,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - `Masonry.tsx` — basic column distribution
 - `SpotlightCard.tsx` — cursor spotlight effect
 - `MobileBottomSheet.tsx` — vaul wrapper with snap points (v1.2)
+- `MagneticCursor.tsx` — Framer Motion useSpring magnetic pull effect (v1.4, Phase 12)
 
 **Espaço section components (v1.3, Phase 10):**
 - `ManifestoSection.tsx` — BlurText manifesto with word-level reveal
@@ -93,6 +94,10 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **ARCH-03 (Phase 10)**: Loading fallbacks maintain approximate vertical space (py-24) to prevent layout shift
 - **VFX-05 (Phase 11)**: All scroll-revealed images use loading="eager" to prevent LCP delay
 - **VFX-06 (Phase 11)**: One IntersectionObserver per section (not per image) - sections use useSectionInView, pass isInView to child RevealImages
+- **POLISH-01 (Phase 12)**: MagneticCursor uses Framer Motion useSpring for physics-based magnetic pull on desktop interactive elements
+- **POLISH-02 (Phase 12)**: Spring config for magnetic cursor: stiffness 150, damping 15, mass 0.1 (responsive without overshooting)
+- **POLISH-03 (Phase 12)**: Default magnetic strength 0.3 (30% pull) provides premium feel without being cartoonish
+- **POLISH-04 (Phase 12)**: MagneticCursor disabled on mobile (<768px) and when prefers-reduced-motion active (renders children directly)
 
 ### Critical Pitfalls (from research)
 
@@ -135,6 +140,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 11 | 11-02 | 2 min | 1 | 1 | 2026-03-16 |
 | 11 | 11-03 | 2 min | 1 | 1 | 2026-03-16 |
 | 11 | 11-04 | 2 min | 1 | 1 | 2026-03-16 |
+| 12 | 12-02 | 1 min | 1 | 1 | 2026-03-16 |
 
 ## Current Todos
 
@@ -149,20 +155,21 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Rewrite Estudios section with creative layout (11-02) — Complete in 11-02
 - [x] Rewrite Cowork section with creative layout (11-03) — Complete in 11-03
 - [x] Rewrite Comodidades section with creative layout (11-04) — Complete in 11-04
+- [x] Create MagneticCursor component with Framer Motion useSpring (12-02) — Complete in 12-02
 
 ## Active Blockers
 
-None — Phase 11 complete! All sections rewritten with creative layouts.
+None — Phase 12 Plan 02 complete! MagneticCursor component ready for integration.
 
 ## Session Continuity
 
-**Last session:** 2026-03-16T11:21:28Z
-**Stopped at:** Completed Phase 11 Plan 04 (Full-bleed Showcase: Comodidades Section)
+**Last session:** 2026-03-16T13:04:07Z
+**Stopped at:** Completed Phase 12 Plan 02 (MagneticCursor Component)
 
-**Next milestone:** v1.3 COMPLETE! All 4 phases shipped.
+**Next steps:** Phase 12 Plan 03 — Integrate MagneticCursor into interactive elements.
 
 **What to tell next Claude:**
-"Phase 11 completo (7 min total, 4 plans, 6 files). All three Espaço sections rewritten with distinct creative layouts: Bento grid (Estudios), staggered offset with spotlight (Cowork), full-bleed showcase (Comodidades). All use GSAP clip-path reveals via RevealImage + useSectionInView pattern. Performance: 13 IntersectionObservers reduced to 3 (VFX-06). All animations respect prefers-reduced-motion, images use loading='eager' (VFX-05). Milestone v1.3 complete! See 11-01-SUMMARY.md through 11-04-SUMMARY.md for full details."
+"Phase 12 Plan 02 completo (1 min, 1 task, 1 file). MagneticCursor component created with Framer Motion useSpring for physics-based magnetic pull effect on desktop interactive elements. Spring config: stiffness 150, damping 15, mass 0.1. Desktop-only (disabled on mobile <768px), respects prefers-reduced-motion (POLISH-04). Component ready for integration in Plan 12-03. See 12-02-SUMMARY.md for full details. Zero deviations from plan."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
@@ -177,3 +184,4 @@ None — Phase 11 complete! All sections rewritten with creative layouts.
 *Updated: 2026-03-16 09:50 UTC (Phase 11 Plan 02 executed — bento grid Estudios)*
 *Updated: 2026-03-16 10:58 UTC (Phase 11 Plan 03 executed — staggered offset Cowork)*
 *Updated: 2026-03-16 11:21 UTC (Phase 11 Plan 04 executed — full-bleed showcase Comodidades — Phase 11 complete — Milestone v1.3 SHIPPED)*
+*Updated: 2026-03-16 13:04 UTC (Phase 12 Plan 02 executed — MagneticCursor component with useSpring physics)*
