@@ -4,10 +4,10 @@
 
 - **Milestone**: v1.4 — Polish & Interactivity
 - **Phase**: Phase 12 — Polish Interactivity
-- **Plan**: 12-02 complete
-- **Status**: MagneticCursor component created with Framer Motion useSpring physics
-- **Progress**: ██████ 17% (milestone: 1/6 plans complete)
-- **Last activity**: 2026-03-16 — Phase 12 Plan 02 executed (MagneticCursor component)
+- **Plan**: 12-02 complete (12-01 also complete)
+- **Status**: Core polish components created (ParallaxImage + ImageLightbox + MagneticCursor)
+- **Progress**: ████████████ 33% (milestone: 2/6 plans complete)
+- **Last activity**: 2026-03-16 — Phase 12 Plans 01 & 02 executed
 
 ## Project Reference
 
@@ -56,6 +56,8 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - `CharReveal.tsx` — character-by-character GSAP reveal (v1.3, Phase 10)
 - `BalancedHeadline.tsx` — react-wrap-balancer wrapper (v1.3, Phase 10)
 - `RevealImage.tsx` — GSAP clip-path reveal animation (v1.3, Phase 11)
+- `ParallaxImage.tsx` — GSAP ScrollTrigger scrub parallax (v1.4, Phase 12)
+- `ImageLightbox.tsx` — Framer Motion layoutId fullscreen lightbox (v1.4, Phase 12)
 - `Masonry.tsx` — basic column distribution
 - `SpotlightCard.tsx` — cursor spotlight effect
 - `MobileBottomSheet.tsx` — vaul wrapper with snap points (v1.2)
@@ -97,6 +99,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **POLISH-01 (Phase 12)**: MagneticCursor uses Framer Motion useSpring for physics-based magnetic pull on desktop interactive elements
 - **POLISH-02 (Phase 12)**: Spring config for magnetic cursor: stiffness 150, damping 15, mass 0.1 (responsive without overshooting)
 - **POLISH-03 (Phase 12)**: Default magnetic strength 0.3 (30% pull) provides premium feel without being cartoonish
+- **POLISH-04 (Phase 12)**: ParallaxImage disabled on mobile (<768px) and reduced-motion for legal compliance and performance
+- **POLISH-05 (Phase 12)**: Parallax intensity capped at max 15% vertical movement to prevent motion sickness
+- **POLISH-06 (Phase 12)**: ImageLightbox uses Framer Motion layoutId for seamless origin-to-fullscreen morph transitions
 - **POLISH-04 (Phase 12)**: MagneticCursor disabled on mobile (<768px) and when prefers-reduced-motion active (renders children directly)
 
 ### Critical Pitfalls (from research)
@@ -140,6 +145,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 11 | 11-02 | 2 min | 1 | 1 | 2026-03-16 |
 | 11 | 11-03 | 2 min | 1 | 1 | 2026-03-16 |
 | 11 | 11-04 | 2 min | 1 | 1 | 2026-03-16 |
+| 12 | 12-01 | 2 min | 2 | 2 | 2026-03-16 |
 | 12 | 12-02 | 1 min | 1 | 1 | 2026-03-16 |
 
 ## Current Todos
@@ -155,21 +161,22 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Rewrite Estudios section with creative layout (11-02) — Complete in 11-02
 - [x] Rewrite Cowork section with creative layout (11-03) — Complete in 11-03
 - [x] Rewrite Comodidades section with creative layout (11-04) — Complete in 11-04
+- [x] Create ParallaxImage and ImageLightbox components (12-01) — Complete in 12-01
 - [x] Create MagneticCursor component with Framer Motion useSpring (12-02) — Complete in 12-02
 
 ## Active Blockers
 
-None — Phase 12 Plan 02 complete! MagneticCursor component ready for integration.
+None — Phase 12 Plans 01 & 02 complete! Core polish components ready for integration.
 
 ## Session Continuity
 
-**Last session:** 2026-03-16T13:04:07Z
-**Stopped at:** Completed Phase 12 Plan 02 (MagneticCursor Component)
+**Last session:** 2026-03-16T13:06:43Z
+**Stopped at:** Completed Phase 12 Plan 01 (Core Polish Components: ParallaxImage + ImageLightbox)
 
-**Next steps:** Phase 12 Plan 03 — Integrate MagneticCursor into interactive elements.
+**Next steps:** Phase 12 Plan 03 — Integrate polish components into Espaço sections.
 
 **What to tell next Claude:**
-"Phase 12 Plan 02 completo (1 min, 1 task, 1 file). MagneticCursor component created with Framer Motion useSpring for physics-based magnetic pull effect on desktop interactive elements. Spring config: stiffness 150, damping 15, mass 0.1. Desktop-only (disabled on mobile <768px), respects prefers-reduced-motion (POLISH-04). Component ready for integration in Plan 12-03. See 12-02-SUMMARY.md for full details. Zero deviations from plan."
+"Phase 12 Plan 01 completo (2 min, 2 tasks, 2 files). Created ParallaxImage (GSAP ScrollTrigger scrub parallax, max 15% movement, desktop-only) and ImageLightbox (Framer Motion layoutId morph transition with AnimatePresence). Both components respect prefers-reduced-motion (POLISH-04). ParallaxImage supports layoutId integration for seamless lightbox transitions. Components ready for integration into EstudiosSection, CoworkSection, and ComodidadesSection in Plan 12-03. See 12-01-SUMMARY.md for full details. Zero deviations from plan. Note: 12-02 (MagneticCursor) was completed earlier, so both 01 and 02 now complete."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
@@ -184,4 +191,6 @@ None — Phase 12 Plan 02 complete! MagneticCursor component ready for integrati
 *Updated: 2026-03-16 09:50 UTC (Phase 11 Plan 02 executed — bento grid Estudios)*
 *Updated: 2026-03-16 10:58 UTC (Phase 11 Plan 03 executed — staggered offset Cowork)*
 *Updated: 2026-03-16 11:21 UTC (Phase 11 Plan 04 executed — full-bleed showcase Comodidades — Phase 11 complete — Milestone v1.3 SHIPPED)*
+*Updated: 2026-03-16 13:04 UTC (Phase 12 Plan 02 executed — MagneticCursor component)*
+*Updated: 2026-03-16 13:06 UTC (Phase 12 Plan 01 executed — ParallaxImage + ImageLightbox components — 2/6 plans complete)*
 *Updated: 2026-03-16 13:04 UTC (Phase 12 Plan 02 executed — MagneticCursor component with useSpring physics)*
