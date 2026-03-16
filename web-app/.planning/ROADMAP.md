@@ -285,7 +285,12 @@ Plans:
 **Requirements:** POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05
 **Complexity:** MEDIUM
 **Research:** SKIP for parallax/cursor, MINOR for lightbox (Framer layoutId pattern research)
-**Plans:** 3-4 plans (estimated)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — ParallaxImage (GSAP scrub) + ImageLightbox (Framer AnimatePresence)
+- [ ] 12-02-PLAN.md — MagneticCursor component (Framer useSpring, desktop-only)
+- [ ] 12-03-PLAN.md — Integrate effects into 3 sections + mobile safety + build verification
 
 **Success Criteria:**
 1. 2-3 hero images têm parallax subtil (máximo 15% movimento) em desktop, effect disabled em mobile
@@ -405,7 +410,7 @@ Phase 12 (Polish) ───── Desktop enhancements
 | 9. Foundation & Pitfall Prevention | v1.3 | 2/2 | Complete | 2026-03-15 |
 | 10. Text & Extraction | v1.3 | 3/3 | Complete | 2026-03-16 |
 | 11. Visual Redesign | v1.3 | 4/4 | Complete | 2026-03-16 |
-| 12. Polish & Interactivity | v1.3 | 0/3 | Not started | - |
+| 12. Polish & Interactivity | v1.3 | 0/3 | Planned | - |
 
 ---
 *Roadmap created: 2026-03-10 (v1.1)*
