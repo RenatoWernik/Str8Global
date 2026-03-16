@@ -249,7 +249,13 @@ Plans:
 **Requirements:** VFX-01, VFX-02, VFX-03, VFX-04, VFX-05, VFX-06
 **Complexity:** HIGH
 **Research:** SKIP (patterns proven in existing HorizontalGallery.tsx)
-**Plans:** 4-5 plans (estimated)
+**Plans:** 4 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — RevealImage component (GSAP clip-path) + useSectionInView hook
+- [ ] 11-02-PLAN.md — EstudiosSection bento grid layout rewrite
+- [ ] 11-03-PLAN.md — CoworkSection staggered offset layout rewrite
+- [ ] 11-04-PLAN.md — ComodidadesSection full-bleed showcase rewrite
 
 **Success Criteria:**
 1. Imagens revelam-se com clip-path animation ao entrar no viewport (não fade simples)
@@ -398,7 +404,7 @@ Phase 12 (Polish) ───── Desktop enhancements
 | 8. Feedback & Performance | v1.2 | 2/2 | Complete | 2026-03-15 |
 | 9. Foundation & Pitfall Prevention | v1.3 | 2/2 | Complete | 2026-03-15 |
 | 10. Text & Extraction | v1.3 | 3/3 | Complete | 2026-03-16 |
-| 11. Visual Redesign | v1.3 | 0/4 | Not started | - |
+| 11. Visual Redesign | v1.3 | 0/4 | Planned | - |
 | 12. Polish & Interactivity | v1.3 | 0/3 | Not started | - |
 
 ---
