@@ -183,7 +183,7 @@ Plans:
 **Research:** Complete (all patterns documented, skip research for all phases)
 
 - [x] **Phase 9: Foundation & Pitfall Prevention** — Infrastructure fixes and accessibility (COMPLETE 2026-03-15)
-- [ ] **Phase 10: Text Animations & Section Extraction** — Character reveals, balanced typography, component architecture
+- [x] **Phase 10: Text Animations & Section Extraction** — Character reveals, balanced typography, component architecture (COMPLETE 2026-03-16)
 - [ ] **Phase 11: Visual Redesign & Image Effects** — Creative layouts, clip-path reveals, bento grids
 - [ ] **Phase 12: Polish & Interactivity** — Parallax, lightbox, magnetic cursor
 
@@ -216,7 +216,7 @@ Plans:
 
 ---
 
-### Phase 10: Text Animations & Section Extraction
+### Phase 10: Text Animations & Section Extraction (COMPLETE 2026-03-16)
 
 **Goal:** Add character-reveal text animations and extract inline sections into separate component files with dynamic imports. Establish architectural foundation for creative layouts.
 
@@ -224,7 +224,7 @@ Plans:
 **Requirements:** TEXT-01, TEXT-02, TEXT-03, TEXT-04, ARCH-01, ARCH-02, ARCH-03, ARCH-04
 **Complexity:** MEDIUM
 **Research:** SKIP (patterns documented in research/STACK.md and research/ARCHITECTURE.md)
-**Plans:** 3-4 plans (estimated)
+**Plans:** 3 plans
 
 **Success Criteria:**
 1. Títulos das secções revelam-se character-by-character ao entrar no viewport com animação fluida
@@ -397,7 +397,7 @@ Phase 12 (Polish) ───── Desktop enhancements
 | 7. Cal Horário Mobile | v1.2 | 2/2 | Complete | 2026-03-15 |
 | 8. Feedback & Performance | v1.2 | 2/2 | Complete | 2026-03-15 |
 | 9. Foundation & Pitfall Prevention | v1.3 | 2/2 | Complete | 2026-03-15 |
-| 10. Text & Extraction | v1.3 | 0/3 | Not started | - |
+| 10. Text & Extraction | v1.3 | 3/3 | Complete | 2026-03-16 |
 | 11. Visual Redesign | v1.3 | 0/4 | Not started | - |
 | 12. Polish & Interactivity | v1.3 | 0/3 | Not started | - |
 
