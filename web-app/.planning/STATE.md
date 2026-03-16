@@ -3,11 +3,11 @@
 ## Current Position
 
 - **Milestone**: v1.3 — Redesign Página Espaço
-- **Phase**: Phase 10 — Text Animations & Section Extraction (Plan 2/3 complete)
-- **Plan**: 10-02 complete
-- **Status**: Phase 10 in progress (2/3 plans complete)
-- **Progress**: ████████░░░░ 67% (milestone: 2/4 phases complete, project: 10/12 phases shipped)
-- **Last activity**: 2026-03-16 — Phase 10 Plan 02 executed (section extraction with text animations)
+- **Phase**: Phase 10 — Text Animations & Section Extraction (COMPLETE - 3/3 plans)
+- **Plan**: 10-03 complete
+- **Status**: Phase 10 complete, ready for Phase 11
+- **Progress**: ████████████ 100% (milestone: 3/4 phases complete, project: 11/12 phases shipped)
+- **Last activity**: 2026-03-16 — Phase 10 Plan 03 executed (dynamic import integration)
 
 ## Project Reference
 
@@ -30,14 +30,16 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 
 ### Current Page State (Espaço)
 
-- **Hero Section**: Globe 3D + BlurText title (INTACT, não alterar)
-- **Manifesto Section**: BlurText component com word-by-word blur-in
-- **Estúdios Section**: Masonry.tsx com 5 fotos em colunas
-- **Cowork Section**: SpotlightCard.tsx com cursor spotlight em 5 fotos
-- **Comodidades Section**: Hover cards com 3 fotos
+- **Hero Section**: Globe 3D + motion title (INTACT, não alterar)
+- **Manifesto Section**: ManifestoSection.tsx component (BlurText word-by-word blur-in, dynamically imported)
+- **Estúdios Section**: EstudiosSection.tsx component (CharReveal title, BalancedHeadline subtitle, Masonry 5 fotos, dynamically imported)
+- **Cowork Section**: CoworkSection.tsx component (CharReveal title, BalancedHeadline subtitle, SpotlightCard 5 fotos, dynamically imported)
+- **Comodidades Section**: ComodidadesSection.tsx component (CharReveal title, BalancedHeadline subtitle, hover cards 3 fotos, dynamically imported)
 - **CTA Section**: Standard CTA (INTACT, não alterar)
+- **Data**: All 13 images + content centralized in espacoData.ts
 
 **Total assets:** 13 fotos (5 studios, 5 cowork, 3 amenities) — usar TODAS e SOMENTE estas.
+**Architecture:** Page.tsx uses dynamic imports with ssr: false for all 4 sections (code splitting active).
 
 ### Current Animation Stack
 
@@ -56,6 +58,12 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - `Masonry.tsx` — basic column distribution
 - `SpotlightCard.tsx` — cursor spotlight effect
 - `MobileBottomSheet.tsx` — vaul wrapper with snap points (v1.2)
+
+**Espaço section components (v1.3, Phase 10):**
+- `ManifestoSection.tsx` — BlurText manifesto with word-level reveal
+- `EstudiosSection.tsx` — CharReveal title + Masonry grid (5 studios)
+- `CoworkSection.tsx` — CharReveal title + SpotlightCard grid (5 cowork)
+- `ComodidadesSection.tsx` — CharReveal title + hover cards (3 amenities)
 
 **Data files:**
 - `espacoData.ts` — all 13 photo paths + section content (v1.3, Phase 10)
@@ -79,6 +87,9 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **TEXT-02 (Phase 10)**: GSAP animations use native IntersectionObserver (useInView), not Framer Motion hooks
 - **TEXT-03 (Phase 10)**: DOM manipulation libraries require client-side execution only
 - **TEXT-04 (Phase 10)**: All text animations must show instantly when prefers-reduced-motion is active
+- **ARCH-01 (Phase 10)**: Section components are self-contained with no props, importing data from espacoData.ts
+- **ARCH-02 (Phase 10)**: Dynamic imports use ssr: false for client-only animation libraries
+- **ARCH-03 (Phase 10)**: Loading fallbacks maintain approximate vertical space (py-24) to prevent layout shift
 
 ### Critical Pitfalls (from research)
 
@@ -116,6 +127,8 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 9 | 09-02 | 3 min | 4 | 5 | 2026-03-15 |
 | 10 | 10-01 | 4 min | 3 | 6 | 2026-03-16 |
 | 10 | 10-02 | 2 min | 2 | 5 | 2026-03-16 |
+| 10 | 10-03 | 2 min | 2 | 1 | 2026-03-16 |
+| Phase 10 P10-03 | 2 | 2 tasks | 1 files |
 
 ## Current Todos
 
@@ -125,21 +138,22 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Document GSAP vs Framer Motion separation pattern (INFRA-04) — Complete in 09-02
 - [x] Create text animation components + data extraction (TEXT-01) — Complete in 10-01
 - [x] Extract all 4 middle sections with text animations (10-02) — Complete in 10-02
-- [ ] Dynamic import sections in page.tsx (10-03)
+- [x] Dynamic import sections in page.tsx (10-03) — Complete in 10-03
+- [ ] Phase 11: Creative Layout Experiments (per v1.3 roadmap)
 
 ## Active Blockers
 
-None — Phase 10 Plan 02 complete, ready to proceed to Plan 03.
+None — Phase 10 complete (3/3 plans), ready to proceed to Phase 11.
 
 ## Session Continuity
 
-**Last session:** 2026-03-16T09:14:27.431Z
-**Stopped at:** Completed Phase 10 Plan 02 (Section Extraction with Text Animations)
+**Last session:** 2026-03-16T09:17:47Z
+**Stopped at:** Completed Phase 10 Plan 03 (Dynamic Import Integration) — PHASE 10 COMPLETE
 
-**Next command:** `/gsd:execute-phase 10` (continue with Plan 03)
+**Next command:** `/gsd:execute-phase 11` (start Phase 11 per v1.3 roadmap)
 
 **What to tell next Claude:**
-"Phase 10 Plan 02 completo. Extracted all 4 middle sections (ManifestoSection, EstudiosSection, CoworkSection, ComodidadesSection) from espaco/page.tsx into standalone components. Each section imports data from espacoData.ts, uses CharReveal for titles (except Manifesto which uses BlurText), BalancedHeadline for subtitles, and has loading='eager' on all images. Created barrel export at src/components/sections/espaco/index.ts. Ready for Plan 03 (dynamic import integration in page.tsx). See 10-02-SUMMARY.md for details."
+"Phase 10 completo (3/3 plans). Espaco page refactored to 109 lines with dynamic imports for all 4 sections (ManifestoSection, EstudiosSection, CoworkSection, ComodidadesSection). Code splitting active with 57 chunks. All inline data removed, sections load lazily with ssr: false. Build passes, all 13 images accounted for. Hero and CTA sections unchanged. Ready for Phase 11 (Creative Layout Experiments). See 10-03-SUMMARY.md for details."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
@@ -148,3 +162,5 @@ None — Phase 10 Plan 02 complete, ready to proceed to Plan 03.
 *Updated: 2026-03-15 23:04 UTC (Phase 9 Plan 01 executed)*
 *Updated: 2026-03-15 23:08 UTC (Phase 9 Plan 02 executed — Phase 9 complete)*
 *Updated: 2026-03-16 09:08 UTC (Phase 10 Plan 01 executed)*
+*Updated: 2026-03-16 09:13 UTC (Phase 10 Plan 02 executed)*
+*Updated: 2026-03-16 09:17 UTC (Phase 10 Plan 03 executed — Phase 10 complete)*
