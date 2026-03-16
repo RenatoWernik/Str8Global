@@ -3,11 +3,11 @@
 ## Current Position
 
 - **Milestone**: v1.3 — Redesign Página Espaço
-- **Phase**: Phase 10 — Text Animations & Section Extraction (COMPLETE - 3/3 plans)
-- **Plan**: 10-03 complete
-- **Status**: Phase 10 complete, ready for Phase 11
-- **Progress**: ████████████ 100% (milestone: 3/4 phases complete, project: 11/12 phases shipped)
-- **Last activity**: 2026-03-16 — Phase 10 Plan 03 executed (dynamic import integration)
+- **Phase**: Phase 11 — Visual Redesign & Image Effects (IN PROGRESS - 1/4 plans)
+- **Plan**: 11-01 complete
+- **Status**: Foundation components created, ready for section rewrites
+- **Progress**: █████████████ 25% (milestone: 3.25/4 phases complete, project: 11.25/12 phases shipped)
+- **Last activity**: 2026-03-16 — Phase 11 Plan 01 executed (foundation components)
 
 ## Project Reference
 
@@ -55,6 +55,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - `RotatingText.tsx` — text rotation effect
 - `CharReveal.tsx` — character-by-character GSAP reveal (v1.3, Phase 10)
 - `BalancedHeadline.tsx` — react-wrap-balancer wrapper (v1.3, Phase 10)
+- `RevealImage.tsx` — GSAP clip-path reveal animation (v1.3, Phase 11)
 - `Masonry.tsx` — basic column distribution
 - `SpotlightCard.tsx` — cursor spotlight effect
 - `MobileBottomSheet.tsx` — vaul wrapper with snap points (v1.2)
@@ -90,6 +91,8 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - **ARCH-01 (Phase 10)**: Section components are self-contained with no props, importing data from espacoData.ts
 - **ARCH-02 (Phase 10)**: Dynamic imports use ssr: false for client-only animation libraries
 - **ARCH-03 (Phase 10)**: Loading fallbacks maintain approximate vertical space (py-24) to prevent layout shift
+- **VFX-05 (Phase 11)**: All scroll-revealed images use loading="eager" to prevent LCP delay
+- **VFX-06 (Phase 11)**: One IntersectionObserver per section (not per image) - sections use useSectionInView, pass isInView to child RevealImages
 
 ### Critical Pitfalls (from research)
 
@@ -128,7 +131,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 | 10 | 10-01 | 4 min | 3 | 6 | 2026-03-16 |
 | 10 | 10-02 | 2 min | 2 | 5 | 2026-03-16 |
 | 10 | 10-03 | 2 min | 2 | 1 | 2026-03-16 |
-| Phase 10 P10-03 | 2 | 2 tasks | 1 files |
+| 11 | 11-01 | 1 min | 2 | 3 | 2026-03-16 |
 
 ## Current Todos
 
@@ -139,21 +142,24 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 - [x] Create text animation components + data extraction (TEXT-01) — Complete in 10-01
 - [x] Extract all 4 middle sections with text animations (10-02) — Complete in 10-02
 - [x] Dynamic import sections in page.tsx (10-03) — Complete in 10-03
-- [ ] Phase 11: Creative Layout Experiments (per v1.3 roadmap)
+- [x] Create RevealImage + useSectionInView foundation (11-01) — Complete in 11-01
+- [ ] Rewrite Estudios section with creative layout (11-02)
+- [ ] Rewrite Cowork section with creative layout (11-03)
+- [ ] Rewrite Comodidades section with creative layout (11-04)
 
 ## Active Blockers
 
-None — Phase 10 complete (3/3 plans), ready to proceed to Phase 11.
+None — Phase 11-01 complete, ready for section rewrites (11-02, 11-03, 11-04).
 
 ## Session Continuity
 
-**Last session:** 2026-03-16T09:17:47Z
-**Stopped at:** Completed Phase 10 Plan 03 (Dynamic Import Integration) — PHASE 10 COMPLETE
+**Last session:** 2026-03-16T09:42:16Z
+**Stopped at:** Completed Phase 11 Plan 01 (Foundation Components: RevealImage + useSectionInView)
 
-**Next command:** `/gsd:execute-phase 11` (start Phase 11 per v1.3 roadmap)
+**Next command:** `/gsd:execute-phase 11` (continue with 11-02: Estudios section rewrite)
 
 **What to tell next Claude:**
-"Phase 10 completo (3/3 plans). Espaco page refactored to 109 lines with dynamic imports for all 4 sections (ManifestoSection, EstudiosSection, CoworkSection, ComodidadesSection). Code splitting active with 57 chunks. All inline data removed, sections load lazily with ssr: false. Build passes, all 13 images accounted for. Hero and CTA sections unchanged. Ready for Phase 11 (Creative Layout Experiments). See 10-03-SUMMARY.md for details."
+"Phase 11-01 completo (1 min, 2 tasks, 3 files). Created RevealImage component (GSAP clip-path reveal with 4 directions) and useSectionInView hook (single IntersectionObserver per section). Foundation established for VFX-06 compliance: reduces 13 observers to 3 (one per section). Both components respect prefers-reduced-motion, use loading='eager' (VFX-05), and follow TEXT-02 decision (native IntersectionObserver). Ready for 11-02 (Estudios section rewrite). See 11-01-SUMMARY.md for full details."
 
 ---
 *State initialized: 2026-03-10 (v1.1)*
@@ -164,3 +170,4 @@ None — Phase 10 complete (3/3 plans), ready to proceed to Phase 11.
 *Updated: 2026-03-16 09:08 UTC (Phase 10 Plan 01 executed)*
 *Updated: 2026-03-16 09:13 UTC (Phase 10 Plan 02 executed)*
 *Updated: 2026-03-16 09:17 UTC (Phase 10 Plan 03 executed — Phase 10 complete)*
+*Updated: 2026-03-16 09:42 UTC (Phase 11 Plan 01 executed — foundation components)*
