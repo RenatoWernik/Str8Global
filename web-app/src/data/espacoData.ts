@@ -4,17 +4,20 @@
 export const estudiosImages = [
   '/images/espaco/Estudio1.jpg',
   '/images/espaco/Estudio2.jpg',
+];
+
+export const podcastImages = [
   '/images/espaco/Estudio-Podcast.jpg',
   '/images/espaco/Estudio-Podcast2.jpg',
   '/images/espaco/Estudio-Podcast3.jpg',
 ];
 
 export const coworkImages = [
-  { src: '/images/espaco/CoworkGeral.jpg', title: 'Open Space Geral' },
+  { src: '/images/espaco/CoworkGeral.jpg', title: '' },
   { src: '/images/espaco/CoworkGeral2.jpg', title: '' },
-  { src: '/images/espaco/Cowork-Starter.jpg', title: 'Plano Starter' },
-  { src: '/images/espaco/Cowork-Prime.jpg', title: 'Plano Prime' },
-  { src: '/images/espaco/Cowork-Premium.jpg', title: 'Lugar Premium' },
+  { src: '/images/espaco/Cowork-Starter.jpg', title: '' },
+  { src: '/images/espaco/Cowork-Prime.jpg', title: '' },
+  { src: '/images/espaco/Cowork-Premium.jpg', title: '' },
 ];
 
 export const comodidadesImages = [
@@ -28,6 +31,10 @@ export const espacoContent = {
   estudios: {
     title: 'Estúdios Nível Cinema',
     subtitle: 'Ambientes desenhados milimetricamente para absorção acústica e iluminação perfeita. O habitat natural das produções premium.',
+  },
+  podcast: {
+    title: 'Estúdio de Podcast',
+    subtitle: 'O espaço perfeito para produções de áudio e vídeo podcast. Acústica profissional, iluminação controlada e equipamento de ponta.',
   },
   cowork: {
     title: 'Zonas de Cowork',

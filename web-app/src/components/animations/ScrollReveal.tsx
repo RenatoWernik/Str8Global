@@ -1,8 +1,7 @@
 'use client';
 
-import { useRef, ReactNode } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
+import { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
@@ -28,56 +27,10 @@ export function ScrollReveal({
     blurStrength = 10,
     containerClassName,
     textClassName,
-    rotationEnd = 'top 80%',
+    rotationEnd = 'top 80%', // Kept for backwards compatibility, not strictly used
     delay = 0,
 }: ScrollRevealProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
     const prefersReducedMotion = useReducedMotion();
-
-    // React 19 concurrent safety: Explicit null check + scope parameter
-    // prevents crashes when refs are not yet mounted
-    useGSAP(() => {
-        if (prefersReducedMotion) return;
-
-        const element = containerRef.current;
-        if (!element) return;
-
-        const ctx = gsap.context(() => {
-            // Initial state
-            gsap.set(element, {
-                opacity: baseOpacity,
-                y: 60,
-                rotationX: baseRotation,
-                filter: 'none',
-            });
-
-            // Create animation timeline
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: element,
-                    scroller: scrollContainerRef?.current || undefined,
-                    start: 'top 90%',
-                    end: rotationEnd,
-                    toggleActions: 'play none none none',
-                },
-            });
-
-            tl.to(element, {
-                opacity: 1,
-                y: 0,
-                rotationX: 0,
-                filter: 'none',
-                duration: 1.2,
-                delay: delay,
-                ease: 'power3.out',
-            });
-        });
-
-        return () => ctx.revert();
-    }, {
-        dependencies: [scrollContainerRef, enableBlur, baseOpacity, baseRotation, blurStrength, rotationEnd, delay, prefersReducedMotion],
-        scope: containerRef
-    });
 
     if (prefersReducedMotion) {
         return (
@@ -88,15 +41,36 @@ export function ScrollReveal({
     }
 
     return (
-        <div
-            ref={containerRef}
+        <motion.div
+            initial={{ 
+                opacity: baseOpacity, 
+                y: 60, 
+                rotateX: baseRotation, 
+                filter: enableBlur ? `blur(${blurStrength}px)` : 'blur(0px)' 
+            }}
+            whileInView={{ 
+                opacity: 1, 
+                y: 0, 
+                rotateX: 0, 
+                filter: 'blur(0px)' 
+            }}
+            viewport={{ 
+                once: true, 
+                margin: "-10%",
+                ...(scrollContainerRef ? { root: scrollContainerRef } : {})
+            }}
+            transition={{ 
+                duration: 1.2, 
+                delay: delay, 
+                ease: [0.16, 1, 0.3, 1] 
+            }}
             className={cn('will-change-transform', containerClassName)}
             style={{ perspective: '1000px' }}
         >
             <div className={cn(textClassName)} style={{ transformStyle: 'preserve-3d' }}>
                 {children}
             </div>
-        </div>
+        </motion.div>
     );
 }
 

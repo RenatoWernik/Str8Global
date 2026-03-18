@@ -22,6 +22,11 @@ const EstudiosSection = dynamic(
   { ssr: false, loading: () => <div className="py-24" /> }
 );
 
+const PodcastSection = dynamic(
+  () => import('@/components/sections/espaco/PodcastSection').then(mod => ({ default: mod.PodcastSection })),
+  { ssr: false, loading: () => <div className="py-24" /> }
+);
+
 const CoworkSection = dynamic(
   () => import('@/components/sections/espaco/CoworkSection').then(mod => ({ default: mod.CoworkSection })),
   { ssr: false, loading: () => <div className="py-24" /> }
@@ -57,8 +62,8 @@ export default function EspacoPage() {
           className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center"
           style={{ y: backgroundY }}
         >
-          <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
-            <div className="relative w-[250%] md:w-[200%] max-w-[1200px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+          <div className="absolute inset-x-0 top-[25%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
+            <div className="relative w-[100%] sm:w-[120%] md:w-[200%] max-w-[600px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
               <Globe className="opacity-100" />
             </div>
           </div>
@@ -93,6 +98,7 @@ export default function EspacoPage() {
       {/* 2-5. DYNAMIC SECTIONS */}
       <ManifestoSection />
       <EstudiosSection />
+      <PodcastSection />
       <CoworkSection />
       <ComodidadesSection />
 

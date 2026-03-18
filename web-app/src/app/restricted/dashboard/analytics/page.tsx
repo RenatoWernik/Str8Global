@@ -5,106 +5,39 @@ import { motion } from 'framer-motion';
 import {
     DollarSign,
     TrendingUp,
-    BarChart3,
-    PieChart,
-    Package,
-    Video,
     Users,
+    AlertCircle,
     Calendar,
     Star,
+    Lightbulb,
+    Target,
+    Activity,
+    Package,
+    Video,
+    Briefcase
 } from 'lucide-react';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Legend,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
+    Radar
+} from 'recharts';
 import type { Reservation, CoworkReservation } from '@/types/database';
 
 function formatCurrency(value: number) {
     return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(value);
 }
 
-// ── Simple Bar Chart (SVG) ──
-function MiniBarChart({ data, color = '#22d3ee' }: { data: number[], color?: string }) {
-    const max = Math.max(...data, 1);
-    const barWidth = 100 / data.length;
-
-    return (
-        <svg viewBox="0 0 100 40" className="w-full h-24" preserveAspectRatio="none">
-            {data.map((val, i) => {
-                const height = (val / max) * 36;
-                return (
-                    <motion.rect
-                        key={i}
-                        initial={{ height: 0, y: 40 }}
-                        animate={{ height, y: 40 - height }}
-                        transition={{ delay: i * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                        x={i * barWidth + barWidth * 0.15}
-                        width={barWidth * 0.7}
-                        rx={1}
-                        fill={color}
-                        fillOpacity={0.6}
-                    />
-                );
-            })}
-        </svg>
-    );
-}
-
-// ── Donut Chart (SVG) ──
-function DonutChart({ segments }: { segments: { label: string; value: number; color: string }[] }) {
-    const total = segments.reduce((sum, s) => sum + s.value, 0);
-    if (total === 0) {
-        return (
-            <div className="flex items-center justify-center h-40 text-white/20 text-sm">
-                Sem dados
-            </div>
-        );
-    }
-
-    let cumulativePercent = 0;
-
-    return (
-        <div className="flex items-center gap-6">
-            <svg viewBox="0 0 36 36" className="w-32 h-32 shrink-0">
-                {segments.map((seg, i) => {
-                    const percent = (seg.value / total) * 100;
-                    const dash = `${percent} ${100 - percent}`;
-                    const offset = -cumulativePercent + 25; // start from top
-                    cumulativePercent += percent;
-
-                    return (
-                        <motion.circle
-                            key={i}
-                            initial={{ strokeDasharray: '0 100' }}
-                            animate={{ strokeDasharray: dash }}
-                            transition={{ delay: i * 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            cx="18"
-                            cy="18"
-                            r="15.91549430918954"
-                            fill="transparent"
-                            stroke={seg.color}
-                            strokeWidth="2.5"
-                            strokeDashoffset={offset}
-                            strokeLinecap="round"
-                        />
-                    );
-                })}
-                <text x="18" y="17" textAnchor="middle" className="fill-white text-[4px] font-bold">
-                    {formatCurrency(total)}
-                </text>
-                <text x="18" y="21" textAnchor="middle" className="fill-white/30 text-[2.5px]">
-                    Total
-                </text>
-            </svg>
-
-            <div className="space-y-2 flex-1">
-                {segments.map((seg, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
-                        <span className="text-xs text-white/50 flex-1">{seg.label}</span>
-                        <span className="text-xs text-white/70 font-medium">{formatCurrency(seg.value)}</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
+const DAYS_OF_WEEK = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
 export default function AnalyticsPage() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -125,76 +58,157 @@ export default function AnalyticsPage() {
     }, []);
 
     const analytics = useMemo(() => {
-        const allActive = [...reservations, ...coworkReservations].filter(r => r.status !== 'cancelled');
+        const allReservations = [...reservations, ...coworkReservations];
+        const allActive = allReservations.filter(r => r.status !== 'cancelled');
+        const cancelledCount = allReservations.filter(r => r.status === 'cancelled').length;
+        const totalReservations = allReservations.length;
 
-        // Revenue by month (last 12 months)
+        // Basic Totals
+        const totalRevenue = allActive.reduce((sum, r) => sum + (r.total_price || 0), 0);
+        const aov = allActive.length > 0 ? totalRevenue / allActive.length : 0;
+        const cancellationRate = totalReservations > 0 ? (cancelledCount / totalReservations) * 100 : 0;
+
+        // Retention Rate
+        const clientCounts: Record<string, number> = {};
+        allActive.forEach(r => {
+            const client = r.client.trim().toLowerCase();
+            clientCounts[client] = (clientCounts[client] || 0) + 1;
+        });
+        const totalClients = Object.keys(clientCounts).length;
+        const repeatClients = Object.values(clientCounts).filter(count => count > 1).length;
+        const retentionRate = totalClients > 0 ? (repeatClients / totalClients) * 100 : 0;
+
+        // Year to Date (YTD) vs Previous YTD
         const now = new Date();
-        const monthlyRevenue = Array.from({ length: 12 }, (_, i) => {
+        const currentYear = now.getFullYear();
+        const ytdRevenue = allActive
+            .filter(r => new Date((r as any).created_at).getFullYear() === currentYear)
+            .reduce((sum, r) => sum + (r.total_price || 0), 0);
+        
+        const previousYtdRevenue = allActive
+            .filter(r => new Date((r as any).created_at).getFullYear() === currentYear - 1)
+            .reduce((sum, r) => sum + (r.total_price || 0), 0);
+
+        // Monthly Revenue by Category for Stacked Bar Chart (Last 12 months)
+        const monthlyData = Array.from({ length: 12 }, (_, i) => {
             const date = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
             const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            return allActive
-                .filter(r => r.created_at.startsWith(monthStr))
+            const label = date.toLocaleDateString('pt-PT', { month: 'short' });
+
+            const gear = allActive
+                .filter(r => 'item_type' in r && r.item_type === 'gear' && (r as any).created_at.startsWith(monthStr))
                 .reduce((sum, r) => sum + (r.total_price || 0), 0);
+            const studio = allActive
+                .filter(r => 'item_type' in r && r.item_type === 'studio' && (r as any).created_at.startsWith(monthStr))
+                .reduce((sum, r) => sum + (r.total_price || 0), 0);
+            const cowork = allActive
+                .filter(r => !('item_type' in r) && (r as any).created_at.startsWith(monthStr))
+                .reduce((sum, r) => sum + (r.total_price || 0), 0);
+
+            return { month: label, Equipamento: gear, Estúdios: studio, Cowork: cowork };
         });
 
-        // Revenue by category
-        const gearRevenue = reservations
-            .filter(r => r.status !== 'cancelled' && r.item_type === 'gear')
-            .reduce((sum, r) => sum + (r.total_price || 0), 0);
-        const studioRevenue = reservations
-            .filter(r => r.status !== 'cancelled' && r.item_type === 'studio')
-            .reduce((sum, r) => sum + (r.total_price || 0), 0);
-        const coworkRevenue = coworkReservations
-            .filter(r => r.status !== 'cancelled')
-            .reduce((sum, r) => sum + (r.total_price || 0), 0);
-
-        // Top items (most rented)
-        const itemCounts: Record<string, { name: string; count: number; revenue: number }> = {};
-        for (const r of reservations.filter(r => r.status !== 'cancelled')) {
-            if (!itemCounts[r.item_id]) {
-                itemCounts[r.item_id] = { name: r.item_name, count: 0, revenue: 0 };
+        // Performance by Day of Week
+        const dayCounts = Array(7).fill(0);
+        const dayStudioCounts = Array(7).fill(0);
+        allActive.forEach(r => {
+            const dateStr = 'start_date' in r ? r.start_date : (r as any).created_at;
+            const day = new Date(dateStr).getDay();
+            // check validity of day
+            if (!isNaN(day)) {
+                dayCounts[day]++;
+                if ('item_type' in r && r.item_type === 'studio') {
+                    dayStudioCounts[day]++;
+                }
             }
-            itemCounts[r.item_id].count++;
-            itemCounts[r.item_id].revenue += r.total_price || 0;
+        });
+        const dnwData = DAYS_OF_WEEK.map((day, i) => ({
+            day,
+            Reservas: dayCounts[i]
+        }));
+
+        // Top Items (Expanded)
+        const itemStats: Record<string, { name: string; count: number; revenue: number; type: string }> = {};
+        allActive.forEach(r => {
+            if ('item_type' in r) { // Gear or Studio
+                if (!itemStats[r.item_id]) {
+                    itemStats[r.item_id] = { name: r.item_name, count: 0, revenue: 0, type: r.item_type };
+                }
+                itemStats[r.item_id].count++;
+                itemStats[r.item_id].revenue += r.total_price || 0;
+            } else { // Cowork
+                const name = `Cowork ${r.plan_id.replace(/-/g, ' ')}`;
+                if (!itemStats[r.plan_id]) {
+                    itemStats[r.plan_id] = { name, count: 0, revenue: 0, type: 'cowork' };
+                }
+                itemStats[r.plan_id].count++;
+                itemStats[r.plan_id].revenue += r.total_price || 0;
+            }
+        });
+        const topItems = Object.values(itemStats)
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 10)
+            .map(item => ({
+                ...item,
+                aov: item.count > 0 ? item.revenue / item.count : 0
+            }));
+
+        // Generate AI-like Insights
+        const insights = [];
+        
+        // Insight: Best day for studios
+        const maxStudioDayIdx = dayStudioCounts.indexOf(Math.max(...dayStudioCounts));
+        if (maxStudioDayIdx >= 0 && dayStudioCounts[maxStudioDayIdx] > 0) {
+            insights.push({
+                type: 'success',
+                text: `🔥 ${DAYS_OF_WEEK[maxStudioDayIdx]} costuma ser o dia com mais estúdios reservados.`
+            });
         }
-        const topItems = Object.values(itemCounts)
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 8);
 
-        // Unique clients
-        const uniqueClients = new Set([
-            ...reservations.map(r => r.client),
-            ...coworkReservations.map(r => r.client),
-        ]).size;
+        // Insight: Top item
+        if (topItems.length > 0) {
+            insights.push({
+                type: 'info',
+                text: `⭐ O "${topItems[0].name}" é o seu bem mais rentável atualmente.`
+            });
+        }
 
-        // This month vs last month
-        const thisMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const lastMonthStr = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`;
+        // Insight: Cancellation alert
+        if (cancellationRate > 15) {
+            insights.push({
+                type: 'warning',
+                text: `⚠️ Atenção: A sua taxa de cancelamento está em ${cancellationRate.toFixed(1)}%, acima do recomendável.`
+            });
+        }
 
-        const thisMonthRevenue = allActive
-            .filter(r => r.created_at.startsWith(thisMonthStr))
-            .reduce((sum, r) => sum + (r.total_price || 0), 0);
-        const lastMonthRevenue = allActive
-            .filter(r => r.created_at.startsWith(lastMonthStr))
-            .reduce((sum, r) => sum + (r.total_price || 0), 0);
-
-        const thisMonthBookings = allActive.filter(r => r.created_at.startsWith(thisMonthStr)).length;
-        const lastMonthBookings = allActive.filter(r => r.created_at.startsWith(lastMonthStr)).length;
+        // Insight: Retention
+        if (retentionRate > 40) {
+            insights.push({
+                type: 'success',
+                text: `💎 A sua retenção de clientes é excecional (${retentionRate.toFixed(1)}% voltam a alugar).`
+            });
+        }
+        
+        // Insight: Fallback neutral/good insight if very few
+        if (insights.length < 2 && totalRevenue > 0) {
+             insights.push({
+                type: 'success',
+                text: `📈 A gerarem uma receita acumulada viva de ${formatCurrency(totalRevenue)}.`
+            });
+        }
 
         return {
-            monthlyRevenue,
-            gearRevenue,
-            studioRevenue,
-            coworkRevenue,
+            totalRevenue,
+            ytdRevenue,
+            previousYtdRevenue,
+            aov,
+            retentionRate,
+            cancelledCount,
+            cancellationRate,
+            monthlyData,
+            dnwData,
             topItems,
-            uniqueClients,
-            thisMonthRevenue,
-            lastMonthRevenue,
-            thisMonthBookings,
-            lastMonthBookings,
-            totalRevenue: gearRevenue + studioRevenue + coworkRevenue,
-            totalBookings: allActive.length,
+            insights
         };
     }, [reservations, coworkReservations]);
 
@@ -208,46 +222,79 @@ export default function AnalyticsPage() {
         );
     }
 
-    const revenueGrowth = analytics.lastMonthRevenue > 0
-        ? ((analytics.thisMonthRevenue - analytics.lastMonthRevenue) / analytics.lastMonthRevenue * 100).toFixed(1)
+    const ytdGrowth = analytics.previousYtdRevenue > 0
+        ? ((analytics.ytdRevenue - analytics.previousYtdRevenue) / analytics.previousYtdRevenue * 100).toFixed(1)
         : '—';
 
     return (
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Analytics</h1>
-                <p className="text-sm text-white/40 mt-1">Métricas, tendências e insights do negócio</p>
+                <h1 className="text-2xl font-bold text-white tracking-tight">Analytics Avançado</h1>
+                <p className="text-sm text-white/40 mt-1">Métricas aprofundadas, de ticket médio a padrões semanais.</p>
             </div>
 
-            {/* Top metrics */}
+            {/* AI Insights Panel */}
+            {analytics.insights.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/[0.02] border border-cyan-500/20 rounded-xl p-5 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                        <Lightbulb size={120} />
+                    </div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <Lightbulb size={18} className="text-cyan-400" />
+                        <h2 className="text-sm font-semibold text-white/90">Insights Inteligentes</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+                        {analytics.insights.map((insight, i) => (
+                            <div 
+                                key={i} 
+                                className={`p-4 rounded-lg border text-sm flex items-start leading-relaxed ${
+                                    insight.type === 'warning' ? 'bg-red-500/10 border-red-500/20 text-red-100' :
+                                    insight.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-100' :
+                                    'bg-cyan-500/10 border-cyan-500/20 text-cyan-100'
+                                }`}
+                            >
+                                {insight.text}
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            )}
+
+            {/* KPI Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {[
                     {
-                        label: 'Receita Total',
-                        value: formatCurrency(analytics.totalRevenue),
-                        icon: DollarSign,
-                        color: 'emerald',
-                    },
-                    {
-                        label: 'Este Mês',
-                        value: formatCurrency(analytics.thisMonthRevenue),
-                        subtitle: revenueGrowth !== '—' ? `${Number(revenueGrowth) >= 0 ? '+' : ''}${revenueGrowth}% vs mês anterior` : undefined,
-                        icon: TrendingUp,
+                        label: 'Ticket Médio (AOV)',
+                        value: formatCurrency(analytics.aov),
+                        subtitle: 'Gasto médio por reserva',
+                        icon: Target,
                         color: 'cyan',
                     },
                     {
-                        label: 'Total Reservas',
-                        value: `${analytics.totalBookings}`,
-                        subtitle: `${analytics.thisMonthBookings} este mês`,
-                        icon: Calendar,
-                        color: 'amber',
-                    },
-                    {
-                        label: 'Clientes Únicos',
-                        value: `${analytics.uniqueClients}`,
+                        label: 'Taxa de Retenção',
+                        value: `${analytics.retentionRate.toFixed(1)}%`,
+                        subtitle: 'Clientes repetidos vs totais',
                         icon: Users,
                         color: 'violet',
+                    },
+                    {
+                        label: 'Cancelamentos',
+                        value: `${analytics.cancelledCount}`,
+                        subtitle: `${analytics.cancellationRate.toFixed(1)}% do acumulado`,
+                        icon: AlertCircle,
+                        color: 'red',
+                    },
+                    {
+                        label: 'Receita YTD',
+                        value: formatCurrency(analytics.ytdRevenue),
+                        subtitle: ytdGrowth !== '—' ? `${Number(ytdGrowth) >= 0 ? '+' : ''}${ytdGrowth}% vs ano anterior` : 'Ano corrente',
+                        icon: DollarSign,
+                        color: 'emerald',
                     },
                 ].map((card, i) => (
                     <motion.div
@@ -267,92 +314,133 @@ export default function AnalyticsPage() {
                 ))}
             </div>
 
-            {/* Charts row */}
+            {/* Charts Row */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                {/* Revenue Trend */}
+                {/* Monthly Stacked Bar Chart */}
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden p-5"
+                >
+                    <div className="flex items-center gap-2 mb-6">
+                        <TrendingUp size={16} className="text-emerald-400/60" />
+                        <h2 className="text-sm font-semibold text-white/80">Receita Mensal Detalhada</h2>
+                    </div>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={analytics.monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="month" stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `€${val}`} />
+                                <Tooltip 
+                                    cursor={{fill: 'rgba(255,255,255,0.02)'}}
+                                    contentStyle={{ backgroundColor: '#12121a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                                    itemStyle={{ fontSize: '12px' }}
+                                    formatter={(value: any) => formatCurrency(Number(value))}
+                                />
+                                <Legend wrapperStyle={{ fontSize: '11px', opacity: 0.7 }} />
+                                <Bar dataKey="Equipamento" stackId="a" fill="#22d3ee" radius={[0, 0, 4, 4]} />
+                                <Bar dataKey="Estúdios" stackId="a" fill="#a78bfa" />
+                                <Bar dataKey="Cowork" stackId="a" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </motion.div>
+
+                {/* Day of Week Radar Chart */}
                 <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden"
+                    className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden p-5"
                 >
-                    <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
-                        <BarChart3 size={16} className="text-cyan-400/60" />
-                        <h2 className="text-sm font-semibold text-white/80">Receita Mensal (12 meses)</h2>
+                    <div className="flex items-center gap-2 mb-6">
+                        <Activity size={16} className="text-violet-400/60" />
+                        <h2 className="text-sm font-semibold text-white/80">Check-ins e Afluência (Dias da Semana)</h2>
                     </div>
-                    <div className="p-5">
-                        <MiniBarChart data={analytics.monthlyRevenue} color="#22d3ee" />
-                        <div className="flex justify-between mt-2 text-[9px] text-white/20 uppercase">
-                            <span>{new Date(new Date().getFullYear(), new Date().getMonth() - 11, 1).toLocaleDateString('pt-PT', { month: 'short' })}</span>
-                            <span>{new Date().toLocaleDateString('pt-PT', { month: 'short' })}</span>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Category Breakdown */}
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden"
-                >
-                    <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
-                        <PieChart size={16} className="text-violet-400/60" />
-                        <h2 className="text-sm font-semibold text-white/80">Receita por Categoria</h2>
-                    </div>
-                    <div className="p-5">
-                        <DonutChart segments={[
-                            { label: 'Equipamento', value: analytics.gearRevenue, color: '#22d3ee' },
-                            { label: 'Estúdios', value: analytics.studioRevenue, color: '#a78bfa' },
-                            { label: 'Cowork', value: analytics.coworkRevenue, color: '#fbbf24' },
-                        ]} />
+                    <div className="h-[300px] w-full flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={analytics.dnwData}>
+                                <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                                <PolarAngleAxis dataKey="day" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />
+                                <Radar 
+                                    name="Reservas Totais" 
+                                    dataKey="Reservas" 
+                                    stroke="#8b5cf6" 
+                                    fill="#8b5cf6" 
+                                    fillOpacity={0.4} 
+                                />
+                                <Tooltip 
+                                    contentStyle={{ backgroundColor: '#12121a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                                />
+                            </RadarChart>
+                        </ResponsiveContainer>
                     </div>
                 </motion.div>
             </div>
 
-            {/* Top Items */}
+            {/* Top Items Table */}
             <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.5 }}
                 className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden"
             >
                 <div className="px-5 py-4 border-b border-white/[0.06] flex items-center gap-2">
                     <Star size={16} className="text-amber-400/60" />
-                    <h2 className="text-sm font-semibold text-white/80">Itens Mais Alugados</h2>
+                    <h2 className="text-sm font-semibold text-white/80">Itens com Maior Rentabilidade</h2>
                 </div>
-                <div className="p-4">
-                    {analytics.topItems.length === 0 ? (
-                        <div className="py-8 text-center text-sm text-white/20">Sem dados de aluguer</div>
-                    ) : (
-                        <div className="space-y-2">
-                            {analytics.topItems.map((item, i) => {
-                                const maxCount = analytics.topItems[0]?.count || 1;
-                                return (
-                                    <div key={item.name} className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/[0.02] transition">
-                                        <span className="text-sm text-white/20 w-6 text-right font-mono">#{i + 1}</span>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-white/80 font-medium truncate">{item.name}</p>
-                                            <div className="mt-1.5 h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${(item.count / maxCount) * 100}%` }}
-                                                    transition={{ delay: 0.1 * i, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                                    className="h-full bg-gradient-to-r from-cyan-500/60 to-cyan-400/40 rounded-full"
-                                                />
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left whitespace-nowrap">
+                        <thead>
+                            <tr className="border-b border-white/[0.06] bg-black/40">
+                                <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Ranking</th>
+                                <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4">Item (Referência)</th>
+                                <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4 text-right">Qtd. Alugueres</th>
+                                <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4 text-right">Ticket Médio</th>
+                                <th className="text-[10px] tracking-[0.15em] uppercase text-white/30 font-medium px-5 py-4 text-right">Receita Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {analytics.topItems.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="text-center py-12 text-white/20 text-sm">
+                                        Sem dados de aluguer suficientes
+                                    </td>
+                                </tr>
+                            ) : (
+                                analytics.topItems.map((item, i) => (
+                                    <tr key={item.name} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition">
+                                        <td className="px-5 py-4 text-xs font-mono text-white/40">
+                                            #{i + 1}
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-2">
+                                                {item.type === 'gear' ? <Package size={14} className="text-cyan-400/60" /> :
+                                                 item.type === 'studio' ? <Video size={14} className="text-violet-400/60" /> :
+                                                 <Briefcase size={14} className="text-amber-400/60" />}
+                                                <span className="text-sm font-medium text-white/80">{item.name}</span>
                                             </div>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                            <p className="text-sm text-white/60 font-medium">{item.count}x</p>
-                                            <p className="text-[10px] text-white/25">{formatCurrency(item.revenue)}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-white/60 text-right">
+                                            {item.count}x
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-white/60 text-right">
+                                            {formatCurrency(item.aov)}
+                                        </td>
+                                        <td className="px-5 py-4 text-sm font-semibold text-emerald-400/90 text-right">
+                                            {formatCurrency(item.revenue)}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </motion.div>
         </div>
     );
 }
+

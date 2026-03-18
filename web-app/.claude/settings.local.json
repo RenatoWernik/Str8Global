@@ -83,7 +83,8 @@
       "Skill(paul:apply)",
       "Skill(paul:unify)",
       "Bash(git reset:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(cowork-capacity\\): implement full cowork capacity logic across system\n\nPhase 1 complete - Cowork Capacity Logic:\n- Fix totalSpots: Starter=4, Prime=4, Premium=2 \\(was 6 for Prime\\)\n- Add checkCoworkCapacity\\(\\) backend validation preventing overbooking\n- API monthly returns spotsByDate for cowork plans \\(backward compatible\\)\n- Public calendar shows real-time spots per day with color indicators\n- Admin dashboard shows cowork occupancy bars per plan\n- Admin form validates capacity in real-time, blocks when full\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(cowork-capacity\\): implement full cowork capacity logic across system\n\nPhase 1 complete - Cowork Capacity Logic:\n- Fix totalSpots: Starter=4, Prime=4, Premium=2 \\(was 6 for Prime\\)\n- Add checkCoworkCapacity\\(\\) backend validation preventing overbooking\n- API monthly returns spotsByDate for cowork plans \\(backward compatible\\)\n- Public calendar shows real-time spots per day with color indicators\n- Admin dashboard shows cowork occupancy bars per plan\n- Admin form validates capacity in real-time, blocks when full\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npx vercel --prod)"
     ]
   }
 }

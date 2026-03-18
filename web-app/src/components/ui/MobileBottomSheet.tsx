@@ -52,7 +52,7 @@ export function MobileBottomSheet({
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]" />
 
         <Drawer.Content
-          className="fixed bottom-0 left-0 right-0 z-[100] flex flex-col bg-black/95 backdrop-blur-xl border border-white/10 rounded-t-3xl"
+          className="fixed bottom-0 left-0 right-0 z-[100] flex flex-col max-h-[90dvh] bg-black/95 backdrop-blur-xl border border-white/10 rounded-t-3xl"
           style={{
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}

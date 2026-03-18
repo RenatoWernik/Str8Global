@@ -63,6 +63,7 @@ export function StudioHourlyCalendar({
   const [isDesktop, setIsDesktop] = useState(false);
   const { blocks, loading, error } = useHourlyAvailability(studioId, selectedDate);
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const today = getTodayString();
   const maxDate = addDays(today, 90);
@@ -85,6 +86,36 @@ export function StudioHourlyCalendar({
   const handleToday = () => {
     setSelectedDate(today);
   };
+
+  // Month navigation
+  const handlePrevMonth = () => {
+    const current = new Date(selectedDate + 'T00:00:00');
+    const firstOfPrevMonth = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+    const todayDate = new Date(today + 'T00:00:00');
+    if (firstOfPrevMonth < todayDate) {
+      setSelectedDate(today);
+    } else {
+      setSelectedDate(firstOfPrevMonth.toISOString().split('T')[0]);
+    }
+  };
+
+  const handleNextMonth = () => {
+    const current = new Date(selectedDate + 'T00:00:00');
+    const firstOfNextMonth = new Date(current.getFullYear(), current.getMonth() + 1, 1);
+    const maxDateObj = new Date(maxDate + 'T00:00:00');
+    if (firstOfNextMonth > maxDateObj) {
+      setSelectedDate(maxDate);
+    } else {
+      setSelectedDate(firstOfNextMonth.toISOString().split('T')[0]);
+    }
+  };
+
+  const currentMonth = new Date(selectedDate + 'T00:00:00').getMonth();
+  const currentYear = new Date(selectedDate + 'T00:00:00').getFullYear();
+  const todayMonth = new Date(today + 'T00:00:00').getMonth();
+  const todayYear = new Date(today + 'T00:00:00').getFullYear();
+  const canGoPrevMonth = !(currentMonth === todayMonth && currentYear === todayYear);
+  const canGoNextMonth = new Date(currentYear, currentMonth + 1, 1) <= new Date(maxDate + 'T00:00:00');
 
   // Detect desktop breakpoint (md: 768px)
   useEffect(() => {
@@ -120,6 +151,19 @@ export function StudioHourlyCalendar({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  // Lock body scroll when calendar is open (desktop only)
+  useEffect(() => {
+    if (!isDesktop) return;
+    
+    // Store the original style to restore it later
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isDesktop]);
+
   // Generate grouped slots
   const generateSlots = (startH: number, endH: number) => {
     const slots = [];
@@ -140,13 +184,13 @@ export function StudioHourlyCalendar({
   const calendarPanel = (
     <motion.div
       ref={panelRef}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      initial={{ opacity: 0, y: isDesktop ? 20 : 0, scale: isDesktop ? 0.95 : 1 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      exit={{ opacity: 0, y: isDesktop ? 20 : 0, scale: isDesktop ? 0.95 : 1 }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       className={`
-        relative w-full flex flex-col overflow-hidden rounded-2xl
-        ${isDesktop ? 'max-w-4xl max-h-[85vh] bg-black/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50' : ''}
+        relative w-full flex flex-col
+        ${isDesktop ? 'overflow-hidden rounded-2xl max-w-4xl max-h-[85vh] bg-black/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50' : ''}
       `}
     >
       {/* Header (desktop only — MobileBottomSheet provides header on mobile) */}
@@ -168,7 +212,10 @@ export function StudioHourlyCalendar({
         </div>
       )}
 
-      <div className="p-4 md:p-6 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div 
+        ref={scrollContainerRef}
+        className={`flex-1 ${isDesktop ? 'p-4 md:p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent' : 'px-0 pt-0 pb-4'}`}
+      >
         {/* Date navigation */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-white/[0.02] p-2 md:p-3 rounded-2xl border border-white/5">
           <div className="flex items-center gap-2 w-full md:w-auto">
@@ -202,6 +249,33 @@ export function StudioHourlyCalendar({
             >
               <ChevronRight size={20} />
             </button>
+          </div>
+
+          {/* Month navigation - responsive */}
+          <div className="flex items-center justify-between md:justify-center gap-2 md:gap-3 w-full md:w-auto px-1 md:px-0">
+            <select
+              value={`${currentYear}-${currentMonth}`}
+              onChange={(e) => {
+                const [y, m] = e.target.value.split('-');
+                const newDate = new Date(Number(y), Number(m), 1);
+                const todayDate = new Date(today + 'T00:00:00');
+                if (newDate < todayDate) {
+                  setSelectedDate(today);
+                } else {
+                  setSelectedDate(newDate.toISOString().split('T')[0]);
+                }
+              }}
+              className="flex-1 md:flex-none w-full md:w-auto text-center md:text-left bg-white/[0.02] border border-white/10 text-white text-xs font-medium uppercase tracking-wider rounded-lg px-3 py-1.5 outline-none cursor-pointer hover:bg-white/[0.05] transition-colors focus:ring-1 focus:ring-[var(--color-accent)]"
+            >
+              {[...Array(6)].map((_, i) => {
+                const d = new Date(todayYear, todayMonth + i, 1);
+                return (
+                  <option key={i} value={`${d.getFullYear()}-${d.getMonth()}`} className="bg-black text-white py-1">
+                    {MONTHS_PT[d.getMonth()]} {d.getFullYear()}
+                  </option>
+                );
+              })}
+            </select>
           </div>
 
           {/* Shortcut to today & Legend */}
@@ -270,7 +344,7 @@ export function StudioHourlyCalendar({
 
                     const isOccupied = blocks.some(b => {
                       const bStart = parseTimeToMinutes(b.start);
-                      const bEnd = parseTimeToMinutes(b.end);
+                      const bEnd = parseTimeToMinutes(b.end) + 30; // 30 minutes buffer after observation
                       return bStart < bookingEndM && bEnd > startM;
                     });
 
@@ -353,12 +427,18 @@ export function StudioHourlyCalendar({
     return createPortal(
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-6"
-        >
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           transition={{ duration: 0.15 }}
+           className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-6"
+           onWheel={(e) => {
+             // Forward scroll events from background overlay to the inner scroll container
+             if (scrollContainerRef.current) {
+               scrollContainerRef.current.scrollTop += e.deltaY;
+             }
+           }}
+         >
           {calendarPanel}
         </motion.div>
       </AnimatePresence>,

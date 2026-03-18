@@ -281,6 +281,15 @@ export function Navbar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Close button inside overlay (Enhanced visibility) */}
+            <button
+              onClick={closeMobileMenu}
+              className="absolute top-6 right-4 p-3 bg-white/10 border border-white/20 rounded-full text-white hover:bg-white/20 hover:scale-105 transition-all z-50 shadow-lg"
+              aria-label="Fechar menu"
+            >
+              <X size={24} />
+            </button>
+
             <nav className="flex flex-col items-center gap-6">
               {mainNav.map((item, index) => (
                 <motion.div
@@ -374,6 +383,22 @@ export function Navbar() {
                 </AnimatePresence>
               </motion.div>
             </nav>
+
+            {/* Explicit Close Menu Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: (mainNav.length + 1) * 0.06, duration: 0.4 }}
+              className="mt-6 mb-2"
+            >
+              <button
+                onClick={closeMobileMenu}
+                className="px-8 py-3 rounded-full border border-white/20 text-white/70 text-sm font-medium hover:text-white hover:bg-white/10 transition-colors"
+              >
+                Sair do Menu
+              </button>
+            </motion.div>
 
             {/* Social Links */}
             <motion.div

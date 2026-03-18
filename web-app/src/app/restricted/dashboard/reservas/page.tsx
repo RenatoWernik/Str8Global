@@ -118,11 +118,13 @@ function ReservationFormModal({
     onClose,
     onSave,
     editingReservation,
+    activeTab,
 }: {
     open: boolean;
     onClose: () => void;
     onSave: () => void;
     editingReservation: Reservation | null;
+    activeTab?: TabType;
 }) {
     const [form, setForm] = useState({
         item_id: '',
@@ -163,7 +165,7 @@ function ReservationFormModal({
             setForm({
                 item_id: '',
                 item_name: '',
-                item_type: 'gear',
+                item_type: activeTab === 'studio' ? 'studio' : 'gear',
                 start_date: new Date().toISOString().split('T')[0],
                 end_date: '',
                 start_time: '',
@@ -261,16 +263,20 @@ function ReservationFormModal({
                             required
                         >
                             <option value="" className="bg-[#12121a]">Selecionar item...</option>
-                            <optgroup label="Equipamento" className="bg-[#12121a]">
-                                {allItems.filter(i => i.type === 'gear').map(i => (
-                                    <option key={i.id} value={i.id} className="bg-[#12121a]">{i.name} — {i.price}€/dia</option>
-                                ))}
-                            </optgroup>
-                            <optgroup label="Estúdios" className="bg-[#12121a]">
-                                {allItems.filter(i => i.type === 'studio').map(i => (
-                                    <option key={i.id} value={i.id} className="bg-[#12121a]">{i.name} — {i.price}€/h</option>
-                                ))}
-                            </optgroup>
+                            {(!activeTab || activeTab === 'gear') && (
+                                <optgroup label="Equipamento" className="bg-[#12121a]">
+                                    {allItems.filter(i => i.type === 'gear').map(i => (
+                                        <option key={i.id} value={i.id} className="bg-[#12121a]">{i.name} — {i.price}€/dia</option>
+                                    ))}
+                                </optgroup>
+                            )}
+                            {(!activeTab || activeTab === 'studio') && (
+                                <optgroup label="Estúdios" className="bg-[#12121a]">
+                                    {allItems.filter(i => i.type === 'studio').map(i => (
+                                        <option key={i.id} value={i.id} className="bg-[#12121a]">{i.name} — {i.price}€/h</option>
+                                    ))}
+                                </optgroup>
+                            )}
                         </select>
                     </div>
 
@@ -971,6 +977,7 @@ export default function ReservasPage() {
                 onClose={() => { setShowGearStudioForm(false); setEditingGearStudioRes(null); }}
                 onSave={fetchData}
                 editingReservation={editingGearStudioRes}
+                activeTab={activeTab}
             />
 
             <CoworkReservationFormModal

@@ -77,6 +77,7 @@ function StudioCard({
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
+  const [selectedTier, setSelectedTier] = useState<StudioTier | null>(studio.tiers.find(t => t.featured) || studio.tiers[0]);
 
   // Handle slot selection from calendar
   const handleSlotSelect = (date: string, hour: string) => {
@@ -93,17 +94,19 @@ function StudioCard({
     return `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   };
 
-  // WhatsApp message with date AND hour
+  // WhatsApp message with selected tier and date AND hour
   const messageBody = selectedDate && selectedHour
     ? `Olá! Gostaria de reservar o ${studio.name}.\n\n` +
+      `📦 Opção: ${selectedTier?.name} (${selectedTier?.priceLabel})\n` +
       `📅 Data: ${formatDatePT(selectedDate)}\n` +
       `⏰ Horário: ${selectedHour} - ${getNextHour(selectedHour)}\n\n` +
       `Podem confirmar a disponibilidade e forma de pagamento?`
     : selectedDate
     ? `Olá! Gostaria de reservar o ${studio.name}.\n\n` +
+      `📦 Opção: ${selectedTier?.name} (${selectedTier?.priceLabel})\n` +
       `📅 Data pretendida: ${formatDatePT(selectedDate)}\n\n` +
       `Podem confirmar a disponibilidade e forma de pagamento?`
-    : `Olá! Gostaria de reservar o ${studio.name}. Podem indicar-me a disponibilidade?`;
+    : `Olá! Gostaria de reservar o ${studio.name} (${selectedTier?.name}). Podem indicar-me a disponibilidade?`;
 
   return (
     <motion.div
@@ -148,9 +151,14 @@ function StudioCard({
           </div>
 
           {/* Tiers */}
-          <div className="space-y-4 mb-6">
+          <div className="space-y-3 mb-6">
             {studio.tiers.map((tier) => (
-              <TierRow key={tier.name} tier={tier} />
+              <TierRow 
+                key={tier.name} 
+                tier={tier} 
+                isSelected={selectedTier?.name === tier.name}
+                onClick={() => setSelectedTier(tier)}
+              />
             ))}
           </div>
 
@@ -248,32 +256,43 @@ function StudioCard({
   );
 }
 
-function TierRow({ tier }: { tier: StudioTier }) {
+function TierRow({ 
+  tier, 
+  isSelected, 
+  onClick 
+}: { 
+  tier: StudioTier; 
+  isSelected: boolean; 
+  onClick: () => void; 
+}) {
   return (
-    <div
+    <button
+      onClick={onClick}
       className={`
-        flex items-center justify-between py-3 px-4 rounded-xl
-        ${tier.featured ? 'bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20' : 'bg-white/[0.02]'}
-        transition-colors duration-300
+        w-full flex items-center justify-between py-3 px-4 rounded-xl text-left
+        transition-all duration-300 border outline-none
+        ${isSelected 
+          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)]/40 shadow-[0_0_15px_rgba(255,255,255,0.05)] ring-1 ring-[var(--color-accent)]' 
+          : 'bg-white/[0.02] border-transparent hover:bg-white/[0.04] hover:border-white/10'}
       `}
     >
       <div className="flex items-center gap-3">
-        {tier.featured && (
-          <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
-        )}
-        <span className={`text-sm md:text-base ${tier.featured ? 'text-white font-medium' : 'text-white/70'}`}>
+        <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/20' : 'border-white/20 bg-black/20'}`}>
+          {isSelected && <div className="w-2 h-2 rounded-full bg-[var(--color-accent)]" />}
+        </div>
+        <span className={`text-sm md:text-base ${isSelected ? 'text-white font-medium' : 'text-white/70'}`}>
           {tier.name}
         </span>
       </div>
       <span
         className={`
-          font-bold text-right
-          ${tier.price !== null ? 'text-lg md:text-xl text-[var(--color-accent)]' : 'text-sm text-white/40 italic'}
+          font-bold text-right shrink-0 ml-2
+          ${tier.price !== null ? (isSelected ? 'text-lg md:text-xl text-[var(--color-accent)]' : 'text-base md:text-lg text-[var(--color-accent)]/70') : 'text-sm text-white/40 italic'}
         `}
       >
         {tier.priceLabel}
       </span>
-    </div>
+    </button>
   );
 }
 
