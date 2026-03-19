@@ -20,18 +20,21 @@ const MONTHS_PT = [
 ];
 
 function formatDatePT(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return `${d.getDate()} de ${MONTHS_PT[d.getMonth()]} de ${d.getFullYear()}`;
+  const d = new Date(dateStr + 'T00:00:00Z');
+  return `${d.getUTCDate()} de ${MONTHS_PT[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
 }
 
 function getTodayString(): string {
   const now = new Date();
-  return now.toISOString().split('T')[0];
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() + days);
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().split('T')[0];
 }
 
@@ -66,56 +69,21 @@ export function StudioHourlyCalendar({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const today = getTodayString();
-  const maxDate = addDays(today, 90);
+  const maxDate = addDays(today, 180); // Allows 6 months to match dropdown
 
-  const canGoPrev = selectedDate > today;
-  const canGoNext = selectedDate < maxDate;
+  const currentMonth = new Date(selectedDate + 'T00:00:00Z').getUTCMonth();
+  const currentYear = new Date(selectedDate + 'T00:00:00Z').getUTCFullYear();
+  const todayMonth = new Date(today + 'T00:00:00Z').getUTCMonth();
+  const todayYear = new Date(today + 'T00:00:00Z').getUTCFullYear();
 
-  const handlePrev = () => {
-    if (canGoPrev) {
-      setSelectedDate(addDays(selectedDate, -1));
-    }
-  };
-
-  const handleNext = () => {
-    if (canGoNext) {
-      setSelectedDate(addDays(selectedDate, 1));
-    }
-  };
+  const daysInCurrentMonth = Array.from({ length: new Date(Date.UTC(currentYear, currentMonth + 1, 0)).getUTCDate() }, (_, i) => {
+    const day = i + 1;
+    return `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  });
 
   const handleToday = () => {
     setSelectedDate(today);
   };
-
-  // Month navigation
-  const handlePrevMonth = () => {
-    const current = new Date(selectedDate + 'T00:00:00');
-    const firstOfPrevMonth = new Date(current.getFullYear(), current.getMonth() - 1, 1);
-    const todayDate = new Date(today + 'T00:00:00');
-    if (firstOfPrevMonth < todayDate) {
-      setSelectedDate(today);
-    } else {
-      setSelectedDate(firstOfPrevMonth.toISOString().split('T')[0]);
-    }
-  };
-
-  const handleNextMonth = () => {
-    const current = new Date(selectedDate + 'T00:00:00');
-    const firstOfNextMonth = new Date(current.getFullYear(), current.getMonth() + 1, 1);
-    const maxDateObj = new Date(maxDate + 'T00:00:00');
-    if (firstOfNextMonth > maxDateObj) {
-      setSelectedDate(maxDate);
-    } else {
-      setSelectedDate(firstOfNextMonth.toISOString().split('T')[0]);
-    }
-  };
-
-  const currentMonth = new Date(selectedDate + 'T00:00:00').getMonth();
-  const currentYear = new Date(selectedDate + 'T00:00:00').getFullYear();
-  const todayMonth = new Date(today + 'T00:00:00').getMonth();
-  const todayYear = new Date(today + 'T00:00:00').getFullYear();
-  const canGoPrevMonth = !(currentMonth === todayMonth && currentYear === todayYear);
-  const canGoNextMonth = new Date(currentYear, currentMonth + 1, 1) <= new Date(maxDate + 'T00:00:00');
 
   // Detect desktop breakpoint (md: 768px)
   useEffect(() => {
@@ -216,81 +184,73 @@ export function StudioHourlyCalendar({
         ref={scrollContainerRef}
         className={`flex-1 ${isDesktop ? 'p-4 md:p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent' : 'px-0 pt-0 pb-4'}`}
       >
-        {/* Date navigation */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-white/[0.02] p-2 md:p-3 rounded-2xl border border-white/5">
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <button
-              onClick={handlePrev}
-              disabled={!canGoPrev}
-              className={`p-3 rounded-xl border transition-all flex-shrink-0 ${
-                canGoPrev
-                  ? 'bg-white/[0.05] hover:bg-white/[0.1] border-white/10 hover:border-white/20 text-white active:scale-95'
-                  : 'bg-transparent border-transparent text-white/20 cursor-not-allowed'
-              }`}
-              aria-label="Dia anterior"
+        {/* Date navigation block */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-white/[0.02] p-3 md:p-4 rounded-2xl border border-white/5">
+          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto">
+            {/* Day Dropdown */}
+            <select
+              value={new Date(selectedDate + 'T00:00:00Z').getUTCDate()}
+              onChange={(e) => {
+                const day = e.target.value.padStart(2, '0');
+                const newDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${day}`;
+                setSelectedDate(newDateStr);
+              }}
+              className="flex-1 md:flex-none w-full md:w-auto bg-white/[0.05] border border-white/10 text-white text-sm font-semibold uppercase tracking-wider rounded-xl px-3 md:px-4 py-2.5 outline-none cursor-pointer hover:bg-white/[0.08] transition-colors focus:ring-2 focus:ring-[var(--color-accent)]"
             >
-              <ChevronLeft size={20} />
-            </button>
-            <div className="flex-1 text-center min-w-[200px]">
-              <p className="text-base md:text-xl font-semibold text-white tracking-wide">{formatDatePT(selectedDate)}</p>
-              {selectedDate === today && (
-                <p className="text-xs font-medium text-[var(--color-accent)] mt-0.5 uppercase tracking-widest">Hoje</p>
-              )}
-            </div>
-            <button
-              onClick={handleNext}
-              disabled={!canGoNext}
-              className={`p-3 rounded-xl border transition-all flex-shrink-0 ${
-                canGoNext
-                  ? 'bg-white/[0.05] hover:bg-white/[0.1] border-white/10 hover:border-white/20 text-white active:scale-95'
-                  : 'bg-transparent border-transparent text-white/20 cursor-not-allowed'
-              }`}
-              aria-label="Próximo dia"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+              {daysInCurrentMonth.map(dateStr => {
+                const d = new Date(dateStr + 'T00:00:00Z');
+                const dayNum = d.getUTCDate();
+                const dayName = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][d.getUTCDay()];
+                const isPast = dateStr < today;
+                const isTooFar = dateStr > maxDate;
+                
+                return (
+                  <option key={dateStr} value={dayNum} disabled={isPast || isTooFar} className="bg-black text-white py-1">
+                    {String(dayNum).padStart(2, '0')} — {dayName}
+                  </option>
+                );
+              })}
+            </select>
 
-          {/* Month navigation - responsive */}
-          <div className="flex items-center justify-between md:justify-center gap-2 md:gap-3 w-full md:w-auto px-1 md:px-0">
+            {/* Month Dropdown */}
             <select
               value={`${currentYear}-${currentMonth}`}
               onChange={(e) => {
                 const [y, m] = e.target.value.split('-');
-                const newDate = new Date(Number(y), Number(m), 1);
-                const todayDate = new Date(today + 'T00:00:00');
-                if (newDate < todayDate) {
+                const newDate = new Date(Date.UTC(Number(y), Number(m), 1));
+                const todayDate = new Date(today + 'T00:00:00Z');
+                if (newDate.getUTCMonth() === todayDate.getUTCMonth() && newDate.getUTCFullYear() === todayDate.getUTCFullYear()) {
+                  setSelectedDate(today);
+                } else if (newDate < todayDate) {
                   setSelectedDate(today);
                 } else {
                   setSelectedDate(newDate.toISOString().split('T')[0]);
                 }
               }}
-              className="flex-1 md:flex-none w-full md:w-auto text-center md:text-left bg-white/[0.02] border border-white/10 text-white text-xs font-medium uppercase tracking-wider rounded-lg px-3 py-1.5 outline-none cursor-pointer hover:bg-white/[0.05] transition-colors focus:ring-1 focus:ring-[var(--color-accent)]"
+              className="flex-1 md:flex-none w-full md:w-auto bg-white/[0.05] border border-white/10 text-white text-sm font-semibold uppercase tracking-wider rounded-xl px-3 md:px-4 py-2.5 outline-none cursor-pointer hover:bg-white/[0.08] transition-colors focus:ring-2 focus:ring-[var(--color-accent)]"
             >
               {[...Array(6)].map((_, i) => {
-                const d = new Date(todayYear, todayMonth + i, 1);
+                const d = new Date(Date.UTC(todayYear, todayMonth + i, 1));
                 return (
-                  <option key={i} value={`${d.getFullYear()}-${d.getMonth()}`} className="bg-black text-white py-1">
-                    {MONTHS_PT[d.getMonth()]} {d.getFullYear()}
+                  <option key={i} value={`${d.getUTCFullYear()}-${d.getUTCMonth()}`} className="bg-black text-white py-1">
+                    {MONTHS_PT[d.getUTCMonth()]} {d.getUTCFullYear()}
                   </option>
                 );
               })}
             </select>
           </div>
 
-          {/* Shortcut to today & Legend */}
-          <div className="flex items-center justify-between w-full md:w-auto gap-4 px-2">
+          <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
             {selectedDate !== today && (
               <button
                 onClick={handleToday}
-                className="px-4 py-2 text-xs md:text-sm font-medium rounded-lg bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40 text-[var(--color-accent)] transition-all active:scale-95"
+                className="px-4 py-2.5 text-xs md:text-sm font-medium rounded-xl bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40 text-[var(--color-accent)] transition-all active:scale-95"
               >
                 Ir para Hoje
               </button>
             )}
-
             {/* Desktop Legend inline */}
-            <div className="hidden md:flex flex-wrap items-center gap-4 text-xs font-medium text-white/50 ml-auto bg-black/40 px-4 py-2 rounded-lg border border-white/5">
+            <div className="hidden md:flex items-center gap-4 text-xs font-medium text-white/50 bg-black/40 px-4 py-2.5 rounded-xl border border-white/5">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-sm bg-white/10 border border-white/20" />
                 <span>Livre</span>
@@ -343,8 +303,8 @@ export function StudioHourlyCalendar({
                     const bookingEndM = startM + 60;
 
                     const isOccupied = blocks.some(b => {
-                      const bStart = parseTimeToMinutes(b.start);
-                      const bEnd = parseTimeToMinutes(b.end) + 30; // 30 minutes buffer after observation
+                      const bStart = parseTimeToMinutes(b.start) - 30; // 30 minutes buffer before
+                      const bEnd = parseTimeToMinutes(b.end) + 30; // 30 minutes buffer after
                       return bStart < bookingEndM && bEnd > startM;
                     });
 

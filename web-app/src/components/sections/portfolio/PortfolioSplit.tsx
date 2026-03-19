@@ -496,7 +496,7 @@ export function PortfolioSplit() {
   const isInView = useInView(sectionRef, { once: true, margin: '-50px' });
 
   return (
-    <section ref={sectionRef} className="relative bg-black py-20 md:py-32">
+    <section ref={sectionRef} className="relative bg-black py-20 md:py-32 overflow-hidden">
       {/* Section header */}
       <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-20 relative z-10">
         <motion.div

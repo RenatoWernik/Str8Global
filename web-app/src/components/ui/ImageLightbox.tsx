@@ -75,21 +75,11 @@ export function ImageLightbox({
           transition={{ duration: transitionDuration }}
           onClick={onClose}
         >
-          {/* Close button - absolute positioned */}
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
-            aria-label="Close lightbox"
-            className="absolute top-4 right-4 z-10 p-2 text-white hover:text-white/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
-          >
-            <X size={32} strokeWidth={2} />
-          </button>
-
           {/* Image container with layoutId for morph transition */}
           <motion.div
             layoutId={layoutId}
-            className="relative w-full h-full max-w-7xl max-h-[90vh] mx-auto px-4"
-            onClick={(e) => e.stopPropagation()}
+            className="relative w-full h-full max-w-7xl max-h-[90vh] mx-auto px-4 cursor-pointer"
+            onClick={onClose}
             transition={{
               layout: {
                 duration: transitionDuration,
@@ -108,6 +98,16 @@ export function ImageLightbox({
               />
             </div>
           </motion.div>
+
+          {/* Close button - moved to render after image for highest natural stacking context */}
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            aria-label="Close lightbox"
+            className="absolute top-6 right-4 md:top-8 md:right-8 z-[999] p-3 text-white hover:text-white/70 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black drop-shadow-xl bg-black/40 hover:bg-black/60 rounded-full"
+          >
+            <X size={28} strokeWidth={2.5} />
+          </button>
         </motion.div>
       )}
     </AnimatePresence>
