@@ -16,12 +16,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'weekly',
             priority: 0.9,
         },
-        {
-            url: `${baseUrl}/cursos`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
+        // Temporarily hidden — will be re-enabled in the future
+        // {
+        //     url: `${baseUrl}/cursos`,
+        //     lastModified: new Date(),
+        //     changeFrequency: 'monthly',
+        //     priority: 0.7,
+        // },
         {
             url: `${baseUrl}/espaco`,
             lastModified: new Date(),
