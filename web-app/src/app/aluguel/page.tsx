@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { Clock, Zap } from 'lucide-react';
 import { RentalHero, GearRenting, StudioRenting, CoworkStudio, CoworkStandalone } from '@/components/sections/rental';
 import { type RentalTab } from '@/data/rentalData';
 import { CTASection } from '@/components/sections/CTASection';
@@ -72,6 +73,10 @@ export default function AluguelPage() {
         subtitle={ctaCopy.aluguel.subtitle}
         buttonText={ctaCopy.aluguel.buttonText}
         buttonHref={ctaCopy.aluguel.buttonHref}
+        trustSignals={[
+          { icon: Clock, text: 'Resposta em menos de 24h' },
+          { icon: Zap, text: 'Orçamento gratuito' },
+        ]}
       />
     </main>
   );

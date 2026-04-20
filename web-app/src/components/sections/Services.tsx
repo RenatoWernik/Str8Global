@@ -61,15 +61,17 @@ export function Services() {
                             <HighlightText text={siteCopy.services.title} />
                         </motion.h2>
                     </div>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '100px' }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-white/60 text-lg md:text-xl font-medium max-w-lg mt-6 lg:mt-0 lg:text-right"
-                    >
-                        <HighlightText text={siteCopy.services.subtitle} />
-                    </motion.p>
+                    {siteCopy.services.subtitle && (
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '100px' }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="text-white/60 text-lg md:text-xl font-medium max-w-lg mt-6 lg:mt-0 lg:text-right"
+                        >
+                            <HighlightText text={siteCopy.services.subtitle} />
+                        </motion.p>
+                    )}
                 </div>
 
                 {/* Bento Grid — responsive, always visible */}
@@ -110,6 +112,9 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
         spanClass = 'col-span-1 md:col-span-2 lg:col-span-2';
         isLarge = true;
     }
+
+    // 30% smaller titles for these specific cards — long titles that overflow small cards
+    const isCompactTitle = service.id === '2' || service.id === '3';
 
     return (
         <motion.div
@@ -177,7 +182,14 @@ function ServiceCard({ service, index, isActive, onActivate, onMouseLeave }: Ser
                             <motion.h3
                                 animate={{ color: isActive ? '#ffffff' : 'rgba(255,255,255,0.9)' }}
                                 transition={{ duration: 0.4 }}
-                                className={`font-bold mb-2 md:mb-3 tracking-tight ${isLarge ? 'text-base md:text-xl lg:text-2xl' : 'text-base md:text-lg lg:text-xl'}`}
+                                style={isCompactTitle ? { fontSize: '0.84em' } : undefined}
+                                className={`font-bold mb-2 md:mb-3 tracking-tight ${
+                                    isLarge
+                                        ? 'text-base md:text-xl lg:text-2xl'
+                                        : isCompactTitle
+                                            ? 'text-sm md:text-base lg:text-lg'
+                                            : 'text-sm md:text-base lg:text-lg'
+                                }`}
                             >
                                 {service.title}
                             </motion.h3>

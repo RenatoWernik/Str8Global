@@ -27,22 +27,22 @@ export const comodidadesImages = [
 ];
 
 export const espacoContent = {
-  manifesto: 'Descubra a infraestrutura que transforma as melhores ideias em produções de alto nível.',
+  manifesto: '',
   estudios: {
-    title: 'Estúdios Nível Cinema',
-    subtitle: 'Ambientes desenhados milimetricamente para absorção acústica e iluminação perfeita. O habitat natural das produções premium.',
+    title: 'Estúdios Fotográficos',
+    subtitle: 'Infinity Wall de 40m2.',
   },
   podcast: {
     title: 'Estúdio de Podcast',
-    subtitle: 'O espaço perfeito para produções de áudio e vídeo podcast. Acústica profissional, iluminação controlada e equipamento de ponta.',
+    subtitle: '35m2 equipados com RodeCaster PRO II Bundle.',
   },
   cowork: {
-    title: 'Zonas de Cowork',
-    subtitle: 'Open space sofisticado para equipas dinâmicas. Silêncio quando necessário, colaboração quando exigido. A elite criativa reúne-se aqui.',
+    title: 'Zona de Cowork',
+    subtitle: '100m2 em openspace dedicados para co-work criativo.',
   },
   comodidades: {
-    title: 'O Toque Premium',
-    subtitle: 'Trabalho de excelência exige pausas à altura. Desfrute das nossas zonas de descanso e comodidades preparadas para si.',
+    title: 'Áreas Comuns',
+    subtitle: 'Desfruta das nossas zonas de descanso e comodidades preparadas para ti.',
   },
 };
 

@@ -99,7 +99,7 @@ export const gearItems: GearItem[] = [
   // Objetivas
   { id: 'sony-20mm', name: 'Sony 20mm G f1.8', category: 'objetivas', dailyPrice: 25, image: '/images/gear/sony-20mm.webp' },
   { id: 'sirui-85mm', name: 'Sirui 85mm f1.4', category: 'objetivas', dailyPrice: 45, image: '/images/gear/sirui-85mm.png' },
-  { id: 'samyang-35-150', name: 'Samyang 35-150mm f2-2.8', category: 'objetivas', dailyPrice: 60, image: '/images/gear/samyang-35-150.png' },
+  { id: 'sony-70-200', name: 'Sony 70-200mm f2.8 GMII', category: 'objetivas', dailyPrice: 70, image: '/images/gear/sony-70-200mm.png' },
   { id: 'sigma-17-40', name: 'Sigma 17-40mm f1.8', category: 'objetivas', dailyPrice: 55, image: '/images/gear/sigma-17-40.png' },
 
   // Drone
@@ -257,31 +257,31 @@ export const coworkAmenities = [
 
 export const rentalCopy = {
   hero: {
-    label: 'Aluguer de Equipamento & Estúdios em Lisboa',
-    title: 'Equipamento & Espaço',
+    label: 'Aluguer de equipamento & Estúdios em Lisboa',
+    title: 'Equipamento & Espaços',
     subtitle:
-      'Não compre equipamento que vai ficar numa prateleira. Alugue gear profissional de cinema, estúdios de fotografia totalmente equipados e espaço cowork criativo em Lisboa — tudo sob o mesmo tecto, sem atrito.',
+      'Aluga equipamento profissional, estúdios de fotografia totalmente equipados e espaço cowork criativo em Lisboa.',
   },
   gear: {
     label: 'Aluguer de Equipamento Profissional',
-    title: 'Arsenal de **Elite**',
-    subtitle: 'O mesmo gear que usamos nas produções das maiores marcas em Lisboa e Cascais — agora nas suas mãos. Câmaras, drones, iluminação e áudio de nível profissional. Zero compromissos.',
+    title: '**Equipamento**',
+    subtitle: 'O mesmo equipamento que usamos nas produções das maiores marcas, agora nas tuas mãos. Câmaras, drones, iluminação e áudio de nível profissional.',
   },
   studio: {
     label: 'Aluguer de Estúdios em Lisboa',
-    title: 'Estúdios de Nível **Cinema**',
-    subtitle: 'O seu conteúdo merece um cenário à altura da sua ambição. Estúdios de fotografia e podcast em Lisboa — equipados, calibrados e prontos para produção de alto nível.',
+    title: 'Estúdios **Fotográficos**',
+    subtitle: 'O teu conteúdo merece um cenário à altura da tua ambição. Estúdios de fotografia e Podcast em Lisboa: totalmente equipados, com ou sem apoio e prontos para as tuas produções.',
   },
   coworkStudio: {
-    label: 'Cowork + Estúdio de Produção',
-    title: 'Crie & **Produza**',
+    label: 'Co-work + Estúdios Fotográficos',
+    title: 'Cria & **Produz**',
     subtitle:
-      'Trabalhe no seu negócio e produza conteúdo profissional sem sair do edifício. O ecossistema completo para criadores e marcas que exigem mais do que uma secretária.',
+      'Trabalha no teu negócio e produz conteúdo profissional sem sair do edifício. O ecossistema completo para criadores e marcas.',
   },
   cowork: {
-    label: 'Espaço Cowork Criativo em Lisboa',
-    title: 'O Seu QG **Criativo**',
-    subtitle: 'Mais do que uma mesa — é o ambiente que acelera ideias. Coworking criativo em Lisboa para empreendedores, freelancers e equipas que recusam a mediocridade.',
+    label: 'Espaço Co-work Criativo em Lisboa',
+    title: 'O teu Hub **Criativo**',
+    subtitle: 'Co-working criativo em Lisboa para empreendedores, freelancers e equipas.',
   },
   cta: {
     title: 'O Próximo Passo É **Seu**',

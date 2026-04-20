@@ -24,10 +24,10 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="text-2xl font-bold text-white hover:text-[var(--color-accent)] transition-colors">
-              Str8Global
+              STR8 Global
             </Link>
             <p className="mt-3 text-sm text-white/50 leading-relaxed">
-              Agência de marketing premium a servir Lisboa, Cascais e Grande Lisboa. Estúdio de fotografia, produção de vídeo, podcast e coworking criativo. O ecossistema completo para marcas que querem dominar.
+              Marketing e produção de Lisboa a Cascais. Estúdio de fotografia, vídeo, podcast e coworking. A estrutura que a tua marca precisa para dominar o mercado.
             </p>
           </div>
 

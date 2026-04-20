@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, Clock, Zap } from 'lucide-react';
 import { siteCopy } from '@/data/mockData';
 import { ctaCopy } from '@/data/ctaData';
 import { CTASection } from '@/components/sections/CTASection';
@@ -19,6 +19,10 @@ export function Contact() {
                 subtitle={ctaCopy.home.subtitle}
                 buttonText={ctaCopy.home.buttonText}
                 buttonHref={ctaCopy.home.buttonHref}
+                trustSignals={[
+                    { icon: Clock, text: 'Resposta em menos de 24h' },
+                    { icon: Zap, text: 'Orçamento gratuito' },
+                ]}
             />
 
             {/* Contact cards + footer — dark background */}

@@ -6,10 +6,10 @@ import { CTASection } from '@/components/sections/CTASection';
 import { ctaCopy } from '@/data/ctaData';
 
 const stats = [
-  { value: '500+', label: 'Projectos Entregues' },
-  { value: '120+', label: 'Marcas Aceleradas' },
-  { value: '5+', label: 'Anos de Mercado' },
-  { value: '2', label: 'Fotógrafos de Elite' },
+  { value: '+500', label: 'Projetos Entregues' },
+  { value: '+200', label: 'Marcas' },
+  { value: '+4', label: 'Anos de Mercado' },
+  { value: '2', label: 'Membros' },
 ];
 
 const services = [

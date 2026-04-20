@@ -30,17 +30,19 @@ export function Industries() {
                             <HighlightText text={siteCopy.industries.title} />
                         </h2>
                     </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '50px' }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="flex items-end"
-                    >
-                        <p className="text-white/70 text-lg lg:text-xl max-w-md">
-                            <HighlightText text={siteCopy.industries.subtitle} />
-                        </p>
-                    </motion.div>
+                    {siteCopy.industries.subtitle && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '50px' }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="flex items-end"
+                        >
+                            <p className="text-white/70 text-lg lg:text-xl max-w-md">
+                                <HighlightText text={siteCopy.industries.subtitle} />
+                            </p>
+                        </motion.div>
+                    )}
                 </div>
 
                 {/* Industries - Zig-Zag Layout */}

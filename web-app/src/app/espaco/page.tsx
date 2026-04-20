@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { Clock, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { CTASection } from '@/components/sections/CTASection';
 import { ctaCopy } from '@/data/ctaData';
@@ -10,11 +11,6 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 const Globe = dynamic(
   () => import('@/components/ui/globe').then(mod => ({ default: mod.Globe })),
   { ssr: false, loading: () => <div className="w-full h-full" /> }
-);
-
-const ManifestoSection = dynamic(
-  () => import('@/components/sections/espaco/ManifestoSection').then(mod => ({ default: mod.ManifestoSection })),
-  { ssr: false, loading: () => <div className="py-24" /> }
 );
 
 const EstudiosSection = dynamic(
@@ -71,24 +67,13 @@ export default function EspacoPage() {
         </motion.div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 pointer-events-none w-full">
-          <motion.span
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-[var(--color-accent)] text-sm uppercase tracking-[0.3em] mb-4 block pointer-events-auto"
-          >
-            Ambiente e Estrutura
-          </motion.span>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 pointer-events-auto"
           >
-            O Espaço
-            <span className="text-[var(--color-accent)]">&amp;</span>
-            <br />A Criatividade
+            O <span className="text-[var(--color-accent)]">Nosso</span> Espaço
           </motion.h1>
         </div>
 
@@ -96,7 +81,6 @@ export default function EspacoPage() {
       </section>
 
       {/* 2-5. DYNAMIC SECTIONS */}
-      <ManifestoSection />
       <EstudiosSection />
       <PodcastSection />
       <CoworkSection />
@@ -109,6 +93,10 @@ export default function EspacoPage() {
         subtitle={ctaCopy.espaco.subtitle}
         buttonText={ctaCopy.espaco.buttonText}
         buttonHref={ctaCopy.espaco.buttonHref}
+        trustSignals={[
+          { icon: Clock, text: 'Resposta em menos de 24h' },
+          { icon: Zap, text: 'Orçamento gratuito' },
+        ]}
       />
     </main>
   );

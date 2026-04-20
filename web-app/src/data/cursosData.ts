@@ -52,7 +52,7 @@ export const courses: Course[] = [
     priceLabel: ' (3 meses)',
     tag: 'Programa Flagship',
     description:
-      'O programa intensivo para quem quer **trabalhar com marcas** de forma estratégica, profissional e consistente. Metodologia prática com aplicação __real no mercado__.',
+      'O programa intensivo para quem quer **trabalhar com marcas** de forma estratégica, profissional e consistente. Metodologia prática com aplicação real no mercado.',
     features: [
       'Módulo 0: Introdução ao Programa',
       'Módulo 1: Posicionamento Profissional & Fundamentos',
@@ -73,7 +73,7 @@ export const courses: Course[] = [
     currency: '$',
     tag: 'Mentoria Contínua',
     description:
-      'Acompanhamento **contínuo e personalizado** para te ajudar a crescer como criadora UGC. Como ter uma __personal trainer do digital__.',
+      'Acompanhamento **contínuo e personalizado** para te ajudar a crescer como criadora UGC. Como ter uma personal trainer do digital.',
     features: [
       'Calls mensais de alinhamento estratégico',
       'Feedback contínuo em pitches, funis de venda e conteúdo',
@@ -93,7 +93,7 @@ export const courses: Course[] = [
     tag: 'Sessão 1:1 · BETA',
     beta: true,
     description:
-      'Cria ou renova o teu portfólio com **orientação personalizada**. Trabalha diretamente com uma creator ou brand manager para construir um portfólio que __atrai as marcas certas__.',
+      'Cria ou renova o teu portfólio com **orientação personalizada**. Trabalha diretamente com uma creator ou brand manager para construir um portfólio que atrai as marcas certas.',
     features: [
       'Sessão 1:1 via Google Meet (45-60 min)',
       'Revisão ou criação de portfólio do zero',
@@ -113,7 +113,7 @@ export const courses: Course[] = [
     currency: '$',
     tag: 'Template Digital',
     description:
-      'Prospeção sem stress: o template que te ajuda a ouvir mais __"sim"__. Organização e estratégia para **poupar tempo e fechar deals**.',
+      'Prospeção sem stress: o template que te ajuda a ouvir mais "sim". Organização e estratégia para **poupar tempo e fechar deals**.',
     features: [
       'Sistema CRM para organizar contactos e oportunidades',
       'Tracking de KPIs para medir resultados',
@@ -134,7 +134,7 @@ export const courses: Course[] = [
     tag: 'Relatório Detalhado · BETA',
     beta: true,
     description:
-      'Análise detalhada do teu portfólio com a perspetiva de uma **creator UGC experiente** e brand manager. Descobre o que te impede de __atrair parcerias com marcas__.',
+      'Análise detalhada do teu portfólio com a perspetiva de uma **creator UGC experiente** e brand manager. Descobre o que te impede de atrair parcerias com marcas.',
     features: [
       'Relatório completo com recomendações personalizadas',
       'Análise de estrutura, copywriting e direção estratégica',
@@ -155,7 +155,7 @@ export const courses: Course[] = [
     free: true,
     tag: 'Call Gratuita',
     description:
-      'Uma sessão de coaching privada de **15 minutos**. Recebe conselhos específicos para a tua marca, um plano claro para a tua __estratégia de conteúdo UGC__ e respostas a todas as tuas dúvidas.',
+      'Uma sessão de coaching privada de **15 minutos**. Recebe conselhos específicos para a tua marca, um plano claro para a tua estratégia de conteúdo UGC e respostas a todas as tuas dúvidas.',
     features: [
       'Conselhos específicos para a tua marca e objetivos',
       'Plano claro para a tua estratégia de conteúdo',
@@ -174,7 +174,7 @@ export const courses: Course[] = [
     free: true,
     tag: 'Newsletter Gratuita',
     description:
-      'A **primeira newsletter** para Criadores UGC/CGC, Estrategistas e Gestores de Redes. Conteúdo exclusivo sobre __marketing, media e social media__ diretamente no teu email.',
+      'A **primeira newsletter** para Criadores UGC/CGC, Estrategistas e Gestores de Redes. Conteúdo exclusivo sobre marketing, media e social media diretamente no teu email.',
     features: [
       'Conteúdo exclusivo sobre UGC e CGC',
       'Estratégias de marketing e social media',
@@ -198,19 +198,19 @@ export const cursosCopy: CursosCopy = {
     label: 'Programa Flagship',
     title: 'Creator Lab',
     subtitle:
-      'O programa **intensivo** para quem quer trabalhar com marcas de forma __estratégica, profissional e consistente__. Não é teoria — é metodologia prática com aplicação real no mercado.',
+      'O programa **intensivo** para quem quer trabalhar com marcas de forma estratégica, profissional e consistente. Não é teoria — é metodologia prática com aplicação real no mercado.',
   },
   grid: {
     label: 'Mais Formações',
     title: 'Encontra o Formato\nCerto Para Ti',
     subtitle:
-      'Desde mentoria **contínua** a sessões rápidas — há sempre uma forma de __acelerar__ o teu crescimento.',
+      'Desde mentoria **contínua** a sessões rápidas — há sempre uma forma de acelerar o teu crescimento.',
   },
   whyLearn: {
     label: 'Porque Aprender Connosco',
     title: 'Resultados Reais,\nNão Promessas Vazias',
     subtitle:
-      'A Marta d\'Oliveira já formou dezenas de creators que hoje trabalham com **marcas de referência**. Não é teoria — é __experiência real__ do mercado português e internacional.',
+      'A Marta d\'Oliveira já formou dezenas de creators que hoje trabalham com **marcas de referência**. Não é teoria — é experiência real do mercado português e internacional.',
     stats: [
       { value: 50, suffix: '+', label: 'Creators Formados' },
       { value: 200, suffix: '+', label: 'Marcas Parceiras' },

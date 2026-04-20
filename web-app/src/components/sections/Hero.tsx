@@ -14,7 +14,7 @@ const Globe = dynamic(
     { ssr: false, loading: () => <div className="w-full h-full" /> }
 );
 
-const STATIC_TEXT = 'A Sua Marca Merece';
+const STATIC_TEXT = 'A Tua Marca Merece';
 const TYPING_SPEED = 80;
 const STATIC_TYPING_DELAY = 1700;
 

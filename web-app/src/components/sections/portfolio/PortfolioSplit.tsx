@@ -28,9 +28,9 @@ interface PhotographerData {
 const photographers: [PhotographerData, PhotographerData] = [
   {
     name: 'Igor',
-    role: 'O Arquitecto Visual',
+    role: 'Videógrafo & Fotógrafo Profissional',
     description:
-      'O olhar cirúrgico por trás das câmaras. Quando o Igor aponta a lente, cada frame é uma decisão estratégica — não um acaso. Especialista em fotografia desportiva, produção de vídeo cinematográfico e operações aéreas com drone em Lisboa e Cascais. Objectivo, implacável e obcecado com a imagem que fecha negócios.',
+      'Fotografia, vídeo e drone. O Igor domina a parte técnica para garantir que cada imagem tem o peso que o mercado exige. Direto e sem falhas.',
     specialties: ['Desporto', 'Vídeo', 'Drone', 'Documental'],
     profileImage: '/images/portfolio/igor/Capa.jpg',
     portfolio: [
@@ -52,10 +52,10 @@ const photographers: [PhotographerData, PhotographerData] = [
     instagram: '#',
   },
   {
-    name: 'Marta Oliveira',
-    role: 'A Estrategista Criativa',
+    name: 'Marta',
+    role: 'Estrategista & Criadora de Conteúdos',
     description:
-      'A mente que transforma conceitos em conteúdo que domina feeds. Direcção de arte, estratégia visual e produção para marcas que recusam o medíocre. Cada sessão é uma operação de posicionamento — com a energia, o olhar e a atenção ao detalhe que separa o profissional do amador.',
+      'A Marta não gere conteúdos, define o domínio deles. O seu trabalho é garantir que a tua marca deixa de ser apenas mais uma.',
     specialties: ['Estratégia Visual', 'Conteúdo para Marcas', 'Direcção de Arte'],
     profileImage: '/images/portfolio/marta/capa.jpg',
     portfolio: [
@@ -513,8 +513,7 @@ export function PortfolioSplit() {
             <span className="text-[var(--color-accent)]">Uma</span>{' '}Visão.
           </h2>
           <p className="text-white/70 text-sm md:text-base max-w-md mx-auto">
-            Desliza para explorar o portfólio de cada fotógrafo. Um executa, a outra arquitecta.
-            Juntos, constroem a percepção que a sua marca merece.
+            Faz match com o nosso conteúdo!
           </p>
         </motion.div>
       </div>

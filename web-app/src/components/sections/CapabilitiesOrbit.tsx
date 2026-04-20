@@ -23,14 +23,14 @@ interface Capability {
 }
 
 const capabilitiesData: Capability[] = [
-    { title: 'Estratégia de Marca', description: 'Engenharia de posicionamento que transforma percepção em domínio de mercado.', icon: Target },
-    { title: 'Identidade Visual', description: 'Sistemas visuais premium que comunicam estatuto antes da primeira palavra.', icon: Palette },
-    { title: 'Fotografia Profissional', description: 'Imagens de estúdio que elevam produtos e marcas a objectos de desejo.', icon: Camera },
-    { title: 'Produção Cinematográfica', description: 'Narrativas em vídeo com qualidade de cinema que prendem e convertem.', icon: Video },
-    { title: 'Estúdio de Podcast', description: 'Gravação broadcast-ready para quem quer ser a voz do seu sector.', icon: Mic },
+    { title: 'Estratégia de Redes Sociais', description: 'Planeamos o caminho para que a tua marca seja referência no mercado.', icon: Target },
+    { title: 'Identidade Visual', description: 'Damos à tua marca o peso que o mercado exige.', icon: Palette },
+    { title: 'Fotografia Profissional', description: 'Fotografia de produto que valida o teu preço.', icon: Camera },
+    { title: 'Produção Publicitária', description: 'Planeamos, gravamos e editamos. No nosso estúdio ou na rua!', icon: Video },
+    { title: 'Estúdio de Podcast', description: 'O espaço e o equipamento para o teu projeto ser ouvido com o padrão que o mercado exige.', icon: Mic },
     { title: 'Direcção Artística', description: 'Visão criativa que unifica cada peça numa linguagem visual coerente.', icon: Plane },
-    { title: 'Marketing Digital', description: 'Campanhas de performance com ROI mensurável em Lisboa e Cascais.', icon: BarChart3 },
-    { title: 'Redes Sociais', description: 'Gestão cirúrgica de feeds que transforma seguidores em clientes.', icon: Share2 },
+    { title: 'Marketing de Conteúdo', description: 'Criamos o conteúdo que coloca a tua marca na conversa e garante que és a única referência que importa no ecrã.', icon: BarChart3 },
+    { title: 'Redes Sociais', description: 'Gerimos o teu posicionamento para que a tua marca se destaque e passe a dominar o feed.', icon: Share2 },
 ];
 
 // Orbital positions for 8 nodes (evenly spaced around a circle)
