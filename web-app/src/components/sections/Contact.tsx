@@ -3,9 +3,9 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Clock, Zap } from 'lucide-react';
-import { siteCopy } from '@/data/mockData';
 import { ctaCopy } from '@/data/ctaData';
 import { CTASection } from '@/components/sections/CTASection';
+import { socialLinks } from '@/data/navigationData';
 
 export function Contact() {
     const sectionRef = useRef<HTMLElement>(null);
@@ -110,11 +110,19 @@ export function Contact() {
                     <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/30">
                         <div>&copy; {new Date().getFullYear()} Str8Global. Todos os direitos reservados.</div>
                         <div className="flex gap-8">
-                            {siteCopy.social.map((platform) => (
-                                <a key={platform} href="#" className="hover:text-[var(--color-accent)] transition-colors duration-300">
-                                    {platform}
-                                </a>
-                            ))}
+                            {socialLinks
+                                .filter(s => ['instagram', 'linkedin', 'behance', 'vimeo'].includes(s.id))
+                                .map((social) => (
+                                    <a
+                                        key={social.id}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-[var(--color-accent)] transition-colors duration-300"
+                                    >
+                                        {social.label}
+                                    </a>
+                                ))}
                         </div>
                     </div>
                 </div>

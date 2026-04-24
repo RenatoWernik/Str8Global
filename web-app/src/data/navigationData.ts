@@ -31,12 +31,6 @@ export const mainNav: NavItem[] = [
   // { id: 'cursos', label: 'Cursos', href: '/cursos' },
 ];
 
-// Footer navigation (main + contact anchor)
-export const footerNav: NavItem[] = [
-  ...mainNav,
-  { id: 'contacto', label: 'Contacto', href: '/#contacto' },
-];
-
 // Social links
 export const socialLinks: SocialLink[] = [
   { id: 'instagram', label: 'Instagram', href: 'https://instagram.com/str8global.co', handle: '@str8global.co' },

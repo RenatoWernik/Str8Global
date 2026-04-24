@@ -25,14 +25,6 @@ export const ctaCopy = {
         buttonText: 'Reservar agora',
         buttonHref: '',
     },
-    servicos: {
-        badge: 'Consultoria inicial gratuita',
-        headline: 'O Ecossistema Que Faltava\nà Sua **Marca**',
-        subtitle:
-            'Estratégia de marketing, fotografia premium, produção de vídeo cinematográfico, estúdio de podcast e gestão de redes sociais — tudo num só **ecossistema** a servir Lisboa e Cascais. O atrito acaba aqui.',
-        buttonText: 'Falar Com a Equipa',
-        buttonHref: '',
-    },
     cursos: {
         badge: 'Turmas com vagas limitadas',
         headline: 'Aprenda Com Quem\n**Faz a Diferença**',
