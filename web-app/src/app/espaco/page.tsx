@@ -59,7 +59,7 @@ export default function EspacoPage() {
           style={{ y: backgroundY }}
         >
           <div className="absolute inset-x-0 top-[25%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
-            <div className="relative w-[100%] sm:w-[120%] md:w-[200%] max-w-[600px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+            <div className="relative w-[92%] sm:w-full md:w-[200%] max-w-[420px] sm:max-w-[600px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
               <Globe className="opacity-100" />
             </div>
           </div>

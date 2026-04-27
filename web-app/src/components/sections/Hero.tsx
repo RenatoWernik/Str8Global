@@ -104,8 +104,8 @@ export function Hero() {
         <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-[#050507] py-20 md:py-0">
             {/* Globe Background */}
             <div className="absolute inset-x-0 -top-20 -bottom-20 z-0 overflow-hidden flex flex-col justify-center items-center">
-                <div className="absolute inset-x-0 top-[40%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
-                    <div className="relative w-[120%] sm:w-[180%] md:w-[200%] max-w-[800px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
+                <div className="absolute inset-x-0 top-[18%] sm:top-[28%] md:top-[30%] lg:top-[25%] z-0 flex justify-center items-start pointer-events-none">
+                    <div className="relative w-[92%] sm:w-[180%] md:w-[200%] max-w-[420px] sm:max-w-[800px] md:max-w-[2000px] lg:max-w-[2500px] aspect-square pointer-events-auto opacity-100">
                         <Globe className="opacity-100" />
                     </div>
                 </div>

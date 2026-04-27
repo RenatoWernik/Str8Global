@@ -64,6 +64,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Mobile-only: harden horizontal-scroll containment.
+   `overflow-x: clip` works around iOS Safari's known bug where
+   `overflow-x: hidden` on body alone is unreliable when descendants
+   use absolute positioning or transforms. */
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+}
+
 /* ==============================
    Typography (public site only)
    Scoped: public site headings use giant clamp sizes
