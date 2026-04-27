@@ -42,12 +42,10 @@ export function Globe({
     config?: any;
 }) {
     const phiRef = useRef(0);
-    const widthRef = useRef(0);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const pointerInteracting = useRef<number | null>(null);
     const pointerInteractionMovement = useRef(0);
-    const resizeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
     const isVisibleRef = useRef(true);
     const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null);
 
@@ -85,8 +83,16 @@ export function Globe({
                 phiRef.current += 0.005;
             }
             state.phi = phiRef.current + r.get();
-            state.width = widthRef.current;
-            state.height = widthRef.current;
+            // Use canvas.width (pixel-buffer = clientWidth * dpr, set by phenomenon)
+            // so the shader's resolution uniform `w` matches gl_FragCoord exactly.
+            // Passing widthRef in CSS-px while gl_FragCoord runs in pixel-buffer
+            // units mis-centers the sphere when dpr ≠ 1 (the off-center top-right
+            // crop seen on mobile where dpr is 0.75).
+            const c = canvasRef.current;
+            if (c && c.width && c.height) {
+                state.width = c.width;
+                state.height = c.height;
+            }
         },
         [r],
     );
@@ -108,46 +114,56 @@ export function Globe({
     }, []);
 
     useEffect(() => {
-        // Debounced resize handler
-        const onResize = () => {
-            clearTimeout(resizeTimerRef.current);
-            resizeTimerRef.current = setTimeout(() => {
-                if (canvasRef.current) {
-                    widthRef.current = canvasRef.current.offsetWidth;
-                }
-            }, 150);
-        };
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        window.addEventListener("resize", onResize, { passive: true });
+        let globe: ReturnType<typeof createGlobe> | null = null;
+        let initialized = false;
 
-        if (canvasRef.current) {
-            widthRef.current = canvasRef.current.offsetWidth;
-        }
-        const initWidth = widthRef.current || 600;
-
-        // Reduce quality on mobile for better performance
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const dpr = isMobile ? 0.75 : 1;
         const mobileOverrides = isMobile ? { mapSamples: 800, devicePixelRatio: 0.75 } : {};
 
-        const globe = createGlobe(canvasRef.current!, {
-            ...config,
-            ...mobileOverrides,
-            width: initWidth,
-            height: initWidth,
-            onRender,
-        });
-        globeRef.current = globe;
+        const init = (cssWidth: number) => {
+            if (initialized) return;
+            initialized = true;
 
-        setTimeout(() => {
-            if (canvasRef.current) canvasRef.current.style.opacity = "1";
+            // Pass the dpr-multiplied buffer size as cobe's `width`/`height`.
+            // phenomenon will set canvas.width = clientWidth * dpr, so seeding the
+            // shader's resolution uniform with the same value guarantees a centered
+            // sphere from the very first frame (no upper-right crop on mobile).
+            const bufferSize = Math.round(cssWidth * dpr);
+
+            globe = createGlobe(canvas, {
+                ...config,
+                ...mobileOverrides,
+                width: bufferSize,
+                height: bufferSize,
+                onRender,
+            });
+            globeRef.current = globe;
+
+            requestAnimationFrame(() => {
+                if (canvas) canvas.style.opacity = "1";
+            });
+        };
+
+        // ResizeObserver defers cobe init until the canvas has a measurable
+        // non-zero width. This eliminates the layout-race that previously made
+        // offsetWidth read 0 on fast mobile loads (which then fell back to 600
+        // and produced the off-center / cropped globe).
+        const ro = new ResizeObserver(() => {
+            const w = canvas.clientWidth;
+            if (w > 0) init(w);
         });
+        ro.observe(canvas);
 
         return () => {
-            globe.destroy();
+            ro.disconnect();
+            globe?.destroy();
             globeRef.current = null;
-            window.removeEventListener("resize", onResize);
-            clearTimeout(resizeTimerRef.current);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
