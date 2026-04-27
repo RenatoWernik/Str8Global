@@ -114,22 +114,61 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showContactOptions, setShowContactOptions] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const lenis = useLenis();
+  const lastScrollYRef = useRef(0);
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Scroll detection — throttled with RAF
+  // Track mobile breakpoint (smart hide/show is mobile-only)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Scroll detection — RAF-throttled. Tracks scroll progress (isScrolled) AND
+  // direction-based visibility (isHidden) for the mobile adaptive header.
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 100);
-          ticking = false;
-        });
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        setIsScrolled(currentY > 100);
+
+        // 4px threshold to ignore touch jitter / iOS bounce
+        const deltaY = currentY - lastScrollYRef.current;
+        if (Math.abs(deltaY) > 4) {
+          if (deltaY > 0 && currentY > 100) {
+            // scrolling down past the hero entry: hide
+            setIsHidden(true);
+          } else if (deltaY < 0) {
+            // scrolling up: show immediately
+            setIsHidden(false);
+          }
+          lastScrollYRef.current = currentY;
+        }
+
+        // user paused scrolling → reveal after 1500ms of inactivity.
+        // Tuned long enough to span typical gaps between consecutive touch
+        // gestures (200-1000ms) so the navbar doesn't flash in/out between
+        // momentum bursts, but short enough to feel responsive after a
+        // genuine pause.
+        if (showTimerRef.current) clearTimeout(showTimerRef.current);
+        showTimerRef.current = setTimeout(() => setIsHidden(false), 1500);
+
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (showTimerRef.current) clearTimeout(showTimerRef.current);
+    };
   }, []);
 
   // Lock body scroll when mobile menu is open
@@ -174,18 +213,24 @@ export function Navbar() {
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
           isScrolled
-            ? 'bg-transparent md:bg-black/90 md:backdrop-blur-sm md:border-b md:border-white/5'
+            ? 'bg-black/90 backdrop-blur-sm border-b border-white/5'
             : 'bg-transparent'
         }`}
         initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        animate={{ y: isMobile && isHidden ? -100 : 0 }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       >
         <div className="max-w-[1400px] mx-auto px-6 md:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link
               href="/"
+              onClick={(e) => {
+                if (pathname === '/') {
+                  e.preventDefault();
+                  scrollToTop();
+                }
+              }}
               className="relative z-10 text-xl font-bold tracking-tight text-white hover:text-[var(--color-accent)] transition-colors duration-300"
             >
               Str8Global
